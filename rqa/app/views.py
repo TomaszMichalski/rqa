@@ -22,12 +22,13 @@ def analysis_generate(request):
 def analysis_chart(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
+        address = form.cleaned_data.get('address')
         date_from = form.cleaned_data.get('date_from')
         date_to = form.cleaned_data.get('date_to')
         is_pm1 = form.cleaned_data.get('is_pm1')
         is_pm25 = form.cleaned_data.get('is_pm25')
         is_pm10 = form.cleaned_data.get('is_pm10')
-        generation_parameters = models.GenerationParameters(date_from, date_to, is_pm1, is_pm25, is_pm10)
+        generation_parameters = models.GenerationParameters(address, date_from, date_to, is_pm1, is_pm25, is_pm10)
     return render(request, 'app/analysis_chart.html', { 'data': generation_parameters })
 
 def prediction_generate(request):
@@ -38,11 +39,12 @@ def prediction_generate(request):
 def prediction_chart(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
+        address = form.cleaned_data.get('address')
         date_from = form.cleaned_data.get('date_from')
         date_to = form.cleaned_data.get('date_to')
         is_pm1 = form.cleaned_data.get('is_pm1')
         is_pm25 = form.cleaned_data.get('is_pm25')
         is_pm10 = form.cleaned_data.get('is_pm10')
-        generation_parameters = models.GenerationParameters(date_from, date_to, is_pm1, is_pm25, is_pm10)
+        generation_parameters = models.GenerationParameters(address, date_from, date_to, is_pm1, is_pm25, is_pm10)
 
     return render(request, 'app/prediction_chart.html', { 'data': generation_parameters })
