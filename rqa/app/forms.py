@@ -4,6 +4,7 @@ from datetime import datetime
 
 class GenerateForm(forms.Form):
     address = forms.CharField(label='Adres')
+    radius = forms.CharField(label='Promień (km)')
     date_from = forms.DateTimeField(label='Od')
     date_to = forms.DateTimeField(label='Do')
     is_pm1 = forms.BooleanField(label='PM1', required=False, initial=True)
