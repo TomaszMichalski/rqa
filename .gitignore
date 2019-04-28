@@ -1,2 +1,5 @@
 rqa/rqa/__pycache__/
 rqa/app/__pycache__/
+*pycache*
+*.idea*
+*venv*
