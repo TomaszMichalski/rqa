@@ -1,6 +1,6 @@
 from django.db import models
 
-class AnalysisParameters():
+class GenerationParameters():
     def __init__(self, date_from, date_to, is_pm1, is_pm25, is_pm10):
         self.date_from = date_from
         self.date_to = date_to

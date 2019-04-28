@@ -1,11 +1,8 @@
 from django import forms
 from . import models
 from datetime import datetime
-import logging
 
-logger = logging.getLogger(__name__)
-
-class AnalysisGenerateForm(forms.Form):
+class GenerateForm(forms.Form):
     date_from = forms.DateTimeField(label='Od')
     date_to = forms.DateTimeField(label='Do')
     is_pm1 = forms.BooleanField(label='PM1', required=False)
