@@ -28,3 +28,10 @@ def geo_location_distance(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
     return earth_radius * c
+
+def get_installations_within_area(lat, lon, radius):
+    # TODO
+    #get installations from db-service into Installation objects
+    #filter for get_location_distance < radius
+    #return the result list
+    return []

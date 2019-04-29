@@ -12,3 +12,12 @@ class GenerationParameters():
 
     def __str__(self):
         return "[address: %s, radius: %s, date_from: %s, date_to: %s, is_pm1: %s, is_pm25: %s, is_pm10: %s]" % (self.address, self.radius, self.date_from, self.date_to, self.is_pm1, self.is_pm25, self.is_pm10)
+
+class Installation():
+    def __init__(self, id, lon, lat):
+        self.id = id
+        self.lon = lon
+        self.lat = lat
+
+    def __str__(self):
+        return "[id: %f, lon: %f, lat: %f]" % (self.id, self.lon, self.lat)
