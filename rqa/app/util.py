@@ -1,5 +1,6 @@
 from . import models
 from math import pi, sqrt, sin, cos, atan2
+import requests
 
 def create_generation_parameters(form):
     address = form.cleaned_data.get('address')
@@ -16,10 +17,11 @@ def create_generation_parameters(form):
     is_clouds = form.cleaned_data.get('is_clouds')
     return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
 
+# Measure distance between two locations - START
+
 def deg_to_rad(deg):
     return deg * math.pi / 180
 
-# Haversine formula
 def geo_location_distance(lat1, lon1, lat2, lon2):
     earth_radius = 6371
 
@@ -33,6 +35,33 @@ def geo_location_distance(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
     return earth_radius * c
+
+# Measure distance between two locations - END
+
+# Get location based on address - START
+api_token = '43cf3f75156b90'
+api_base_url = 'https://eu1.locationiq.com/v1/search.php'
+
+def get_geo_location(address):
+    data = {
+        'key': api_token,
+        'q': address,
+        'format': 'json'
+    }
+
+    response = requests.get(api_base_url, params=data)
+    if response.status_code == 200:
+        json_response = json.loads(response.content.decode('utf-8'))
+        if json_response["error"] is None:
+            lat = json_response[0]["lat"]
+            lon = json_response[0]["lon"]
+            return lat, lon
+        else:
+            return None
+    else:
+        return None
+
+# Get location based on address - END
 
 def get_installations_within_area(lat, lon, radius):
     # TODO
