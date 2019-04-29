@@ -9,7 +9,12 @@ def create_generation_parameters(form):
     is_pm1 = form.cleaned_data.get('is_pm1')
     is_pm25 = form.cleaned_data.get('is_pm25')
     is_pm10 = form.cleaned_data.get('is_pm10')
-    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10)
+    is_temp = form.cleaned_data.get('is_temp')
+    is_pressure = form.cleaned_data.get('is_pressure')
+    is_humidity = form.cleaned_data.get('is_humidity')
+    is_wind = form.cleaned_data.get('is_wind')
+    is_clouds = form.cleaned_data.get('is_clouds')
+    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
 
 def deg_to_rad(deg):
     return deg * math.pi / 180
