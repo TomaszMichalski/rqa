@@ -1,10 +1,12 @@
 from . import models
 from math import pi, sqrt, sin, cos, atan2
 import requests
+import datetime
+import json
 
 def create_generation_parameters(form):
     address = form.cleaned_data.get('address')
-    radius = form.cleaned_data.get('radius')
+    radius = int(form.cleaned_data.get('radius'))
     date_from = form.cleaned_data.get('date_from')
     date_to = form.cleaned_data.get('date_to')
     is_pm1 = form.cleaned_data.get('is_pm1')
@@ -52,9 +54,9 @@ def get_geo_location(address):
     response = requests.get(api_base_url, params=data)
     if response.status_code == 200:
         json_response = json.loads(response.content.decode('utf-8'))
-        if json_response["error"] is None:
-            lat = json_response[0]["lat"]
-            lon = json_response[0]["lon"]
+        if isinstance(json_response, list):
+            lat = json_response[0]['lat']
+            lon = json_response[0]['lon']
             return lat, lon
         else:
             return None
@@ -62,10 +64,3 @@ def get_geo_location(address):
         return None
 
 # Get location based on address - END
-
-def get_installations_within_area(lat, lon, radius):
-    # TODO
-    #get installations from db-service into Installation objects
-    #filter for get_location_distance < radius
-    #return the result list
-    return []

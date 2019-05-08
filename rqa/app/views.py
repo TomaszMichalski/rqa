@@ -2,6 +2,7 @@ from django.shortcuts import render
 from . import forms
 from . import models
 from . import util
+from . import db
 
 def home(request):
     return render(request, 'app/home.html')
@@ -24,8 +25,11 @@ def analysis_chart(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
+        data = db.get_analysis_data(generation_parameters)
+
+        return render(request, 'app/analysis_chart.html', { 'data': data })
         
-    return render(request, 'app/analysis_chart.html', { 'data': generation_parameters })
+    return render(request, 'app/analysis_generate.html', { 'form': form })
 
 def prediction_generate(request):
     form = forms.GenerateForm()
