@@ -1,5 +1,6 @@
 from . import models
 from . import util
+from . import consts
 
 def get_installations_within_area(lat, lon, radius):
     # TODO
@@ -33,6 +34,13 @@ def get_analysis_data(parameters):
         data['wind_degree'] = get_weather_data(installations, parameters.date_from, parameters.date_to, 'wind_degree')
     if parameters.is_clouds:
         data['clouds'] = get_weather_data(installations, parameters.date_from, parameters.date_to, 'clouds')
+    # fill information data
+    data['info'] = []
+    data['info'].append('Analysis based on {} installation(s) in given area.'.format(len(installations)))
+    if len(installations) < consts.INSTALLATIONS_WARNING_NUM:
+        data['info'].append('Analysis may be inaccurate due to low installations number in area.')
+    if installation_weight(installations, lat, lon, parameters.radius) < consts.INSTALLATIONS_WARNING_WEIGHT:
+        data['info'].append('Analysis may be inaccurate due to installations being far from area center.')
 
     return data
 
@@ -60,3 +68,12 @@ def data_average(installation_data, center_lat, center_lon, radius):
         sum_w = sum_w + w
 
     return sum_w_data / sum_w
+
+def installation_weight(installations, center_lat, center_lon, radius):
+    sum_w = 0
+    for i in installations:
+        distance = geo_location_distance(center_lat, center_lon, installation.lat, installation.lon)
+        w = (radius - distance) / radius
+        sum_w = sum_w + w
+
+    return sum_w
