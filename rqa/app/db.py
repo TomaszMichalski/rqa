@@ -52,7 +52,7 @@ def get_weather_data(installations, date_from, date_to, column):
 
 def data_average(installation_data, center_lat, center_lon, radius):
     sum_w_data = 0
-    sum_w
+    sum_w = 0
     for installation, data in installation_data:
         distance = geo_location_distance(center_lat, center_lon, installation.lat, installation.lon)
         w = (radius - distance) / radius
