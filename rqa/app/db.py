@@ -41,6 +41,9 @@ def get_analysis_data(parameters):
         data['info'].append('Analysis may be inaccurate due to low installations number in area.')
     if installation_weight(installations, lat, lon, parameters.radius) < consts.INSTALLATIONS_WARNING_WEIGHT:
         data['info'].append('Analysis may be inaccurate due to installations being far from area center.')
+    # fill WHO norms for PM25 and PM10
+    data['pm25_norm'] = consts.PM25_WHO_NORM
+    data['pm10_norm'] = consts.PM10_WHO_NORM
 
     return data
 
