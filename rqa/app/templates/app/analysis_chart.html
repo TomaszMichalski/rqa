@@ -24,10 +24,13 @@
               <div class="col-sm-3">
                 <div id="side-panel">
                     <div id="description" class="row">
-                        Description placeholder
+                        <h4>Analysis information</h4>
+                        {% for info_line in data.info %}
+                            <li>{{ info_line }}</li>
+                        {% endfor %}
                     </div>
                     <!-- delete these br's later -->
-                    <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                    <br /><br /><br /><br /><br /><br /><br /><br /><br />
                     <div id="buttons" class="row">
                         <a href={% url 'analysis_generate' %} class="btn btn-primary btn-block" role="button">Generate for...</a>
                         <br />
