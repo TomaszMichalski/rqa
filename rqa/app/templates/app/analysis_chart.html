@@ -58,8 +58,86 @@
 
 <script type="text/javascript">
     var data = JSON.parse('{{ data | escapejs }}');
-    console.log(data);
 
+    /* PM1 */
+    var pm1 = new Chart(document.getElementById('pm1'), {
+        type: 'line',
+        data: {
+
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'PM1'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'PM1 (\xB5g/m\xB3)'
+                    },
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    })
+
+    /* PM25 */
+    var pm25 = new Chart(document.getElementById('pm25'), {
+        type: 'line',
+        data: {
+
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'PM2.5'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true
+            },
+            annotation: {
+                annotations: [{
+                    type: 'line',
+                    mode: 'horizontal',
+                    scaleID: 'y-axis-0',
+                    value: data.pm25_norm,
+                    borderColor: 'rgb(255, 0, 0)',
+                    borderWidth: 2,
+                    label: {
+                        enabled: false,
+                        content: 'Norm',
+                        position: 'right'
+                    }
+                }]
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'PM2.5 (\xB5g/m\xB3)',
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    },
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    })
+
+    /* PM10 */
     var pm10 = new Chart(document.getElementById('pm10'), {
         type: 'line',
         data: {
@@ -82,10 +160,195 @@
                     scaleID: 'y-axis-0',
                     value: data.pm10_norm,
                     borderColor: 'rgb(255, 0, 0)',
-                    borderWidth: 4,
+                    borderWidth: 2,
                     label: {
                         enabled: false,
-                        content: 'Norm'
+                        content: 'Norm',
+                        position: 'right'
+                    }
+                }]
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'PM10 (\xB5g/m\xB3)'
+                    },
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    })
+
+    /* TEMPERATURE */
+    var temp = new Chart(document.getElementById('temp'), {
+        type: 'line',
+        data: {
+
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Temperature'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Temperature (\xB0C)'
+                    }
+                }]
+            }
+        }
+    })
+
+    /* PRESSURE */
+    var pressure = new Chart(document.getElementById('pressure'), {
+        type: 'line',
+        data: {
+
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Pressure'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Pressure (hPa)'
+                    }
+                }]
+            }
+        }
+    })
+
+    /* HUMIDITY */
+    var humidity = new Chart(document.getElementById('humidity'), {
+        type: 'line',
+        data: {
+
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Humidity'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: '% of humidity'
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }]
+            }
+        }
+    })
+
+    /* WIND SPEED */
+    var wind_speed = new Chart(document.getElementById('wind_speed'), {
+        type: 'line',
+        data: {
+
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Wind speed'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Speed (m/s)'
+                    },
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    })
+
+    /* WIND DIRECTION */
+    var wind_degree = new Chart(document.getElementById('wind_degree'), {
+        type: 'line',
+        data: {
+
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Wind direction'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true
+            },
+            scales:{
+                xAxes: [{
+                    display: false
+                }],
+                yAxes: [{
+                    display: false
+                }]
+            }
+        }
+    })
+
+    /* CLOUDS */
+    var clouds = new Chart(document.getElementById('clouds'), {
+        type: 'bar',
+        data: {
+
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Clouds'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: '% of cloudiness'
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        max: 100
                     }
                 }]
             }
