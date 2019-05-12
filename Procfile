@@ -1,1 +1,1 @@
-web: gunicorn rqa.rqa.rqa.wsgi
+web: gunicorn rqa.rqa.wsgi
