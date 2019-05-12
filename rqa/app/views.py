@@ -27,10 +27,9 @@ def analysis_chart(request):
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
         data = db.get_analysis_data(generation_parameters)
-        info = data['info']
         data = json.dumps(data)
 
-        return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
+        return render(request, 'app/analysis_chart.html', { 'data': data })
         
     return render(request, 'app/analysis_generate.html', { 'form': form })
 
