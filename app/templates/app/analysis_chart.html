@@ -18,13 +18,11 @@
           <div class="row">
               <div class="col-sm-9">
                 <div id="chart">
-                    Chart placeholder <br />
-                    {{ data }}
-                    <canvas id="pm1" width="800" height="150"></canvas>
-                    <canvas id="pm25" width="800" height="150"></canvas>
-                    <canvas id="pm10" width="800" height="150"></canvas>
-                    <canvas id="temp" width="800" height="150"></canvas>
-                    <canvas id="pressure" width="800" height="150"></canvas>
+                    <canvas id="pm1" width="800" height="200"></canvas>
+                    <canvas id="pm25" width="800" height="200"></canvas>
+                    <canvas id="pm10" width="800" height="200"></canvas>
+                    <canvas id="temp" width="800" height="200"></canvas>
+                    <canvas id="pressure" width="800" height="200"></canvas>
                     <canvas id="humidity" width="800" height="150"></canvas>
                     <canvas id="wind_speed" width="800" height="150"></canvas>
                     <canvas id="wind_degree" width="800" height="150"></canvas>
@@ -59,13 +57,23 @@
 <script type="text/javascript">
     var data = JSON.parse('{{ data | escapejs }}');
 
+    /* TODO: Remove duplicate code */
+
     /* PM1 */
     var pm1 = new Chart(document.getElementById('pm1'), {
         type: 'line',
         data: {
-
+            labels: Object.keys(data.pm1),
+            datasets: [{
+                data: Object.values(data.pm1),
+                fill: false,
+                borderColor: 'rgba(0,0,0,0.6)'
+            }]
         },
         options: {
+            legend: {
+                display: false
+            },
             responsive: true,
             title: {
                 display: true,
@@ -76,6 +84,13 @@
                 intersect: true
             },
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
@@ -93,9 +108,17 @@
     var pm25 = new Chart(document.getElementById('pm25'), {
         type: 'line',
         data: {
-
+            labels: Object.keys(data.pm25),
+            datasets: [{
+                data: Object.values(data.pm25),
+                fill: false,
+                borderColor: 'rgba(0,0,0,0.6)'
+            }]
         },
         options: {
+            legend: {
+                display: false
+            },
             responsive: true,
             title: {
                 display: true,
@@ -121,6 +144,13 @@
                 }]
             },
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
@@ -141,9 +171,17 @@
     var pm10 = new Chart(document.getElementById('pm10'), {
         type: 'line',
         data: {
-
+            labels: Object.keys(data.pm10),
+            datasets: [{
+                data: Object.values(data.pm10),
+                fill: false,
+                borderColor: 'rgba(0,0,0,0.6)'
+            }]
         },
         options: {
+            legend: {
+                display: false
+            },
             responsive: true,
             title: {
                 display: true,
@@ -169,6 +207,13 @@
                 }]
             },
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
@@ -186,9 +231,17 @@
     var temp = new Chart(document.getElementById('temp'), {
         type: 'line',
         data: {
-
+            labels: Object.keys(data.temp),
+            datasets: [{
+                data: Object.values(data.temp),
+                fill: false,
+                borderColor: 'rgba(0,0,0,0.6)'
+            }]
         },
         options: {
+            legend: {
+                display: false
+            },
             responsive: true,
             title: {
                 display: true,
@@ -199,6 +252,13 @@
                 intersect: true
             },
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
@@ -213,9 +273,17 @@
     var pressure = new Chart(document.getElementById('pressure'), {
         type: 'line',
         data: {
-
+            labels: Object.keys(data.pressure),
+            datasets: [{
+                data: Object.values(data.pressure),
+                fill: false,
+                borderColor: 'rgba(0,0,0,0.6)'
+            }]
         },
         options: {
+            legend: {
+                display: false
+            },
             responsive: true,
             title: {
                 display: true,
@@ -226,6 +294,13 @@
                 intersect: true
             },
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
@@ -238,11 +313,18 @@
 
     /* HUMIDITY */
     var humidity = new Chart(document.getElementById('humidity'), {
-        type: 'line',
+        type: 'bar',
         data: {
-
+            labels: Object.keys(data.humidity),
+            datasets: [{
+                data: Object.values(data.humidity),
+                fill: false
+            }]
         },
         options: {
+            legend: {
+                display: false
+            },
             responsive: true,
             title: {
                 display: true,
@@ -253,6 +335,15 @@
                 intersect: true
             },
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear',
+                    time: {
+                        unit: 'day'
+                    },
+                    categoryPercentage: 1.0,
+                    barPercentage: 1.0
+                }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
@@ -271,9 +362,17 @@
     var wind_speed = new Chart(document.getElementById('wind_speed'), {
         type: 'line',
         data: {
-
+            labels: Object.keys(data.wind_speed),
+            datasets: [{
+                data: Object.values(data.wind_speed),
+                fill: false,
+                borderColor: 'rgba(0,0,0,0.6)'
+            }]
         },
         options: {
+            legend: {
+                display: false
+            },
             responsive: true,
             title: {
                 display: true,
@@ -284,6 +383,13 @@
                 intersect: true
             },
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
@@ -328,9 +434,17 @@
     var clouds = new Chart(document.getElementById('clouds'), {
         type: 'bar',
         data: {
-
+            labels: Object.keys(data.clouds),
+            datasets: [{
+                data: Object.values(data.clouds),
+                fill: false,
+                borderColor: 'rgba(0,0,0,0.6)'
+            }]
         },
         options: {
+            legend: {
+                display: false
+            },
             responsive: true,
             title: {
                 display: true,
@@ -341,6 +455,15 @@
                 intersect: true
             },
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear',
+                    time: {
+                        unit: 'day'
+                    },
+                    categoryPercentage: 1.0,
+                    barPercentage: 1.0
+                }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
