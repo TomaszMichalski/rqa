@@ -26,7 +26,7 @@
                     <canvas id="humidity" width="800" height="150"></canvas>
                     <canvas id="wind_speed" width="800" height="150"></canvas>
                     <canvas id="wind_degree" width="800" height="150"></canvas>
-                    <canvas id="clouds" width="800" height="150"></canvas>
+                    <canvas id="clouds" width="800" height="150"></canvas>  
                 </div>
               </div>
               <div class="col-sm-3">
@@ -56,6 +56,20 @@
 
 <script type="text/javascript">
     var data = JSON.parse('{{ data | escapejs }}');
+
+    /* Hide unused canvas */
+    function getDisplayOption(factor) {
+        return Object.keys(factor).length === 0 ? "none" : "block";
+    }
+    document.getElementById("pm1").style.display = getDisplayOption(data.pm1);
+    document.getElementById("pm25").style.display = getDisplayOption(data.pm25);
+    document.getElementById("pm10").style.display = getDisplayOption(data.pm10);
+    document.getElementById("temp").style.display = getDisplayOption(data.temp);
+    document.getElementById("pressure").style.display = getDisplayOption(data.pressure);
+    document.getElementById("humidity").style.display = getDisplayOption(data.humidity);
+    document.getElementById("wind_speed").style.display = getDisplayOption(data.wind_speed);
+    document.getElementById("wind_degree").style.display = getDisplayOption(data.wind_degree);
+    document.getElementById("clouds").style.display = getDisplayOption(data.clouds);
 
     /* TODO: Remove duplicate code */
 

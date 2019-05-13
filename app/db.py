@@ -15,7 +15,7 @@ def get_analysis_data(parameters):
     # get installation within given radius based on coordinates
     installations = get_installations_within_area(lat, lon, parameters.radius)
     # create data object
-    data = dict()
+    data = empty_analysis_data()
     # fill data based on form fields
     if parameters.is_pm1:
         data['pm1'] = get_air_data(installations, parameters.date_from, parameters.date_to, 'pm1')
@@ -44,6 +44,20 @@ def get_analysis_data(parameters):
     # fill WHO norms for PM25 and PM10
     data['pm25_norm'] = consts.PM25_WHO_NORM
     data['pm10_norm'] = consts.PM10_WHO_NORM
+
+    return data
+
+def empty_analysis_data():
+    data = dict()
+    data['pm1'] = dict()
+    data['pm25'] = dict()
+    data['pm10'] = dict()
+    data['temp'] = dict()
+    data['pressure'] = dict()
+    data['humidity'] = dict()
+    data['wind_speed'] = dict()
+    data['wind_degree'] = dict()
+    data['clouds'] = dict()
 
     return data
 
