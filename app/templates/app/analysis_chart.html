@@ -46,7 +46,7 @@
                         <br />
                         <a href="#" class="btn btn-primary btn-block" role="button">Refresh</a>
                         <br />
-                        <a href="#" class="btn btn-primary btn-block" role="button">Export</a>
+                        <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="analysis.png">Export</a>
                     </div>
                   </div>
               </div>
@@ -57,19 +57,45 @@
 <script type="text/javascript">
     var data = JSON.parse('{{ data | escapejs }}');
 
+    var canvases = [document.getElementById('pm1'),
+                    document.getElementById('pm25'),
+                    document.getElementById('pm10'),
+                    document.getElementById('temp'),
+                    document.getElementById('pressure'),
+                    document.getElementById('humidity'),
+                    document.getElementById('wind_speed'),
+                    document.getElementById('wind_degree'),
+                    document.getElementById('clouds')];
+
     /* Hide unused canvas */
-    function getDisplayOption(factor) {
-        return Object.keys(factor).length === 0 ? "none" : "block";
+    canvases.map(c => c.style.display = Object.keys(data[c.id]).length === 0 ? "none" : "block")
+
+    /* Helper functions */
+    function getFullChartWidth() {
+        return Math.max.apply(null, canvases.map(c => c.width));
     }
-    document.getElementById("pm1").style.display = getDisplayOption(data.pm1);
-    document.getElementById("pm25").style.display = getDisplayOption(data.pm25);
-    document.getElementById("pm10").style.display = getDisplayOption(data.pm10);
-    document.getElementById("temp").style.display = getDisplayOption(data.temp);
-    document.getElementById("pressure").style.display = getDisplayOption(data.pressure);
-    document.getElementById("humidity").style.display = getDisplayOption(data.humidity);
-    document.getElementById("wind_speed").style.display = getDisplayOption(data.wind_speed);
-    document.getElementById("wind_degree").style.display = getDisplayOption(data.wind_degree);
-    document.getElementById("clouds").style.display = getDisplayOption(data.clouds);
+
+    function getFullChartHeight() {
+        return canvases.filter(c => c.style.display != 'none').map(c => c.height).reduce((a, b) => a + b, 0);
+    }
+
+    /* Add export button handler */
+    var exportBtn = document.getElementById('btn-export');
+    exportBtn.addEventListener('click', function(e) {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.width = getFullChartWidth();
+        canvas.height = getFullChartHeight();
+        var tempY = 0;
+        for (var i = 0; i < canvases.length; i++) {
+            if (canvases[i].style.display != 'none') {
+                ctx.drawImage(canvases[i], 0, tempY);
+                tempY = tempY + canvases[i].height;
+            }
+        }
+        var dataUrl = canvas.toDataURL('image/png');
+        exportBtn.href = dataUrl;
+    });
 
     /* TODO: Remove duplicate code */
 
