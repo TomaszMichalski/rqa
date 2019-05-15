@@ -4,4 +4,3 @@ rqa-db-service/__pycache__/
 *pycache*
 *.idea*
 *venv*
-.env
