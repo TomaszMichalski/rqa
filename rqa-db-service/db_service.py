@@ -1,6 +1,8 @@
 # db_service.py
-import json
+import os
 
+import airly_reader
+import db_get
 import db_insert
 import psycopg2
 import subprocess
@@ -19,9 +21,12 @@ def main():
     conn = psycopg2.connect(db_url)
     cur = conn.cursor()
 
-    db_insert.insert_installations(cur, lat=50.066059, lon=19.917971, max_res=20, max_dist=5)
     db_insert.insert_weather_for_all_points(cur)
+    db_insert.insert_air_for_all_installations(cur)
     conn.commit()
+
+    cur.close()
+    conn.close()
 
 
 if __name__ == "__main__":

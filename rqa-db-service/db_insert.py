@@ -62,6 +62,46 @@ def insert_weather_for_coord(cur, latitude, longitude):
         (point_id, dt, weather, temperature, pressure, humidity, temp_min, temp_max, wind_speed, wind_degree, clouds))
 
 
+def insert_air_for_all_installations(cur):
+    installation_ids = db_get.get_installation_ids(cur)
+    for iid in installation_ids:
+        insert_air_for_id(cur, iid[0])
+
+
+def insert_air_for_id(cur, iid):
+    air_data = airly_reader.get_measurements(iid)
+    if air_data is not None:
+        current = air_data.get('current')
+        raw_dt = current.get('tillDateTime')
+        dt = raw_dt[0:10] + ' ' + raw_dt[11:19]
+        pm1 = pm10 = pm25 = pressure = humidity = temperature = None
+        values = current.get('values')
+        for value in values:
+            if value.get('name').lower() == "pm1":
+                pm1 = value.get('value', None)
+            if value.get('name').lower() == "pm10":
+                pm10 = value.get('value', None)
+            if value.get('name').lower() == "pm25":
+                pm25 = value.get('value', None)
+            if value.get('name').lower() == "pressure":
+                pressure = value.get('value', None)
+            if value.get('name').lower() == "humidity":
+                humidity = value.get('value', None)
+            if value.get('name').lower() == "temperature":
+                temperature = value.get('value', None)
+
+        print(
+            "Executing query: INSERT INTO air (installation_id, datetime, pm1, pm10, pm25, "
+            "temperature, pressure, humidity) "
+            "VALUES ({0}, {1}, {2}, {3},"
+            " {4}, {5}, {6}, {7});".format(iid, dt, pm1, pm10, pm25, temperature, pressure, humidity))
+        cur.execute(
+            "INSERT INTO air (installation_id, datetime, pm1, pm10, pm25, "
+            "temperature, pressure, humidity) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
+            (iid, dt, pm1, pm10, pm25, temperature, pressure, humidity))
+
+
 def insert_installations(cur, *args, **kwargs):
     latitude = kwargs.get('lat', None)
     longitude = kwargs.get('lon', None)
