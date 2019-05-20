@@ -1,5 +1,4 @@
-# db_get.py
-from logging import Logger
+# db_getters.py
 
 
 def get_installation_ids(cur):

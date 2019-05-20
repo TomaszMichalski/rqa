@@ -1,22 +1,22 @@
 import airly_reader
-import db_get
+import db_getters
 import owm_reader
 from datetime import datetime
 
 
 def insert_point(cur, latitude, longitude):
-    point_id = db_get.get_point_id_by_coord(cur, latitude, longitude)
+    point_id = db_getters.get_point_id_by_coord(cur, latitude, longitude)
 
     if point_id is None:
         print(
             "Executing query: INSERT INTO point (latitude, longitude) VALUES (%s, %s);".format(latitude, longitude))
         cur.execute("INSERT INTO point (latitude, longitude) VALUES (%s, %s);", (latitude, longitude))
 
-    return db_get.get_point_id_by_coord(cur, latitude, longitude)
+    return db_getters.get_point_id_by_coord(cur, latitude, longitude)
 
 
 def insert_weather_for_all_points(cur):
-    points = db_get.get_points(cur)
+    points = db_getters.get_points(cur)
     for point in points:
         insert_weather_for_coord(cur, point[1], point[2])
 
@@ -63,7 +63,7 @@ def insert_weather_for_coord(cur, latitude, longitude):
 
 
 def insert_air_for_all_installations(cur):
-    installation_ids = db_get.get_installation_ids(cur)
+    installation_ids = db_getters.get_installation_ids(cur)
     for iid in installation_ids:
         insert_air_for_id(cur, iid[0])
 
@@ -112,7 +112,7 @@ def insert_installations(cur, *args, **kwargs):
 
     for installation in installations:
         installation_id = installation.get('id')
-        if db_get.get_installation_by_id(cur, installation_id) is None:
+        if db_getters.get_installation_by_id(cur, installation_id) is None:
             insert_single_installation(cur, installation)
 
 
@@ -147,7 +147,7 @@ def insert_address(cur, location, address):
 
     point_id = insert_point(cur, lat_point, lon_point)
 
-    address_id = db_get.get_address_id_by_coord(cur, latitude, longitude)
+    address_id = db_getters.get_address_id_by_coord(cur, latitude, longitude)
 
     if address_id is None:
         print(
@@ -161,4 +161,4 @@ def insert_address(cur, location, address):
             "VALUES (%s, %s, %s, %s, %s, %s, %s);",
             (point_id, latitude, longitude, country, city, street, st_number))
 
-    return db_get.get_address_id_by_coord(cur, latitude, longitude)
+    return db_getters.get_address_id_by_coord(cur, latitude, longitude)
