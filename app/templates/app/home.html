@@ -4,11 +4,37 @@
     <li class="active">
         <a href={% url 'home' %}>Home</a>
     </li>
-    <li>
-        <a href={% url 'analysis' %}>Analysis</a>
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'analysis_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'analysis_group' %}>Group</a>
+            </li>
+            <li>
+                <a href={% url 'analysis_generate' %}>Custom</a>
+            </li>
+        </ul>
     </li>
-    <li>
-        <a href={% url 'prediction' %}>Prediction</a>
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'prediction' %}>Prediction
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'prediction_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'prediction_group' %}>Group</a>
+            </li>
+            <li>
+                <a href={% url 'prediction_generate' %}>Custom</a>
+            </li>
+        </ul>
     </li>
     <li>
         <a href={% url 'configuration' %}>Configuration</a>
