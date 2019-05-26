@@ -1,22 +1,29 @@
-{% extends "app/base.html" %}
-
-{% block content %}
+{% extends "app/base.html" %} {% block content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
 
 <ul class="nav nav-tabs">
-    <li><a href={% url 'home' %}>Home</a></li>
-    <li class="active"><a href={% url 'analysis' %}>Analysis</a></li>
-    <li><a href={% url 'prediction' %}>Prediction</a></li>
-    <li><a href={% url 'configuration' %}>Configuration</a></li>
-  </ul>
+    <li>
+        <a href={% url 'home' %}>Home</a>
+    </li>
+    <li class="active">
+        <a href={% url 'analysis' %}>Analysis</a>
+    </li>
+    <li>
+        <a href={% url 'prediction' %}>Prediction</a>
+    </li>
+    <li>
+        <a href={% url 'configuration' %}>Configuration</a>
+    </li>
+</ul>
 
-  <div id="content">
-      <div class="container">
-          <br /><br />
-          <div class="row">
-              <div class="col-sm-9">
+<div id="content">
+    <div class="container">
+        <br />
+        <br />
+        <div class="row">
+            <div class="col-sm-9">
                 <div id="chart">
                     <canvas id="pm1" width="800" height="200"></canvas>
                     <canvas id="pm25" width="800" height="200"></canvas>
@@ -26,19 +33,27 @@
                     <canvas id="humidity" width="800" height="150"></canvas>
                     <canvas id="wind_speed" width="800" height="150"></canvas>
                     <canvas id="wind_degree" width="800" height="150"></canvas>
-                    <canvas id="clouds" width="800" height="150"></canvas>  
+                    <canvas id="clouds" width="800" height="150"></canvas>
                 </div>
-              </div>
-              <div class="col-sm-3">
+            </div>
+            <div class="col-sm-3">
                 <div id="side-panel">
                     <div id="description" class="row">
                         <h4>Analysis information</h4>
                         {% for info_line in info %}
-                            <li>{{ info_line }}</li>
+                        <li>{{ info_line }}</li>
                         {% endfor %}
                     </div>
                     <!-- delete these br's later -->
-                    <br /><br /><br /><br /><br /><br /><br /><br /><br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
                     <div id="buttons" class="row">
                         <a href={% url 'analysis_generate' %} class="btn btn-primary btn-block" role="button">Generate for...</a>
                         <br />
@@ -48,24 +63,24 @@
                         <br />
                         <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="analysis.png">Export</a>
                     </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     var data = JSON.parse('{{ data | escapejs }}');
 
     var canvases = [document.getElementById('pm1'),
-                    document.getElementById('pm25'),
-                    document.getElementById('pm10'),
-                    document.getElementById('temp'),
-                    document.getElementById('pressure'),
-                    document.getElementById('humidity'),
-                    document.getElementById('wind_speed'),
-                    document.getElementById('wind_degree'),
-                    document.getElementById('clouds')];
+    document.getElementById('pm25'),
+    document.getElementById('pm10'),
+    document.getElementById('temp'),
+    document.getElementById('pressure'),
+    document.getElementById('humidity'),
+    document.getElementById('wind_speed'),
+    document.getElementById('wind_degree'),
+    document.getElementById('clouds')];
 
     /* Hide unused canvas */
     canvases.map(c => c.style.display = Object.keys(data[c.id]).length === 0 ? "none" : "block")
@@ -81,7 +96,7 @@
 
     /* Add export button handler */
     var exportBtn = document.getElementById('btn-export');
-    exportBtn.addEventListener('click', function(e) {
+    exportBtn.addEventListener('click', function (e) {
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
         canvas.width = getFullChartWidth();
@@ -459,7 +474,7 @@
                 mode: 'index',
                 intersect: true
             },
-            scales:{
+            scales: {
                 xAxes: [{
                     display: false
                 }],
@@ -517,6 +532,4 @@
             }
         }
     })
-  </script>
-
-  {% endblock %}
+</script> {% endblock %}

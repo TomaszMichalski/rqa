@@ -1,17 +1,24 @@
-{% extends "app/base.html" %}
-
-{% block content %}
+{% extends "app/base.html" %} {% block content %}
 
 <ul class="nav nav-tabs">
-    <li><a href={% url 'home' %}>Home</a></li>
-    <li><a href={% url 'analysis' %}>Analysis</a></li>
-    <li class="active"><a href={% url 'prediction' %}>Prediction</a></li>
-    <li><a href={% url 'configuration' %}>Configuration</a></li>
-  </ul>
+    <li>
+        <a href={% url 'home' %}>Home</a>
+    </li>
+    <li>
+        <a href={% url 'analysis' %}>Analysis</a>
+    </li>
+    <li class="active">
+        <a href={% url 'prediction' %}>Prediction</a>
+    </li>
+    <li>
+        <a href={% url 'configuration' %}>Configuration</a>
+    </li>
+</ul>
 
-  <div id="content">
+<div id="content">
     <div class="container">
-        <br /><br />
+        <br />
+        <br />
         <div class="row">
             <div class="col-sm-9">
                 <div id="chart">
@@ -24,7 +31,18 @@
                         Description placeholder
                     </div>
                     <!-- delete these br's later -->
-                    <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
                     <div id="buttons" class="row">
                         <a href={% url 'prediction_generate' %} class="btn btn-primary btn-block" role="button">Generate for...</a>
                         <br />
@@ -40,4 +58,4 @@
     </div>
 </div>
 
-  {% endblock %}
+{% endblock %}

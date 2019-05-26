@@ -1,15 +1,21 @@
-{% extends "app/base.html" %}
-
-{% block content %}
+{% extends "app/base.html" %} {% block content %}
 
 <ul class="nav nav-tabs">
-    <li><a href={% url 'home' %}>Home</a></li>
-    <li><a href={% url 'analysis' %}>Analysis</a></li>
-    <li class="active"><a href={% url 'prediction' %}>Prediction</a></li>
-    <li><a href={% url 'configuration' %}>Configuration</a></li>
-  </ul>
+    <li>
+        <a href={% url 'home' %}>Home</a>
+    </li>
+    <li>
+        <a href={% url 'analysis' %}>Analysis</a>
+    </li>
+    <li class="active">
+        <a href={% url 'prediction' %}>Prediction</a>
+    </li>
+    <li>
+        <a href={% url 'configuration' %}>Configuration</a>
+    </li>
+</ul>
 
-  <div id="content">
+<div id="content">
     <center>
         <div style="width: 30%">
             <h2>Generate for</h2>
@@ -28,6 +34,6 @@
             </form>
         </div>
     </center>
-  </div>
+</div>
 
-  {% endblock %}
+{% endblock %}

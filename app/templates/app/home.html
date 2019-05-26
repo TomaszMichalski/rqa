@@ -1,20 +1,29 @@
-{% extends "app/base.html" %}
-
-{% block content %}
+{% extends "app/base.html" %} {% block content %}
 
 <ul class="nav nav-tabs">
-    <li class="active"><a href={% url 'home' %}>Home</a></li>
-    <li><a href={% url 'analysis' %}>Analysis</a></li>
-    <li><a href={% url 'prediction' %}>Prediction</a></li>
-    <li><a href={% url 'configuration' %}>Configuration</a></li>
-  </ul>
+    <li class="active">
+        <a href={% url 'home' %}>Home</a>
+    </li>
+    <li>
+        <a href={% url 'analysis' %}>Analysis</a>
+    </li>
+    <li>
+        <a href={% url 'prediction' %}>Prediction</a>
+    </li>
+    <li>
+        <a href={% url 'configuration' %}>Configuration</a>
+    </li>
+</ul>
 
-  <div id="content">
-      <h2>Welcome to RQA!</h2>
-      <h3>Air Quality Analysis application</h3>
-      Press <b>Analysis</b> for air quality analysis. <br />
-      Press <b>Prediction</b> for air quality prediction. <br />
-      Press <b>Configuration</b> to view and edit your user configuration.
-  </div>
+<div id="content">
+    <h2>Welcome to RQA!</h2>
+    <h3>Air Quality Analysis application</h3>
+    Press
+    <b>Analysis</b> for air quality analysis.
+    <br /> Press
+    <b>Prediction</b> for air quality prediction.
+    <br /> Press
+    <b>Configuration</b> to view and edit your user configuration.
+</div>
 
-  {% endblock %}
+{% endblock %}
