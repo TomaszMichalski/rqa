@@ -22,7 +22,19 @@ def analysis_generate(request):
 
     return render(request, 'app/analysis_generate.html', { 'form': form })
 
-def analysis_chart(request):
+def analysis_user(request):
+    data = dict()
+    info = []
+
+    return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
+
+def analysis_group(request):
+    data = dict()
+    info = []
+
+    return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
+
+def analysis_custom(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
@@ -39,11 +51,25 @@ def prediction_generate(request):
 
     return render(request, 'app/prediction_generate.html', { 'form': form })
 
-def prediction_chart(request):
+def prediction_user(request):
+    data = dict()
+    info = []
+
+    return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
+
+def prediction_group(request):
+    data = dict()
+    info = []
+
+    return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
+
+def prediction_custom(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
+        data = dict()
+        info = []
 
-        return render(request, 'app/prediction_chart.html', { 'data': generation_parameters })
+        return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
 
     return render(request, 'app/prediction_generate.html', { 'form': form })
