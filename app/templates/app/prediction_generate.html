@@ -43,20 +43,20 @@
 
 <div id="content">
     <center>
-        <div style="width: 30%">
+        <div class="custom-form">
             <h2>Generate for</h2>
             <form method="get" action={% url 'prediction_custom' %}>
                 <table>
                     {% for field in form %}
                     <div class="form-group">
                         <tr>
-                            <td style="text-align: left; padding: 5px">{{ field.label_tag }}</td>
-                            <td style="text-align: left; padding: 5px">{{ field }}</td>
+                            <td>{{ field.label_tag }}</td>
+                            <td>{{ field }}</td>
                         </tr>
                     </div>
                     {% endfor %}
                 </table>
-                <button class="btn btn-primary" style="width: 100%">Generate</button>
+                <button class="btn btn-primary btn-single" style="width: 100%">Generate</button>
             </form>
         </div>
     </center>
