@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import timedelta
 
 class GenerationParameters():
     def __init__(self, address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds):
@@ -31,15 +32,15 @@ class Installation():
 class Configuration(models.Model):
     address = models.CharField(max_length=128)
     radius = models.CharField(max_length=8)
-    period = models.DurationField()
-    is_pm1 = models.BooleanField()
-    is_pm25 = models.BooleanField()
-    is_pm10 = models.BooleanField()
-    is_temp = models.BooleanField()
-    is_pressure = models.BooleanField()
-    is_humidity = models.BooleanField()
-    is_wind = models.BooleanField()
-    is_clouds = models.BooleanField()
+    period = models.DurationField(default=timedelta(days=7))
+    is_pm1 = models.BooleanField(default=True)
+    is_pm25 = models.BooleanField(default=True)
+    is_pm10 = models.BooleanField(default=True)
+    is_temp = models.BooleanField(default=True)
+    is_pressure = models.BooleanField(default=True)
+    is_humidity = models.BooleanField(default=True)
+    is_wind = models.BooleanField(default=True)
+    is_clouds = models.BooleanField(default=True)
 
 class Group(models.Model):
     name = models.CharField(max_length=64)
