@@ -1,9 +1,10 @@
-# db_service.py
+# worker.py
 import os
 
-import db_insertions
 import psycopg2
 import subprocess
+from database.insertions.misc import insert_nearest_airly_installations
+from worker_functions import retrieve_and_insert_readings_for_all_addresses
 
 
 def main():
@@ -19,10 +20,9 @@ def main():
     conn = psycopg2.connect(db_url)
     cur = conn.cursor()
 
-    #db_insert.insert_weather_for_all_points(cur)
-    #db_insert.insert_air_for_all_installations(cur)
-    conn.commit()
+    retrieve_and_insert_readings_for_all_addresses(cur)
 
+    conn.commit()
     cur.close()
     conn.close()
 
