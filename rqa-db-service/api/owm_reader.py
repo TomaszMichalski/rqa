@@ -8,7 +8,7 @@ headers = {'Content-Type': 'application/json'}
 
 
 def get_conditions(lat, lng):
-    api_url = '{0}weather?lat={1}&lon={2}&appid={3}'.format(api_base_url, lat, lng, api_token)
+    api_url = '{0}weather?lat={1}&lon={2}&appid={3}&units=metric'.format(api_base_url, lat, lng, api_token)
     return get_json_response(api_url)
 
 
