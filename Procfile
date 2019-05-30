@@ -1,2 +1,2 @@
 web: gunicorn rqa.wsgi
-clock: python scheduler.py
+clock: python ./rqa-db-service/scheduler.py
