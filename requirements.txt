@@ -3,3 +3,4 @@ django_heroku
 python-dotenv
 requests
 gunicorn
+apscheduler
