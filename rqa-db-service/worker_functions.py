@@ -1,6 +1,6 @@
 # worker_functions.py
 from datetime import datetime
-
+import pytz
 from api import airly_reader, owm_reader
 from database.getters.misc import get_coordinates_for_each_address, get_airly_installation_ids, get_address_id_for_installation_id
 from database.insertions import air, weather
@@ -74,7 +74,7 @@ def retrieve_and_insert_airly_air_readings(cur):
             pm1 = pm10 = pm25 = None
             current = air_data.get('current')
             raw_dt = current.get('tillDateTime')
-            dt = raw_dt[0:10] + ' ' + raw_dt[11:19]
+            dt = convert_airly_date(raw_dt)
             values = current.get('values')
             for value in values:
                 if value.get('name').lower() == "pm1":
@@ -98,7 +98,7 @@ def retrieve_and_insert_airly_weather_readings(cur):
             temperature = pressure = humidity = None
             current = air_data.get('current')
             raw_dt = current.get('tillDateTime')
-            dt = raw_dt[0:10] + ' ' + raw_dt[11:19]
+            dt = convert_airly_date(raw_dt)
             values = current.get('values')
             for value in values:
                 if value.get('name').lower() == "temperature":
@@ -112,3 +112,11 @@ def retrieve_and_insert_airly_weather_readings(cur):
             address_id = address_id[0]
             weather.insert_single_weather_reading(cur, address_id, dt, "airly",
                                                   temperature=temperature, pressure=pressure, humidity=humidity)
+
+
+def convert_airly_date(raw_dt):
+    dt = raw_dt[0:19]
+    d = datetime.fromisoformat(dt)
+    d = pytz.timezone("UTC").localize(d)
+    d = d.astimezone(pytz.timezone("Europe/Warsaw"))
+    return d.strftime("%Y-%m-%d %H:%M:%S")
