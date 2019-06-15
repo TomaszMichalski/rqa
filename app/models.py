@@ -20,8 +20,8 @@ class GenerationParameters():
     def __str__(self):
         return "[address: %s, radius: %s, date_from: %s, date_to: %s, is_pm1: %s, is_pm25: %s, is_pm10: %s, is_temp: %s, is_pressure: %s, is_humidity: %s, is_wind: %s, is_clouds: %s]" % (self.address, self.radius, self.date_from, self.date_to, self.is_pm1, self.is_pm25, self.is_pm10, self.is_temp, self.is_pressure, self.is_humidity, self.is_wind, self.is_clouds)
 
-class Installation():
-    def __init__(self, id, lat, long):
+class Address():
+    def __init__(self, id, lat, lon):
         self.id = id
         self.lat = lat
         self.lon = lon

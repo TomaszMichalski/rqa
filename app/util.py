@@ -22,7 +22,7 @@ def create_generation_parameters(form):
 # Measure distance between two locations - START
 
 def deg_to_rad(deg):
-    return deg * math.pi / 180
+    return deg * pi / 180
 
 def geo_location_distance(lat1, lon1, lat2, lon2):
     earth_radius = 6371
@@ -33,8 +33,8 @@ def geo_location_distance(lat1, lon1, lat2, lon2):
     deg_lat1 = deg_to_rad(lat1)
     deg_lat2 = deg_to_rad(lat2)
 
-    a = math.sin(d_lat / 2) * math.sin(d_lat/2) + math.sin(d_lon / 2) * math.sin(d_lon / 2) * math.cos(deg_lat1) * math.cos(deg_lat2)
-    c = 2 * math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    a = sin(d_lat / 2) * sin(d_lat/2) + sin(d_lon / 2) * sin(d_lon / 2) * cos(deg_lat1) * cos(deg_lat2)
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
     return earth_radius * c
 
@@ -55,8 +55,8 @@ def get_geo_location(address):
     if response.status_code == 200:
         json_response = json.loads(response.content.decode('utf-8'))
         if isinstance(json_response, list):
-            lat = json_response[0]['lat']
-            lon = json_response[0]['lon']
+            lat = float(json_response[0]['lat'])
+            lon = float(json_response[0]['lon'])
             return lat, lon
         else:
             return None
