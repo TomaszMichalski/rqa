@@ -66,39 +66,39 @@ def empty_analysis_data():
 
 def get_air_data(addresses, date_from, date_to, columns, lat, lon, radius):
     data = dict()
+    for col in columns:
+        data[col] = dict()
+
     for address in addresses:
-        data_for_address = reader.get_air_readings_for_address(address.id, date_from, date_to, ', '.join(columns))
-        for col in range(len(columns)):
-            data_to_average = dict()
+        data_for_address = reader.get_air_readings_for_address(address.id, date_from, date_to, prepare_columns_query_string(columns))
+        for col_i in range(len(columns)):
             for record in data_for_address:
-                if not str(round_datetime(record[0])) in data_to_average:
-                    data_to_average[str(round_datetime(record[0]))] = []
-                data_to_average[str(round_datetime(record[0]))].append((address, record[col+1]))
+                if not str(round_datetime(record[0])) in data[columns[col_i]]:
+                    data[columns[col_i]][str(round_datetime(record[0]))] = []
+                data[columns[col_i]][str(round_datetime(record[0]))].append((address, record[col_i+1]))
 
-            data_averaged = dict()
-            for date, values in data_to_average.items():
-                data_averaged[date] = data_average(values, lat, lon, radius)
-
-            data[columns[col]] = data_averaged
+    for col in data.keys():
+        for date, address_data in data[col].items():
+            data[col][date] = data_average(address_data, lat, lon, radius)
 
     return data
 
 def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
     data = dict()
+    for col in columns:
+        data[col] = dict()
+
     for address in addresses:
-        data_for_address = reader.get_weather_readings_for_address(address.id, date_from, date_to, ', '.join(columns))
-        for col in range(len(columns)):
-            data_to_average = dict()
+        data_for_address = reader.get_weather_readings_for_address(address.id, date_from, date_to, prepare_columns_query_string(columns))
+        for col_i in range(len(columns)):
             for record in data_for_address:
-                if not str(round_datetime(record[0])) in data_to_average:
-                    data_to_average[str(round_datetime(record[0]))] = []
-                data_to_average[str(round_datetime(record[0]))].append((address, record[col+1]))
+                if not str(round_datetime(record[0])) in data[columns[col_i]]:
+                    data[columns[col_i]][str(round_datetime(record[0]))] = []
+                data[columns[col_i]][str(round_datetime(record[0]))].append((address, record[col_i+1]))
 
-            data_averaged = dict()
-            for date, values in data_to_average.items():
-                data_averaged[date] = data_average(values, lat, lon, radius)
-
-            data[columns[col]] = data_averaged
+    for col in data.keys():
+        for date, address_data in data[col].items():
+            data[col][date] = data_average(address_data, lat, lon, radius)
 
     return data
 
@@ -155,3 +155,9 @@ def prepare_weather_columns(parameters):
         columns.append('clouds')
 
     return columns
+
+def prepare_columns_query_string(columns):
+    if columns:
+        return ', ' + ', '.join(columns)
+    else:
+        return ''
