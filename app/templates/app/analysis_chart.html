@@ -115,6 +115,8 @@
         var ctx = canvas.getContext('2d');
         canvas.width = getFullChartWidth();
         canvas.height = getFullChartHeight();
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         var tempY = 0;
         for (var i = 0; i < canvases.length; i++) {
             if (canvases[i].style.display != 'none') {
@@ -387,7 +389,8 @@
             labels: Object.keys(data.humidity),
             datasets: [{
                 data: Object.values(data.humidity),
-                fill: false
+                fill: false,
+                backgroundColor: 'rgb(128,128,128)'
             }]
         },
         options: {
@@ -507,7 +510,7 @@
             datasets: [{
                 data: Object.values(data.clouds),
                 fill: false,
-                borderColor: 'rgba(0,0,0,0.6)'
+                backgroundColor: 'rgb(128,128,128)'
             }]
         },
         options: {
