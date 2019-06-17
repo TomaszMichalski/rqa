@@ -1,33 +1,65 @@
-{% extends "app/base.html" %}
-
-{% block content %}
+{% extends "app/base.html" %} {% block content %}
 
 <ul class="nav nav-tabs">
-    <li><a href={% url 'home' %}>Home</a></li>
-    <li><a href={% url 'analysis' %}>Analysis</a></li>
-    <li class="active"><a href={% url 'prediction' %}>Prediction</a></li>
-    <li><a href={% url 'configuration' %}>Configuration</a></li>
-  </ul>
+    <li>
+        <a href={% url 'home' %}>Home</a>
+    </li>
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'analysis_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'analysis_group' %}>Group</a>
+            </li>
+            <li>
+                <a href={% url 'analysis_generate' %}>Custom</a>
+            </li>
+        </ul>
+    </li>
+    <li class="dropdown active">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'prediction' %}>Prediction
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'prediction_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'prediction_group' %}>Group</a>
+            </li>
+            <li>
+                <a href={% url 'prediction_generate' %}>Custom</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href={% url 'configuration' %}>Configuration</a>
+    </li>
+</ul>
 
-  <div id="content">
+<div id="content">
     <center>
-        <div style="width: 30%">
+        <div class="custom-form">
             <h2>Generate for</h2>
-            <form method="get" action={% url 'prediction_chart' %}>
+            <form method="get" action={% url 'prediction_custom' %}>
                 <table>
                     {% for field in form %}
                     <div class="form-group">
                         <tr>
-                            <td style="text-align: left; padding: 5px">{{ field.label_tag }}</td>
-                            <td style="text-align: left; padding: 5px">{{ field }}</td>
+                            <td>{{ field.label_tag }}</td>
+                            <td>{{ field }}</td>
                         </tr>
                     </div>
                     {% endfor %}
                 </table>
-                <button class="btn btn-primary" style="width: 100%">Generate</button>
+                <button class="btn btn-primary btn-single" style="width: 100%">Generate</button>
             </form>
         </div>
     </center>
-  </div>
+</div>
 
-  {% endblock %}
+{% endblock %}

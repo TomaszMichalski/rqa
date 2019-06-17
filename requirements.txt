@@ -1,4 +1,6 @@
+django
+django_heroku
+python-dotenv
 requests
 gunicorn
-django-heroku
-django
+apscheduler

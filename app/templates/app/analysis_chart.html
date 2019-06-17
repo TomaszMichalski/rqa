@@ -1,75 +1,132 @@
-{% extends "app/base.html" %}
-
-{% block content %}
+{% extends "app/base.html" %} {% block content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
 
 <ul class="nav nav-tabs">
-    <li><a href={% url 'home' %}>Home</a></li>
-    <li class="active"><a href={% url 'analysis' %}>Analysis</a></li>
-    <li><a href={% url 'prediction' %}>Prediction</a></li>
-    <li><a href={% url 'configuration' %}>Configuration</a></li>
-  </ul>
+    <li>
+        <a href={% url 'home' %}>Home</a>
+    </li>
+    <li class="dropdown active">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'analysis_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'analysis_group' %}>Group</a>
+            </li>
+            <li>
+                <a href={% url 'analysis_generate' %}>Custom</a>
+            </li>
+        </ul>
+    </li>
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'prediction' %}>Prediction
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'prediction_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'prediction_group' %}>Group</a>
+            </li>
+            <li>
+                <a href={% url 'prediction_generate' %}>Custom</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href={% url 'configuration' %}>Configuration</a>
+    </li>
+</ul>
 
-  <div id="content">
-      <div class="container">
-          <br /><br />
-          <div class="row">
-              <div class="col-sm-9">
+<div id="content">
+    <div class="container">
+        <br />
+        <br />
+        <div class="row">
+            <div class="col-sm-9">
                 <div id="chart">
                     <canvas id="pm1" width="800" height="200"></canvas>
                     <canvas id="pm25" width="800" height="200"></canvas>
                     <canvas id="pm10" width="800" height="200"></canvas>
-                    <canvas id="temp" width="800" height="200"></canvas>
+                    <canvas id="temperature" width="800" height="200"></canvas>
                     <canvas id="pressure" width="800" height="200"></canvas>
                     <canvas id="humidity" width="800" height="150"></canvas>
                     <canvas id="wind_speed" width="800" height="150"></canvas>
                     <canvas id="wind_degree" width="800" height="150"></canvas>
-                    <canvas id="clouds" width="800" height="150"></canvas>  
+                    <canvas id="clouds" width="800" height="150"></canvas>
                 </div>
-              </div>
-              <div class="col-sm-3">
+            </div>
+            <div class="col-sm-3">
                 <div id="side-panel">
-                    <div id="description" class="row">
-                        <h4>Analysis information</h4>
-                        {% for info_line in info %}
-                            <li>{{ info_line }}</li>
-                        {% endfor %}
-                    </div>
-                    <!-- delete these br's later -->
-                    <br /><br /><br /><br /><br /><br /><br /><br /><br />
                     <div id="buttons" class="row">
-                        <a href={% url 'analysis_generate' %} class="btn btn-primary btn-block" role="button">Generate for...</a>
-                        <br />
                         <a href="#" class="btn btn-primary btn-block" role="button">Email copy</a>
                         <br />
                         <a href="#" class="btn btn-primary btn-block" role="button">Refresh</a>
                         <br />
-                        <a href="#" class="btn btn-primary btn-block" role="button">Export</a>
+                        <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="analysis.png">Export</a>
                     </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+                    <div id="description" class="row">
+                        <h4>Analysis information</h4>
+                        {% for info_line in info %}
+                        <li>{{ info_line }}</li>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     var data = JSON.parse('{{ data | escapejs }}');
 
+    var canvases = [document.getElementById('pm1'),
+    document.getElementById('pm25'),
+    document.getElementById('pm10'),
+    document.getElementById('temperature'),
+    document.getElementById('pressure'),
+    document.getElementById('humidity'),
+    document.getElementById('wind_speed'),
+    document.getElementById('wind_degree'),
+    document.getElementById('clouds')];
+
     /* Hide unused canvas */
-    function getDisplayOption(factor) {
-        return Object.keys(factor).length === 0 ? "none" : "block";
+    canvases.map(c => c.style.display = Object.keys(data[c.id]).length === 0 ? "none" : "block")
+
+    /* Helper functions */
+    function getFullChartWidth() {
+        return Math.max.apply(null, canvases.map(c => c.width));
     }
-    document.getElementById("pm1").style.display = getDisplayOption(data.pm1);
-    document.getElementById("pm25").style.display = getDisplayOption(data.pm25);
-    document.getElementById("pm10").style.display = getDisplayOption(data.pm10);
-    document.getElementById("temp").style.display = getDisplayOption(data.temp);
-    document.getElementById("pressure").style.display = getDisplayOption(data.pressure);
-    document.getElementById("humidity").style.display = getDisplayOption(data.humidity);
-    document.getElementById("wind_speed").style.display = getDisplayOption(data.wind_speed);
-    document.getElementById("wind_degree").style.display = getDisplayOption(data.wind_degree);
-    document.getElementById("clouds").style.display = getDisplayOption(data.clouds);
+
+    function getFullChartHeight() {
+        return canvases.filter(c => c.style.display != 'none').map(c => c.height).reduce((a, b) => a + b, 0);
+    }
+
+    /* Add export button handler */
+    var exportBtn = document.getElementById('btn-export');
+    exportBtn.addEventListener('click', function (e) {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.width = getFullChartWidth();
+        canvas.height = getFullChartHeight();
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        var tempY = 0;
+        for (var i = 0; i < canvases.length; i++) {
+            if (canvases[i].style.display != 'none') {
+                ctx.drawImage(canvases[i], 0, tempY);
+                tempY = tempY + canvases[i].height;
+            }
+        }
+        var dataUrl = canvas.toDataURL('image/png');
+        exportBtn.href = dataUrl;
+    });
 
     /* TODO: Remove duplicate code */
 
@@ -242,12 +299,12 @@
     })
 
     /* TEMPERATURE */
-    var temp = new Chart(document.getElementById('temp'), {
+    var temperature = new Chart(document.getElementById('temperature'), {
         type: 'line',
         data: {
-            labels: Object.keys(data.temp),
+            labels: Object.keys(data.temperature),
             datasets: [{
-                data: Object.values(data.temp),
+                data: Object.values(data.temperature),
                 fill: false,
                 borderColor: 'rgba(0,0,0,0.6)'
             }]
@@ -332,7 +389,8 @@
             labels: Object.keys(data.humidity),
             datasets: [{
                 data: Object.values(data.humidity),
-                fill: false
+                fill: false,
+                backgroundColor: 'rgb(128,128,128)'
             }]
         },
         options: {
@@ -433,7 +491,7 @@
                 mode: 'index',
                 intersect: true
             },
-            scales:{
+            scales: {
                 xAxes: [{
                     display: false
                 }],
@@ -452,7 +510,7 @@
             datasets: [{
                 data: Object.values(data.clouds),
                 fill: false,
-                borderColor: 'rgba(0,0,0,0.6)'
+                backgroundColor: 'rgb(128,128,128)'
             }]
         },
         options: {
@@ -491,6 +549,4 @@
             }
         }
     })
-  </script>
-
-  {% endblock %}
+</script> {% endblock %}
