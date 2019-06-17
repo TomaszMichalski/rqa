@@ -6,7 +6,7 @@ import json
 
 def create_generation_parameters(form):
     address = form.cleaned_data.get('address')
-    radius = int(form.cleaned_data.get('radius'))
+    radius = float(form.cleaned_data.get('radius'))
     date_from = form.cleaned_data.get('date_from')
     date_to = form.cleaned_data.get('date_to')
     is_pm1 = form.cleaned_data.get('is_pm1')

@@ -77,9 +77,23 @@ def get_air_data(addresses, date_from, date_to, columns, lat, lon, radius):
                     data[columns[col_i]][str(round_datetime(record[0]))] = []
                 data[columns[col_i]][str(round_datetime(record[0]))].append((address, record[col_i+1]))
 
+    data_cpy = dict()
     for col in data.keys():
+        data_cpy[col] = dict()
         for date, address_data in data[col].items():
-            data[col][date] = data_average(address_data, lat, lon, radius)
+            data_avg = data_average(address_data, lat, lon, radius)
+            if data_avg != -1:
+                data_cpy[col][date] = data_avg
+
+    data = data_cpy
+
+    data_cpy = dict()
+    for col in data.keys():
+        data_cpy[col] = dict()
+        for date in sorted(data[col].keys()):
+            data_cpy[col][date] = data[col][date]
+
+    data = data_cpy
 
     return data
 
@@ -96,9 +110,23 @@ def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
                     data[columns[col_i]][str(round_datetime(record[0]))] = []
                 data[columns[col_i]][str(round_datetime(record[0]))].append((address, record[col_i+1]))
 
+    data_cpy = dict()
     for col in data.keys():
+        data_cpy[col] = dict()
         for date, address_data in data[col].items():
-            data[col][date] = data_average(address_data, lat, lon, radius)
+            data_avg = data_average(address_data, lat, lon, radius)
+            if data_avg != -1:
+                data_cpy[col][date] = data_avg
+
+    data = data_cpy
+
+    data_cpy = dict()
+    for col in data.keys():
+        data_cpy[col] = dict()
+        for date in sorted(data[col].keys()):
+            data_cpy[col][date] = data[col][date]
+
+    data = data_cpy
 
     return data
 
@@ -113,7 +141,7 @@ def data_average(address_data, center_lat, center_lon, radius):
             sum_w = sum_w + w
 
     if sum_w == 0:
-        return 0
+        return -1
     else:
         return sum_w_data / sum_w
 
