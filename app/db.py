@@ -1,6 +1,7 @@
 from . import models
 from . import util
 from . import consts
+from . import prediction
 from dbservice.database.readers import reader
 
 def get_addresses_within_area(lat, lon, radius):
@@ -26,7 +27,7 @@ def get_analysis_data(parameters):
     # get weather columns
     weather_columns = prepare_weather_columns(parameters)
     # create data object
-    data = empty_analysis_data()
+    data = empty_data()
 
     # get analysis data
     air_data = get_air_data(addresses, date_from, date_to, air_columns, lat, lon, radius)
@@ -50,7 +51,47 @@ def get_analysis_data(parameters):
 
     return data
 
-def empty_analysis_data():
+def get_prediction_data(parameters):
+    # convert address to coordinates
+    lat, lon = util.get_geo_location(parameters.address)
+    # get other parameters
+    radius = parameters.radius
+    date_from = parameters.date_from
+    date_to = parameters.date_to
+    # get installation within given radius based on coordinates
+    addresses = get_addresses_within_area(lat, lon, radius)
+    # get air columns
+    air_columns = prepare_air_columns(parameters)
+    # get weather columns
+    weather_columns = prepare_weather_columns(parameters)
+    # create past data object
+    past_data = empty_data()
+
+    # get past data
+    air_data = get_air_data(addresses, consts.PREDICTION_PAST_DATA_START, date_from, air_columns, lat, lon, radius)
+    weather_data = get_weather_data(addresses, consts.PREDICTION_PAST_DATA_START, date_from, weather_columns, lat, lon, radius)
+    # combine data
+    for k, v in air_data.items():
+        past_data[k] = v
+    for k, v in weather_data.items():
+        past_data[k] = v
+
+    data = prediction.predict(past_data, date_from, date_to)
+
+    # fill information data
+    data['info'] = []
+    data['info'].append('Prediction based on {} point(s) in given area.'.format(len(addresses)))
+    if len(addresses) < consts.ADDRESSES_WARNING_NUM:
+        data['info'].append('Prediction may be inaccurate due to low point number in area.')
+    if 0 < addresses_weight(addresses, lat, lon, radius) < consts.ADDRESSES_WARNING_WEIGHT:
+        data['info'].append('Prediction may be inaccurate due to points being far from area center.')
+    # fill WHO norms for PM25 and PM10
+    data['pm25_norm'] = consts.PM25_WHO_NORM
+    data['pm10_norm'] = consts.PM10_WHO_NORM
+
+    return data
+
+def empty_data():
     data = dict()
     data['pm1'] = dict()
     data['pm25'] = dict()

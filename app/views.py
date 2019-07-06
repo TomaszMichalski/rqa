@@ -114,8 +114,9 @@ def prediction_custom(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
-        data = dict()
-        info = []
+        data = db.get_prediction_data(generation_parameters)
+        info = data['info']
+        data = json.dumps(data)
 
         return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
 
