@@ -3,6 +3,7 @@ from . import util
 from . import consts
 from . import prediction
 from dbservice.database.readers import reader
+from datetime import datetime
 
 def get_addresses_within_area(lat, lon, radius):
     all_addresses = reader.get_addresses()
@@ -68,15 +69,15 @@ def get_prediction_data(parameters):
     past_data = empty_data()
 
     # get past data
-    air_data = get_air_data(addresses, consts.PREDICTION_PAST_DATA_START, date_from, air_columns, lat, lon, radius)
-    weather_data = get_weather_data(addresses, consts.PREDICTION_PAST_DATA_START, date_from, weather_columns, lat, lon, radius)
+    air_data = get_air_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), air_columns, lat, lon, radius)
+    weather_data = get_weather_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), weather_columns, lat, lon, radius)
     # combine data
     for k, v in air_data.items():
         past_data[k] = v
     for k, v in weather_data.items():
         past_data[k] = v
 
-    data = prediction.predict(past_data, date_from, date_to)
+    data = prediction.predict(past_data, date_to)
 
     # fill information data
     data['info'] = []
@@ -136,6 +137,19 @@ def get_air_data(addresses, date_from, date_to, columns, lat, lon, radius):
 
     data = data_cpy
 
+    data_cpy = dict()
+    date_to_tzinfo_free = date_to.replace(tzinfo=None)
+    for col in data.keys():
+        data_cpy[col] = dict()
+        aggregation_datetime = util.get_data_aggregation_starting_datetime(date_from)
+        while aggregation_datetime < date_to_tzinfo_free:
+            aggregated_data = aggregate_data(data[col], aggregation_datetime)
+            if aggregated_data != -1:
+                data_cpy[col][str(aggregation_datetime)] = aggregated_data
+            aggregation_datetime = aggregation_datetime + consts.DATA_TIMEDELTA
+
+    data = data_cpy
+
     return data
 
 def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
@@ -169,7 +183,35 @@ def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
 
     data = data_cpy
 
+    data_cpy = dict()
+    date_to_tzinfo_free = date_to.replace(tzinfo=None)
+    for col in data.keys():
+        data_cpy[col] = dict()
+        aggregation_datetime = util.get_data_aggregation_starting_datetime(date_from)
+        while aggregation_datetime < date_to_tzinfo_free:
+            aggregated_data = aggregate_data(data[col], aggregation_datetime)
+            if aggregated_data != -1:
+                data_cpy[col][str(aggregation_datetime)] = aggregated_data
+            aggregation_datetime = aggregation_datetime + consts.DATA_TIMEDELTA
+
+    data = data_cpy
+
     return data
+
+def aggregate_data(data, aggregation_datetime):
+    dates = list(map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'), data.keys()))
+    dates = list(filter(lambda x: x > aggregation_datetime - consts.DATA_TIMEDELTA / 2 and x < aggregation_datetime + consts.DATA_TIMEDELTA / 2, dates))
+    aggregated_data_sum = 0
+    aggregated_data_weight = 0
+    for date in dates:
+        temp_weight = (consts.DATA_TIMEDELTA / 2 - abs(aggregation_datetime - date)) / (consts.DATA_TIMEDELTA / 2)
+        aggregated_data_sum = aggregated_data_sum + temp_weight * data[str(date)]
+        aggregated_data_weight = aggregated_data_weight + temp_weight
+
+    if aggregated_data_weight == 0:
+        return -1
+    else:
+        return aggregated_data_sum / aggregated_data_weight
 
 def data_average(address_data, center_lat, center_lon, radius):
     sum_w_data = 0
