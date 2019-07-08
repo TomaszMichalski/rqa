@@ -77,7 +77,7 @@ def get_prediction_data(parameters):
     for k, v in weather_data.items():
         past_data[k] = v
 
-    data = prediction.predict(past_data, date_to)
+    data = prediction.predict(past_data, date_from, date_to)
 
     # fill information data
     data['info'] = []
