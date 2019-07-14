@@ -12,3 +12,5 @@ AIR_COLUMNS = ['pm1', 'pm25', 'pm10']
 WEATHER_COLUMNS = ['temperature', 'pressure', 'humidity', 'wind_speed', 'wind_degree', 'clouds']
 
 DATA_TIMEDELTA = timedelta(hours=6)
+
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S'

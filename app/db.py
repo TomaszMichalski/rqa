@@ -119,36 +119,12 @@ def get_air_data(addresses, date_from, date_to, columns, lat, lon, radius):
                     data[columns[col_i]][str(round_datetime(record[0]))] = []
                 data[columns[col_i]][str(round_datetime(record[0]))].append((address, record[col_i+1]))
 
-    data_cpy = dict()
-    for col in data.keys():
-        data_cpy[col] = dict()
-        for date, address_data in data[col].items():
-            data_avg = data_average(address_data, lat, lon, radius)
-            if data_avg != -1:
-                data_cpy[col][date] = data_avg
-
-    data = data_cpy
-
-    data_cpy = dict()
-    for col in data.keys():
-        data_cpy[col] = dict()
-        for date in sorted(data[col].keys()):
-            data_cpy[col][date] = data[col][date]
-
-    data = data_cpy
-
-    data_cpy = dict()
-    date_to_tzinfo_free = date_to.replace(tzinfo=None)
-    for col in data.keys():
-        data_cpy[col] = dict()
-        aggregation_datetime = util.get_data_aggregation_starting_datetime(date_from)
-        while aggregation_datetime < date_to_tzinfo_free:
-            aggregated_data = aggregate_data(data[col], aggregation_datetime)
-            if aggregated_data != -1:
-                data_cpy[col][str(aggregation_datetime)] = aggregated_data
-            aggregation_datetime = aggregation_datetime + consts.DATA_TIMEDELTA
-
-    data = data_cpy
+    # average data
+    data = get_averaged_data(data, lat, lon, radius)
+    # sort it by date
+    data = get_sorted_data(data)
+    # aggregate to points with 6hr delta
+    data = get_aggregated_data(data, date_from, date_to)
 
     return data
 
@@ -165,6 +141,16 @@ def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
                     data[columns[col_i]][str(round_datetime(record[0]))] = []
                 data[columns[col_i]][str(round_datetime(record[0]))].append((address, record[col_i+1]))
 
+    # average data
+    data = get_averaged_data(data, lat, lon, radius)
+    # sort it by date
+    data = get_sorted_data(data)
+    # aggregate to points with 6hr delta
+    data = get_aggregated_data(data, date_from, date_to)
+
+    return data
+
+def get_averaged_data(data, lat, lon, radius):
     data_cpy = dict()
     for col in data.keys():
         data_cpy[col] = dict()
@@ -172,17 +158,19 @@ def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
             data_avg = data_average(address_data, lat, lon, radius)
             if data_avg != -1:
                 data_cpy[col][date] = data_avg
+    
+    return data_cpy
 
-    data = data_cpy
-
+def get_sorted_data(data):
     data_cpy = dict()
     for col in data.keys():
         data_cpy[col] = dict()
         for date in sorted(data[col].keys()):
             data_cpy[col][date] = data[col][date]
 
-    data = data_cpy
+    return data_cpy
 
+def get_aggregated_data(data, date_from, date_to):
     data_cpy = dict()
     date_to_tzinfo_free = date_to.replace(tzinfo=None)
     for col in data.keys():
@@ -194,12 +182,10 @@ def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
                 data_cpy[col][str(aggregation_datetime)] = aggregated_data
             aggregation_datetime = aggregation_datetime + consts.DATA_TIMEDELTA
 
-    data = data_cpy
-
-    return data
+    return data_cpy
 
 def aggregate_data(data, aggregation_datetime):
-    dates = list(map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'), data.keys()))
+    dates = list(map(lambda x: datetime.strptime(x, consts.DATE_FORMAT), data.keys()))
     dates = list(filter(lambda x: x > aggregation_datetime - consts.DATA_TIMEDELTA / 2 and x < aggregation_datetime + consts.DATA_TIMEDELTA / 2, dates))
     aggregated_data_sum = 0
     aggregated_data_weight = 0

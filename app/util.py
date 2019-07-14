@@ -68,7 +68,7 @@ def get_geo_location(address):
 
 def get_data_aggregation_starting_datetime(date_from):
     if isinstance(date_from, str):
-        date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d %H:%M:%S')
+        date_from = datetime.datetime.strptime(date_from, consts.DATE_FORMAT)
     starting_datetime = datetime.datetime(year=date_from.year, month=date_from.month, day=date_from.day)
     date_from_tzinfo_free = date_from.replace(tzinfo=None)
     while starting_datetime <= date_from_tzinfo_free:
