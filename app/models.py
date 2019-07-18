@@ -32,7 +32,7 @@ class Address():
 class Configuration(models.Model):
     address = models.CharField(max_length=128)
     radius = models.CharField(max_length=8)
-    period = models.DurationField(default=timedelta(days=7))
+    period = models.CharField(max_length=4)
     is_pm1 = models.BooleanField(default=True)
     is_pm25 = models.BooleanField(default=True)
     is_pm10 = models.BooleanField(default=True)
