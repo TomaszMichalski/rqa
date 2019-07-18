@@ -1,7 +1,9 @@
 from . import models
 from . import util
 from . import consts
+from . import prediction
 from dbservice.database.readers import reader
+from datetime import datetime
 
 def get_addresses_within_area(lat, lon, radius):
     all_addresses = reader.get_addresses()
@@ -26,7 +28,7 @@ def get_analysis_data(parameters):
     # get weather columns
     weather_columns = prepare_weather_columns(parameters)
     # create data object
-    data = empty_analysis_data()
+    data = empty_data()
 
     # get analysis data
     air_data = get_air_data(addresses, date_from, date_to, air_columns, lat, lon, radius)
@@ -50,7 +52,47 @@ def get_analysis_data(parameters):
 
     return data
 
-def empty_analysis_data():
+def get_prediction_data(parameters):
+    # convert address to coordinates
+    lat, lon = util.get_geo_location(parameters.address)
+    # get other parameters
+    radius = parameters.radius
+    date_from = parameters.date_from
+    date_to = parameters.date_to
+    # get installation within given radius based on coordinates
+    addresses = get_addresses_within_area(lat, lon, radius)
+    # get air columns
+    air_columns = prepare_air_columns(parameters)
+    # get weather columns
+    weather_columns = prepare_weather_columns(parameters)
+    # create past data object
+    past_data = empty_data()
+
+    # get past data
+    air_data = get_air_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), air_columns, lat, lon, radius)
+    weather_data = get_weather_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), weather_columns, lat, lon, radius)
+    # combine data
+    for k, v in air_data.items():
+        past_data[k] = v
+    for k, v in weather_data.items():
+        past_data[k] = v
+
+    data = prediction.predict(past_data, date_from, date_to)
+
+    # fill information data
+    data['info'] = []
+    data['info'].append('Prediction based on {} point(s) in given area.'.format(len(addresses)))
+    if len(addresses) < consts.ADDRESSES_WARNING_NUM:
+        data['info'].append('Prediction may be inaccurate due to low point number in area.')
+    if 0 < addresses_weight(addresses, lat, lon, radius) < consts.ADDRESSES_WARNING_WEIGHT:
+        data['info'].append('Prediction may be inaccurate due to points being far from area center.')
+    # fill WHO norms for PM25 and PM10
+    data['pm25_norm'] = consts.PM25_WHO_NORM
+    data['pm10_norm'] = consts.PM10_WHO_NORM
+
+    return data
+
+def empty_data():
     data = dict()
     data['pm1'] = dict()
     data['pm25'] = dict()
@@ -77,23 +119,12 @@ def get_air_data(addresses, date_from, date_to, columns, lat, lon, radius):
                     data[columns[col_i]][str(round_datetime(record[0]))] = []
                 data[columns[col_i]][str(round_datetime(record[0]))].append((address, record[col_i+1]))
 
-    data_cpy = dict()
-    for col in data.keys():
-        data_cpy[col] = dict()
-        for date, address_data in data[col].items():
-            data_avg = data_average(address_data, lat, lon, radius)
-            if data_avg != -1:
-                data_cpy[col][date] = data_avg
-
-    data = data_cpy
-
-    data_cpy = dict()
-    for col in data.keys():
-        data_cpy[col] = dict()
-        for date in sorted(data[col].keys()):
-            data_cpy[col][date] = data[col][date]
-
-    data = data_cpy
+    # average data
+    data = get_averaged_data(data, lat, lon, radius)
+    # sort it by date
+    data = get_sorted_data(data)
+    # aggregate to points with 6hr delta
+    data = get_aggregated_data(data, date_from, date_to)
 
     return data
 
@@ -110,6 +141,16 @@ def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
                     data[columns[col_i]][str(round_datetime(record[0]))] = []
                 data[columns[col_i]][str(round_datetime(record[0]))].append((address, record[col_i+1]))
 
+    # average data
+    data = get_averaged_data(data, lat, lon, radius)
+    # sort it by date
+    data = get_sorted_data(data)
+    # aggregate to points with 6hr delta
+    data = get_aggregated_data(data, date_from, date_to)
+
+    return data
+
+def get_averaged_data(data, lat, lon, radius):
     data_cpy = dict()
     for col in data.keys():
         data_cpy[col] = dict()
@@ -117,18 +158,46 @@ def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
             data_avg = data_average(address_data, lat, lon, radius)
             if data_avg != -1:
                 data_cpy[col][date] = data_avg
+    
+    return data_cpy
 
-    data = data_cpy
-
+def get_sorted_data(data):
     data_cpy = dict()
     for col in data.keys():
         data_cpy[col] = dict()
         for date in sorted(data[col].keys()):
             data_cpy[col][date] = data[col][date]
 
-    data = data_cpy
+    return data_cpy
 
-    return data
+def get_aggregated_data(data, date_from, date_to):
+    data_cpy = dict()
+    date_to_tzinfo_free = date_to.replace(tzinfo=None)
+    for col in data.keys():
+        data_cpy[col] = dict()
+        aggregation_datetime = util.get_data_aggregation_starting_datetime(date_from)
+        while aggregation_datetime < date_to_tzinfo_free:
+            aggregated_data = aggregate_data(data[col], aggregation_datetime)
+            if aggregated_data != -1:
+                data_cpy[col][str(aggregation_datetime)] = aggregated_data
+            aggregation_datetime = aggregation_datetime + consts.DATA_TIMEDELTA
+
+    return data_cpy
+
+def aggregate_data(data, aggregation_datetime):
+    dates = list(map(lambda x: datetime.strptime(x, consts.DATE_FORMAT), data.keys()))
+    dates = list(filter(lambda x: x > aggregation_datetime - consts.DATA_TIMEDELTA / 2 and x < aggregation_datetime + consts.DATA_TIMEDELTA / 2, dates))
+    aggregated_data_sum = 0
+    aggregated_data_weight = 0
+    for date in dates:
+        temp_weight = (consts.DATA_TIMEDELTA / 2 - abs(aggregation_datetime - date)) / (consts.DATA_TIMEDELTA / 2)
+        aggregated_data_sum = aggregated_data_sum + temp_weight * data[str(date)]
+        aggregated_data_weight = aggregated_data_weight + temp_weight
+
+    if aggregated_data_weight == 0:
+        return -1
+    else:
+        return aggregated_data_sum / aggregated_data_weight
 
 def data_average(address_data, center_lat, center_lon, radius):
     sum_w_data = 0

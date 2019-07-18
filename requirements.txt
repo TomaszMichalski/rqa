@@ -4,3 +4,5 @@ python-dotenv
 requests
 gunicorn
 apscheduler
+numpy
+scikit-learn

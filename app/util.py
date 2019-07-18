@@ -1,3 +1,4 @@
+from . import consts
 from . import models
 from math import pi, sqrt, sin, cos, atan2
 import requests
@@ -64,3 +65,25 @@ def get_geo_location(address):
         return None
 
 # Get location based on address - END
+
+def get_data_aggregation_starting_datetime(date_from):
+    if isinstance(date_from, str):
+        date_from = datetime.datetime.strptime(date_from, consts.DATE_FORMAT)
+    starting_datetime = datetime.datetime(year=date_from.year, month=date_from.month, day=date_from.day)
+    date_from_tzinfo_free = date_from.replace(tzinfo=None)
+    while starting_datetime <= date_from_tzinfo_free:
+        starting_datetime = starting_datetime + consts.DATA_TIMEDELTA
+
+    return starting_datetime
+
+def get_prediction_datetimes(date_from, date_to):
+    dt = get_data_aggregation_starting_datetime(date_from)
+    date_to_tzinfo_free = date_to.replace(tzinfo=None)
+    datetimes = []
+    while dt <= date_to_tzinfo_free:
+        datetimes.append(dt)
+        dt = dt + consts.DATA_TIMEDELTA
+
+    datetimes = list(map(lambda x: datetime.datetime.timestamp(x), datetimes))
+
+    return datetimes
