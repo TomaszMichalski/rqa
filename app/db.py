@@ -5,6 +5,8 @@ from . import prediction
 from dbservice.database.readers import reader
 from datetime import datetime
 
+# fetch all addresses within radius from (lat, lon) point using geo location distance algorithm
+# returns result in form of Address list
 def get_addresses_within_area(lat, lon, radius):
     all_addresses = reader.get_addresses()
     filtered_addresses = list(filter(lambda address: util.geo_location_distance(address[1], address[2], lat, lon) < radius, all_addresses))
@@ -14,6 +16,7 @@ def get_addresses_within_area(lat, lon, radius):
     
     return addresses
 
+# returns analysis data based on given GenerationParameters
 def get_analysis_data(parameters):
     # convert address to coordinates
     lat, lon = util.get_geo_location(parameters.address)
@@ -52,6 +55,7 @@ def get_analysis_data(parameters):
 
     return data
 
+# returns prediction data based on given GenerationParameters
 def get_prediction_data(parameters):
     # convert address to coordinates
     lat, lon = util.get_geo_location(parameters.address)
@@ -92,6 +96,8 @@ def get_prediction_data(parameters):
 
     return data
 
+# returns empty data object, which is a dict, where keys are column names,
+# and values are dicts of data for each column with datetime as a key and measurement value as value
 def empty_data():
     data = dict()
     data['pm1'] = dict()
@@ -106,6 +112,9 @@ def empty_data():
 
     return data
 
+# retrieves air data for given parameters
+# performs data average using addresses
+# performs data aggregation to given datetimes (00:00, 06:00 etc.)
 def get_air_data(addresses, date_from, date_to, columns, lat, lon, radius):
     data = dict()
     for col in columns:
@@ -128,6 +137,9 @@ def get_air_data(addresses, date_from, date_to, columns, lat, lon, radius):
 
     return data
 
+# retrieves weather data for given parameters
+# performs data average using addresses
+# performs data aggregation to given datetimes (00:00, 06:00 etc.)
 def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
     data = dict()
     for col in columns:
@@ -150,6 +162,7 @@ def get_weather_data(addresses, date_from, date_to, columns, lat, lon, radius):
 
     return data
 
+# returns averaged data for addresses so that a single measurement value for datetime is present
 def get_averaged_data(data, lat, lon, radius):
     data_cpy = dict()
     for col in data.keys():
@@ -161,6 +174,7 @@ def get_averaged_data(data, lat, lon, radius):
     
     return data_cpy
 
+# sorts data for each column by datetime
 def get_sorted_data(data):
     data_cpy = dict()
     for col in data.keys():
@@ -170,6 +184,7 @@ def get_sorted_data(data):
 
     return data_cpy
 
+# returns aggregated data to specific datetimes (00:00, 06:00 etc.) for whole data dict
 def get_aggregated_data(data, date_from, date_to):
     data_cpy = dict()
     date_to_tzinfo_free = date_to.replace(tzinfo=None)
@@ -184,6 +199,9 @@ def get_aggregated_data(data, date_from, date_to):
 
     return data_cpy
 
+# retrieves data which should be aggregated to given aggregation datetime,
+# that is data in (aggregation_datetime - consts.DATA_TIMEDELTA / 2, aggregation_datatime + consts.DATA_TIMEDELTA / 2) period
+# then it is aggregated using weighted average, where weight is aggregation_datetime - measurement's datetime distance from aggreation_datetime 
 def aggregate_data(data, aggregation_datetime):
     dates = list(map(lambda x: datetime.strptime(x, consts.DATE_FORMAT), data.keys()))
     dates = list(filter(lambda x: x > aggregation_datetime - consts.DATA_TIMEDELTA / 2 and x < aggregation_datetime + consts.DATA_TIMEDELTA / 2, dates))
@@ -199,6 +217,8 @@ def aggregate_data(data, aggregation_datetime):
     else:
         return aggregated_data_sum / aggregated_data_weight
 
+# averages data from multiple addresses to a single point using weighted average, where weight
+# is radius - measurement's point distance from center
 def data_average(address_data, center_lat, center_lon, radius):
     sum_w_data = 0
     sum_w = 0
@@ -214,6 +234,7 @@ def data_average(address_data, center_lat, center_lon, radius):
     else:
         return sum_w_data / sum_w
 
+# calculated weight of address, where weight is center - distance from center
 def addresses_weight(addresses, center_lat, center_lon, radius):
     sum_w = 0
     for address in addresses:
@@ -223,9 +244,11 @@ def addresses_weight(addresses, center_lat, center_lon, radius):
 
     return sum_w
 
+# rounds datetime by setting seconds and microseconds to 0
 def round_datetime(dt):
     return dt.replace(second=0, microsecond=0)
 
+# prepares list of present air columns based on GenerationParameters
 def prepare_air_columns(parameters):
     columns = []
     if parameters.is_pm1:
@@ -237,6 +260,7 @@ def prepare_air_columns(parameters):
 
     return columns
 
+# prepares list of present weather columns based on GenerationParameters
 def prepare_weather_columns(parameters):
     columns = []
     if parameters.is_temp:
@@ -253,6 +277,7 @@ def prepare_weather_columns(parameters):
 
     return columns
 
+# build query string between SELECT and FROM for data retrieve based on given columns
 def prepare_columns_query_string(columns):
     if columns:
         return ', ' + ', '.join(columns)

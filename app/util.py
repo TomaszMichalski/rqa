@@ -5,6 +5,7 @@ import requests
 import datetime
 import json
 
+# creates GenerationParameters model from GenerateForm
 def create_generation_parameters(form):
     address = form.cleaned_data.get('address')
     radius = float(form.cleaned_data.get('radius'))
@@ -21,6 +22,7 @@ def create_generation_parameters(form):
 
     return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
 
+# converts configuration data to GenerationParameters model
 def convert_to_generation_parameters(configuration, for_prediction=False):
     address = configuration.address
     radius = float(configuration.radius)
@@ -89,6 +91,9 @@ def get_geo_location(address):
 
 # Get location based on address - END
 
+# gets first data aggregation datetime (which is 00:00, 06:00, 12:00 or 18:00) after date_from
+# date_from can be both datetime or string, if it is string then it is converted to datetime
+# using consts.DATE_FORMAT
 def get_data_aggregation_starting_datetime(date_from):
     if isinstance(date_from, str):
         date_from = datetime.datetime.strptime(date_from, consts.DATE_FORMAT)
@@ -99,6 +104,12 @@ def get_data_aggregation_starting_datetime(date_from):
 
     return starting_datetime
 
+# gets all aggregation datetimes between date_from and date_to,
+# staring with result of get_data_aggregation_starting_datetime
+# datetimes are calculated by adding consts.DATA_TIMEDELTA
+# result is not a list of datetimes, but a list of timestamps,
+# which was a requirement for linear regression, but this is expected to change
+# when switched to a non-placeholder prediction algorithm
 def get_prediction_datetimes(date_from, date_to):
     dt = get_data_aggregation_starting_datetime(date_from)
     date_to_tzinfo_free = date_to.replace(tzinfo=None)

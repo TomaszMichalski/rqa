@@ -5,6 +5,9 @@ from datetime import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
+# calculates prediction data from date_from to date_to using past_data
+# after the process, cuts the (< date_from) part of predicted data so that
+# only datetimes between date_from and date_to are present in the result
 def predict(past_data, date_from, date_to):
     # create empty prediction data object
     data = db.empty_data()
@@ -25,6 +28,10 @@ def predict(past_data, date_from, date_to):
 
     return data
 
+# calculates prediction data using linear regression
+# calculations are performed for each column (PM1 etc.) separately
+# specific datetimes (00:00, 06:00 etc.) are used
+# note that past data is also included in result
 def calculate_placeholder_prediction_data(past_data, date_to):
     for col in past_data.keys():
         if len(list(past_data[col].keys())) > 0:

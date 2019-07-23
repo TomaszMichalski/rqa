@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import timedelta
 
+# container for analysis and prediction generation
 class GenerationParameters():
     def __init__(self, address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds):
         self.address = address
@@ -20,6 +21,7 @@ class GenerationParameters():
     def __str__(self):
         return "[address: %s, radius: %s, date_from: %s, date_to: %s, is_pm1: %s, is_pm25: %s, is_pm10: %s, is_temp: %s, is_pressure: %s, is_humidity: %s, is_wind: %s, is_clouds: %s]" % (self.address, self.radius, self.date_from, self.date_to, self.is_pm1, self.is_pm25, self.is_pm10, self.is_temp, self.is_pressure, self.is_humidity, self.is_wind, self.is_clouds)
 
+# container for latitude and longitude of address
 class Address():
     def __init__(self, id, lat, lon):
         self.id = id
@@ -29,6 +31,7 @@ class Address():
     def __str__(self):
         return "[id: %f, lat: %f, lon: %f]" % (self.id, self.lat, self.lon)
 
+# container for user and group configuration data
 class Configuration(models.Model):
     address = models.CharField(max_length=128)
     radius = models.CharField(max_length=8)
@@ -42,11 +45,13 @@ class Configuration(models.Model):
     is_wind = models.BooleanField(default=True)
     is_clouds = models.BooleanField(default=True)
 
+# user group
 class Group(models.Model):
     name = models.CharField(max_length=64)
     analysis_configuration = models.OneToOneField(Configuration, null=True, on_delete=models.SET_NULL, related_name="group_analysis_configuration")
     prediction_configuration = models.OneToOneField(Configuration, null=True, on_delete=models.SET_NULL, related_name="group_prediction_configuration")
 
+# user profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     analysis_configuration = models.OneToOneField(Configuration, null=True, on_delete=models.SET_NULL, related_name="analysis_configuration")

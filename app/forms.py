@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from . import models
 from datetime import datetime, timedelta
 
+# form used to gather custom analysis and custom prediction parameters
 class GenerateForm(forms.Form):
     address = forms.CharField(label='Address')
     radius = forms.CharField(label='Radius (km)')
@@ -18,6 +19,7 @@ class GenerateForm(forms.Form):
     is_wind = forms.BooleanField(label='Wind', required=False, initial=True)
     is_clouds = forms.BooleanField(label='Clouds', required=False, initial=True)
 
+# form used to display and modify analysis and prediction configuration for user and group
 class ConfigurationForm(forms.ModelForm):
     class Meta:
         model = models.Configuration
@@ -35,6 +37,7 @@ class ConfigurationForm(forms.ModelForm):
             'is_clouds': 'Clouds'
         }
 
+# register new user form
 class RegisterForm(UserCreationForm):
     first_name = forms.CharField(max_length=32)
     last_name = forms.CharField(max_length=32)
