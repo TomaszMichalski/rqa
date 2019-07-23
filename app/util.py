@@ -18,6 +18,29 @@ def create_generation_parameters(form):
     is_humidity = form.cleaned_data.get('is_humidity')
     is_wind = form.cleaned_data.get('is_wind')
     is_clouds = form.cleaned_data.get('is_clouds')
+
+    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
+
+def convert_to_generation_parameters(configuration, for_prediction=False):
+    address = configuration.address
+    radius = float(configuration.radius)
+    
+    if for_prediction:
+        date_from = datetime.datetime.now()
+        date_to = datetime.datetime.now() + datetime.timedelta(days=float(configuration.period))
+    else:
+        date_from = datetime.datetime.now() - datetime.timedelta(days=float(configuration.period))
+        date_to = datetime.datetime.now()
+
+    is_pm1 = configuration.is_pm1
+    is_pm25 = configuration.is_pm25
+    is_pm10 = configuration.is_pm10
+    is_temp = configuration.is_temp
+    is_pressure = configuration.is_pressure
+    is_humidity = configuration.is_humidity
+    is_wind = configuration.is_wind
+    is_clouds = configuration.is_clouds
+
     return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
 
 # Measure distance between two locations - START

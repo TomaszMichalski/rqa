@@ -54,7 +54,20 @@ def prediction(request):
 
 @login_required(login_url='user/login')
 def configuration(request):
-    return render(request, 'app/configuration.html')
+    profile = models.Profile.objects.get(user=request.user)
+    analysis_configuration = profile.analysis_configuration
+    prediction_configuration = profile.prediction_configuration
+    if request.method == "POST":
+        analysis_configuration_form = forms.ConfigurationForm(request.POST, instance=analysis_configuration, prefix='analysis')
+        prediction_configuration_form = forms.ConfigurationForm(request.POST, instance=prediction_configuration, prefix='prediction')
+        if analysis_configuration_form.is_valid() and prediction_configuration_form.is_valid():
+            analysis_configuration_form.save()
+            prediction_configuration_form.save()
+    else:
+        analysis_configuration_form = forms.ConfigurationForm(instance=analysis_configuration, prefix='analysis')
+        prediction_configuration_form = forms.ConfigurationForm(instance=prediction_configuration, prefix='prediction')
+    
+    return render(request, 'app/configuration.html', { 'analysis_configuration': analysis_configuration_form, 'prediction_configuration': prediction_configuration_form })
 
 @login_required(login_url='user/login')
 def analysis_generate(request):
@@ -64,8 +77,12 @@ def analysis_generate(request):
 
 @login_required(login_url='user/login')
 def analysis_user(request):
-    data = dict()
-    info = []
+    profile = models.Profile.objects.get(user=request.user)
+    analysis_configuration = profile.analysis_configuration
+    generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
+    data = db.get_analysis_data(generation_parameters)
+    info = data['info']
+    data = json.dumps(data)
 
     return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
 
@@ -97,8 +114,12 @@ def prediction_generate(request):
 
 @login_required(login_url='user/login')
 def prediction_user(request):
-    data = dict()
-    info = []
+    profile = models.Profile.objects.get(user=request.user)
+    prediction_configuration = profile.prediction_configuration
+    generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
+    data = db.get_prediction_data(generation_parameters)
+    info = data['info']
+    data = json.dumps(data)
 
     return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
 
