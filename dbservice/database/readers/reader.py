@@ -8,11 +8,10 @@ def open_connection():
     db_url = os.environ.get('DATABASE_URL')
 
     # local version
-    if db_url is None or db_url == "sqlite:///db.sqlite3":
-        proc = subprocess.Popen('heroku config:get DATABASE_URL -a rqa', stdout=subprocess.PIPE, shell=True)
-        db_url = proc.stdout.read().decode('utf-8').strip() + '?sslmode=require'
-
-    conn = psycopg2.connect(db_url)
+    if db_url is None:
+        conn = psycopg2.connect(host='localhost', user='rqa_user', password='password', dbname='rqa_db')
+    else:
+        conn = psycopg2.connect(db_url)
     cur = conn.cursor()
 
     return cur, conn
