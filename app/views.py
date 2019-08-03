@@ -40,9 +40,11 @@ def login(request):
 def logout(request):
     return render(request, 'app/logout.html')
 
-@login_required(login_url='user/login')
 def home(request):
-    return render(request, 'app/home.html')
+    if request.user.is_authenticated:
+        return render(request, 'app/home.html')
+    
+    return render(request, 'app/guest.html')
 
 @login_required(login_url='user/login')
 def analysis(request):
@@ -142,3 +144,6 @@ def prediction_custom(request):
         return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
 
     return render(request, 'app/prediction_generate.html', { 'form': form })
+
+def guest_generate(request):
+    pass
