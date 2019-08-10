@@ -6,6 +6,7 @@ from . import forms
 from . import models
 from . import util
 from . import db
+from . import consts
 import json
 
 def register(request):
@@ -146,4 +147,15 @@ def prediction_custom(request):
     return render(request, 'app/prediction_generate.html', { 'form': form })
 
 def guest_generate(request):
-    pass
+    location = request.GET.get('location', None)
+    if location is None:
+        return redirect('guest')
+    
+    generation_parameters = util.create_guest_generation_parameters(location)
+    data = db.get_prediction_data(generation_parameters)
+    info = data['info']
+    info.append(consts.GUEST_MESSAGE)
+    data = json.dumps(data)
+    chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+
+    return render(request, 'app/guest_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title })
