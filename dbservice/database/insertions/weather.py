@@ -20,7 +20,7 @@ def insert_single_weather_reading(cur, address_id, datetime, api, *args, **kwarg
 
     done = False
 
-    for attempts in range(1000):
+    for attempts in range(3000):
         if done:
             break
         try:
@@ -32,7 +32,7 @@ def insert_single_weather_reading(cur, address_id, datetime, api, *args, **kwarg
                  wind_speed, wind_degree, clouds, address_id, api))
             done = True
         except psycopg2.Error as e:
-            print("PostgreSQL Error {0}: {1}".format(e.args[0], e.args[1]))
+            print("PostgreSQL Error {0}".format(e))
 
     if done:
         print(
