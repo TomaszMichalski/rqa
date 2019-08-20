@@ -1,4 +1,4 @@
-from database.connection import connection
+from dbservice.database.connection import connection
 
 
 def open_connection():

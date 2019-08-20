@@ -60,6 +60,9 @@
         <br />
         <div class="row">
             <div class="col-sm-9">
+                <div id="chart_title">
+                    <h3>{{ chart_title }}</h3>
+                </div>
                 <div id="chart">
                     <canvas id="pm1" width="800" height="200"></canvas>
                     <canvas id="pm25" width="800" height="200"></canvas>
@@ -79,13 +82,31 @@
                         <br />
                         <a href="#" class="btn btn-primary btn-block" role="button">Refresh</a>
                         <br />
-                        <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="analysis.png">Export</a>
+                        <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="{{ filename }}">Export</a>
                     </div>
                     <div id="description" class="row">
                         <h4>Analysis information</h4>
                         {% for info_line in info %}
-                        <li>{{ info_line }}</li>
+                        {{ info_line }}<br />
                         {% endfor %}
+                        <br />
+                        <br />
+                        <table class="table table-bordered table-sm">
+                            <tr>
+                                <th><center>Factor</center></th>
+                                <th><center>Mean</center></th>
+                                <th><center>Median</center></th>
+                                <th><center>Standard deviation</center></th>
+                            </tr>
+                            {% for factor, stats in statistics.items %}
+                            <tr>
+                                <td><center>{{ factor }}</center></td>
+                                <td><center>{{ stats.mean }}</center></td>
+                                <td><center>{{ stats.median }}</center></td>
+                                <td><center>{{ stats.stdev }}</center></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
                     </div>
                 </div>
             </div>
