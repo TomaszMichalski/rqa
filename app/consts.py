@@ -21,3 +21,6 @@ DATA_TIMEDELTA = timedelta(hours=6)
 
 # date format
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+# guest information about registered user functionalities
+GUEST_MESSAGE = "Please note that this is a demo version of RQA app.\nBy registering, you gain plenty of functionalities - analysis and prediction based on your preferences, custom examinations, configuration options, groups, and more!"
