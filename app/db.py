@@ -43,13 +43,7 @@ def get_analysis_data(parameters):
         data[k] = v
 
     # fill information data
-    data['info'] = []
-    data['info'].append('Analysis based on {} point(s) in given area.'.format(len(addresses)))
-    if len(addresses) < consts.ADDRESSES_WARNING_NUM:
-        data['info'].append('Analysis may be inaccurate due to low point number in area.')
-    if 0 < addresses_weight(addresses, lat, lon, radius) < consts.ADDRESSES_WARNING_WEIGHT:
-        data['info'].append('Analysis may be inaccurate due to points being far from area center.')
-    # fill WHO norms for PM25 and PM10
+    data['info'] = get_analysis_data_info(addresses, lat, lon, radius)
     data['pm25_norm'] = consts.PM25_WHO_NORM
     data['pm10_norm'] = consts.PM10_WHO_NORM
 
@@ -84,17 +78,31 @@ def get_prediction_data(parameters):
     data = prediction.predict(past_data, date_from, date_to)
 
     # fill information data
-    data['info'] = []
-    data['info'].append('Prediction based on {} point(s) in given area.'.format(len(addresses)))
-    if len(addresses) < consts.ADDRESSES_WARNING_NUM:
-        data['info'].append('Prediction may be inaccurate due to low point number in area.')
-    if 0 < addresses_weight(addresses, lat, lon, radius) < consts.ADDRESSES_WARNING_WEIGHT:
-        data['info'].append('Prediction may be inaccurate due to points being far from area center.')
-    # fill WHO norms for PM25 and PM10
+    data['info'] = get_prediction_data_info(addresses, lat, lon, radius)
     data['pm25_norm'] = consts.PM25_WHO_NORM
     data['pm10_norm'] = consts.PM10_WHO_NORM
 
     return data
+
+def get_analysis_data_info(addresses, lat, lon, radius):
+    info = []
+    info.append(consts.ANALYSIS_POINTS_NUM_MESSAGE.format(len(addresses)))
+    if len(addresses) < consts.ADDRESSES_WARNING_NUM:
+        info.append(consts.ANALYSIS_INACCURATE_POINTS_NUM_LOW_WARNING)
+    if 0 < addresses_weight(addresses, lat, lon, radius) < consts.ADDRESSES_WARNING_WEIGHT:
+        info.append(consts.ANALYSIS_INACCURATE_POINTS_FAR_FROM_CENTER_WARNING)
+
+    return info
+
+def get_prediction_data_info(addresses, lat, lon, radius):
+    info = []
+    info.append(consts.PREDICTION_POINTS_NUM_MESSAGE.format(len(addresses)))
+    if len(addresses) < consts.ADDRESSES_WARNING_NUM:
+        info.append(consts.PREDICTION_INACCURATE_POINTS_NUM_LOW_WARNING)
+    if 0 < addresses_weight(addresses, lat, lon, radius) < consts.ADDRESSES_WARNING_WEIGHT:
+        info.append(consts.PREDICTION_INACCURATE_POINTS_FAR_FROM_CENTER_WARNING)
+
+    return info
 
 # returns empty data object, which is a dict, where keys are column names,
 # and values are dicts of data for each column with datetime as a key and measurement value as value

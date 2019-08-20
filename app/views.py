@@ -8,6 +8,7 @@ from . import models
 from . import util
 from . import db
 from . import consts
+from . import statistics
 import json
 
 def register(request):
@@ -181,9 +182,13 @@ def analysis_user(request):
     generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
     data = db.get_analysis_data(generation_parameters)
     info = data['info']
+    info = statistics.append_statistics_info(info, data)
+    stats = statistics.get_statistics_for_data(data)
     data = json.dumps(data)
+    chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+    examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-    return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
+    return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
 
 @login_required(login_url='user/login')
 def analysis_group(request):
@@ -199,9 +204,13 @@ def analysis_group(request):
         generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
         data = db.get_analysis_data(generation_parameters)
         info = data['info']
+        info = statistics.append_statistics_info(info, data)
+        stats = statistics.get_statistics_for_data(data)
         data = json.dumps(data)
-        
-        return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
+        chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+        examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+
+        return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
 
 @login_required(login_url='user/login')
 def analysis_custom(request):
@@ -210,9 +219,13 @@ def analysis_custom(request):
         generation_parameters = util.create_generation_parameters(form)
         data = db.get_analysis_data(generation_parameters)
         info = data['info']
+        info = statistics.append_statistics_info(info, data)
+        stats = statistics.get_statistics_for_data(data)
         data = json.dumps(data)
+        chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+        examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-        return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
+        return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
         
     return render(request, 'app/analysis_generate.html', { 'form': form })
 
@@ -229,9 +242,13 @@ def prediction_user(request):
     generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
     data = db.get_prediction_data(generation_parameters)
     info = data['info']
+    info = statistics.append_statistics_info(info, data)
+    stats = statistics.get_statistics_for_data(data)
     data = json.dumps(data)
+    chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+    examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-    return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
+    return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
 
 @login_required(login_url='user/login')
 def prediction_group(request):
@@ -247,9 +264,13 @@ def prediction_group(request):
         generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
         data = db.get_prediction_data(generation_parameters)
         info = data['info']
+        info = statistics.append_statistics_info(info, data)
+        stats = statistics.get_statistics_for_data(data)
         data = json.dumps(data)
+        chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+        examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-        return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
+        return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
 
 @login_required(login_url='user/login')
 def prediction_custom(request):
@@ -258,9 +279,13 @@ def prediction_custom(request):
         generation_parameters = util.create_generation_parameters(form)
         data = db.get_prediction_data(generation_parameters)
         info = data['info']
+        info = statistics.append_statistics_info(info, data)
+        stats = statistics.get_statistics_for_data(data)
         data = json.dumps(data)
+        chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+        examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-        return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
+        return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
 
     return render(request, 'app/prediction_generate.html', { 'form': form })
 
@@ -273,7 +298,10 @@ def guest_generate(request):
     data = db.get_prediction_data(generation_parameters)
     info = data['info']
     info.append(consts.GUEST_MESSAGE)
+    info = statistics.append_statistics_info(info, data)
+    stats = statistics.get_statistics_for_data(data)
     data = json.dumps(data)
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+    examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-    return render(request, 'app/guest_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title })
+    return render(request, 'app/guest_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })

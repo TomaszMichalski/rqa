@@ -131,3 +131,18 @@ def get_prediction_datetimes(date_from, date_to):
 
 def get_chart_title(location, date_from, date_to):
     return "Examination for {0}, {1} to {2}".format(location, date_from.date(), date_to.date())
+
+def get_examination_filename(location, date_from, date_to):
+    return "RQA {0} {1} {2}.png".format(location, date_from.date(), date_to.date())
+
+def extract_factor_data(data):
+    result = dict()
+    for column in consts.AIR_COLUMNS:
+        result[column] = data[column]
+    for column in consts.WEATHER_COLUMNS:
+        result[column] = data[column]
+    
+    return result
+
+def get_factor_name(factor):
+    return consts.COLUMNS_NAMES[factor]
