@@ -36,49 +36,29 @@
             </li>
         </ul>
     </li>
-    <li class="active">
-        <a href={% url 'configuration' %}>Configuration</a>
+    <li class="dropdown active">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'configuration_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'configuration_group' %}>Group</a>
+            </li>
+        </ul>
     </li>
 </ul>
 
 <div id="content">
-    <center>
-        <form method="post" action={% url 'configuration' %}>
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-sm-2"></div>
-                <div class="col-sm-4">
-                    <h3>Analysis configuration</h3>
-                    <table>
-                        {% for field in analysis_configuration %}
-                        <div class="form-group">
-                            <tr>
-                                <td style="text-align: left;">{{ field.label_tag }}</td>
-                                <td style="text-align: left;">{{ field }}</td>
-                            </tr>
-                        </div>
-                        {% endfor %}
-                    </table>
-                </div>
-                <div class="col-sm-4">
-                    <h3>Prediction configuration</h3>
-                    <table>
-                        {% for field in prediction_configuration %}
-                        <div class="form-group">
-                            <tr>
-                                <td style="text-align: left;">{{ field.label_tag }}</td>
-                                <td style="text-align: left;">{{ field }}</td>
-                            </tr>
-                        </div>
-                        {% endfor %}
-                    </table>
-                </div>
-                <div class="col-sm-2"></div>
-            </div>
-            <hr />
-            <button class="btn btn-primary btn-lg" style="width: 40%">Save configuration</button>
-        </form>
-    </center>
+    Here you can manage configuration.
+    <br /> Choose a proper option from
+    <i>Configuration</i> dropdown menu above.
+    <br /> Press
+    <b>User</b> for your user configuration.
+    <br /> Press
+    <b>Group</b> for your group configuration.
 </div>
 
 {% endblock %}

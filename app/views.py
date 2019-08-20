@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
+from django.core.paginator import Paginator
 from . import forms
 from . import models
 from . import util
@@ -54,6 +55,10 @@ def prediction(request):
 
 @login_required(login_url='user/login')
 def configuration(request):
+    return render(request, 'app/configuration.html')
+
+@login_required(login_url='user/login')
+def configuration_user(request):
     profile = models.Profile.objects.get(user=request.user)
     analysis_configuration = profile.analysis_configuration
     prediction_configuration = profile.prediction_configuration
@@ -67,7 +72,98 @@ def configuration(request):
         analysis_configuration_form = forms.ConfigurationForm(instance=analysis_configuration, prefix='analysis')
         prediction_configuration_form = forms.ConfigurationForm(instance=prediction_configuration, prefix='prediction')
     
-    return render(request, 'app/configuration.html', { 'analysis_configuration': analysis_configuration_form, 'prediction_configuration': prediction_configuration_form })
+    return render(request, 'app/configuration_user.html', { 'analysis_configuration': analysis_configuration_form, 'prediction_configuration': prediction_configuration_form })
+
+def configuration_group(request):
+    profile = models.Profile.objects.get(user=request.user)
+    group = profile.group
+
+    if group is None:
+        return render(request, 'app/configuration_group_no_config.html')
+    else:
+        analysis_configuration = group.analysis_configuration
+        prediction_configuration = group.prediction_configuration
+        if request.method == "POST":
+            analysis_configuration_form = forms.ConfigurationForm(request.POST, instance=analysis_configuration, prefix='analysis')
+            prediction_configuration_form = forms.ConfigurationForm(request.POST, instance=prediction_configuration, prefix='prediction')
+            if analysis_configuration_form.is_valid() and prediction_configuration_form.is_valid():
+                updated_analysis_configuration = analysis_configuration_form.save()
+                updated_prediction_configuration = prediction_configuration_form.save()
+                group.analysis_configuration = updated_analysis_configuration
+                group.prediction_configuration = updated_prediction_configuration
+                group.save()
+        else:
+            analysis_configuration_form = forms.ConfigurationForm(instance=analysis_configuration, prefix='analysis')
+            prediction_configuration_form = forms.ConfigurationForm(instance=prediction_configuration, prefix='prediction')
+        
+        return render(request, 'app/configuration_group.html', { 'analysis_configuration': analysis_configuration_form, 'prediction_configuration': prediction_configuration_form, 'group_name': group.name })
+
+@login_required(login_url='user/login')
+def configuration_group_create(request):
+    profile = models.Profile.objects.get(user=request.user)
+    group = profile.group
+
+    if group is not None:
+        return render(request, 'app/configuration_group_already_in.html', { 'group_name': group.name })
+    else:
+        if request.method == "POST":
+            form = forms.GroupForm(request.POST)
+            if form.is_valid():
+                form.save()
+                created_group_key = form.cleaned_data.get('key')
+                created_group = models.Group.objects.get(key=created_group_key)
+                profile.group = created_group
+                profile.save()
+                return redirect('configuration_group')
+        else:
+            form = forms.GroupForm()
+        return render(request, 'app/configuration_group_create.html', { 'form': form })
+
+@login_required(login_url='user/login')
+def configuration_group_list(request):
+    profile = models.Profile.objects.get(user=request.user)
+    group = profile.group
+
+    if group is not None:
+        return render(request, 'app/configuration_group_already_in.html', { 'group_name': group.name })
+    else:
+        group_list = models.Group.objects.all()
+        paginator = Paginator(group_list, 20)
+        page = request.GET.get('page')
+        groups = paginator.get_page(page)
+
+        return render(request, 'app/configuration_group_list.html', { 'groups': groups })
+
+@login_required(login_url='user/login')
+def configuration_group_join(request):
+    profile = models.Profile.objects.get(user=request.user)
+    group = profile.group
+
+    if group is not None:
+        return render(request, 'app/configuration_group_already_in.html', { 'group_name': group.name })
+    else:
+        if request.method == "POST":
+            group_name = request.POST.get('group_name', '')
+            group_key = request.POST.get('group_key', '')
+            targeted_group = models.Group.objects.get(name=group_name)
+            if targeted_group.key == group_key:
+                profile.group = targeted_group
+                profile.save()
+                return redirect('configuration_group')
+        else:
+            group_name = request.GET.get('group_name', '')
+        return render(request, 'app/configuration_group_join.html', { 'group_name': group_name })
+
+@login_required(login_url='user/login')
+def configuration_group_leave(request):
+    profile = models.Profile.objects.get(user=request.user)
+    group = profile.group
+
+    if group is not None:
+        profile.group = None
+        profile.save()
+
+    return redirect('configuration_group')
 
 @login_required(login_url='user/login')
 def analysis_generate(request):
@@ -90,8 +186,19 @@ def analysis_user(request):
 def analysis_group(request):
     data = dict()
     info = []
-
-    return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
+    profile = models.Profile.objects.get(user=request.user)
+    group = profile.group
+    
+    if group is None:
+        return render(request, 'app/analysis_group_no_config.html')
+    else:
+        analysis_configuration = group.analysis_configuration
+        generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
+        data = db.get_analysis_data(generation_parameters)
+        info = data['info']
+        data = json.dumps(data)
+        
+        return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info })
 
 @login_required(login_url='user/login')
 def analysis_custom(request):
@@ -127,8 +234,19 @@ def prediction_user(request):
 def prediction_group(request):
     data = dict()
     info = []
+    profile = models.Profile.objects.get(user=request.user)
+    group = profile.group
 
-    return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
+    if group is None:
+        return render(request, 'app/prediction_group_no_config.html')
+    else:
+        prediction_configuration = group.prediction_configuration
+        generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
+        data = db.get_prediction_data(generation_parameters)
+        info = data['info']
+        data = json.dumps(data)
+
+        return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info })
 
 @login_required(login_url='user/login')
 def prediction_custom(request):

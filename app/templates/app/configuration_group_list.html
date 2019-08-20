@@ -1,0 +1,103 @@
+{% extends "app/base.html" %} {% block content %}
+
+<ul class="nav nav-tabs">
+    <li>
+        <a href={% url 'home' %}>Home</a>
+    </li>
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'analysis_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'analysis_group' %}>Group</a>
+            </li>
+            <li>
+                <a href={% url 'analysis_generate' %}>Custom</a>
+            </li>
+        </ul>
+    </li>
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'prediction' %}>Prediction
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'prediction_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'prediction_group' %}>Group</a>
+            </li>
+            <li>
+                <a href={% url 'prediction_generate' %}>Custom</a>
+            </li>
+        </ul>
+    </li>
+    <li class="dropdown active">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'configuration_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'configuration_group' %}>Group</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<div id="content">
+    <center>
+        <br />
+        <table class="table table-bordered table-hover" style="width:40%">
+            <thead>
+                <tr>
+                    <th>Group name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for group in groups %}
+                    <tr>
+                        <td><center>{{ group.name }}</center></td>
+                        <td>
+                            <form action={% url 'configuration_group_join' %}>
+                                <input type="hidden" value={{ group.name }} name="group_name">
+                                <button class="btn btn-primary btn-md" role="button" style="width:100%">Join</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2" align="center">No groups to show</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if groups.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ groups.previous_page_number }}">previous</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ groups.number }} of {{ groups.paginator.num_pages }}.
+                </span>
+        
+                {% if groups.has_next %}
+                    <a href="?page={{ groups.next_page_number }}">next</a>
+                    <a href="?page={{ groups.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </center>
+</div>
+
+{% endblock %}

@@ -4,7 +4,7 @@
     <li>
         <a href={% url 'home' %}>Home</a>
     </li>
-    <li class="dropdown active">
+    <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
             <span class="caret"></span>
         </a>
@@ -36,7 +36,7 @@
             </li>
         </ul>
     </li>
-    <li class="dropdown">
+    <li class="dropdown active">
         <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
             <span class="caret"></span>
         </a>
@@ -53,20 +53,24 @@
 
 <div id="content">
     <center>
-        <div class="custom-form">
-            <h2>Generate for</h2>
-            <form method="get" action={% url 'analysis_custom' %}>
+        <div style="width: 30%">
+            <h2>Create group</h2>
+            <form method="post">
+                {% csrf_token %}
                 <table>
                     {% for field in form %}
                     <div class="form-group">
                         <tr>
-                            <td>{{ field.label_tag }}</td>
-                            <td>{{ field }}</td>
+                            <td style="text-align: left;">{{ field.label_tag }}</td>
+                            <td style="text-align: left;">{{ field }}</td>
                         </tr>
+                        {% for error in field.errors %}
+                        <p style="color: red">{{ error }}</p>
+                        {% endfor %}
                     </div>
                     {% endfor %}
                 </table>
-                <button class="btn btn-primary btn-single">Generate</button>
+                <button class="btn btn-primary btn-lg" style="width: 100%">Create</button>
             </form>
         </div>
     </center>

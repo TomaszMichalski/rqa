@@ -4,7 +4,7 @@
     <li>
         <a href={% url 'home' %}>Home</a>
     </li>
-    <li class="dropdown active">
+    <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
             <span class="caret"></span>
         </a>
@@ -36,7 +36,7 @@
             </li>
         </ul>
     </li>
-    <li class="dropdown">
+    <li class="dropdown active">
         <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
             <span class="caret"></span>
         </a>
@@ -53,22 +53,41 @@
 
 <div id="content">
     <center>
-        <div class="custom-form">
-            <h2>Generate for</h2>
-            <form method="get" action={% url 'analysis_custom' %}>
-                <table>
-                    {% for field in form %}
-                    <div class="form-group">
-                        <tr>
-                            <td>{{ field.label_tag }}</td>
-                            <td>{{ field }}</td>
-                        </tr>
-                    </div>
-                    {% endfor %}
-                </table>
-                <button class="btn btn-primary btn-single">Generate</button>
-            </form>
-        </div>
+        <form method="post" action={% url 'configuration_user' %}>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <h3>Analysis configuration</h3>
+                    <table>
+                        {% for field in analysis_configuration %}
+                        <div class="form-group">
+                            <tr>
+                                <td style="text-align: left;">{{ field.label_tag }}</td>
+                                <td style="text-align: left;">{{ field }}</td>
+                            </tr>
+                        </div>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="col-sm-4">
+                    <h3>Prediction configuration</h3>
+                    <table>
+                        {% for field in prediction_configuration %}
+                        <div class="form-group">
+                            <tr>
+                                <td style="text-align: left;">{{ field.label_tag }}</td>
+                                <td style="text-align: left;">{{ field }}</td>
+                            </tr>
+                        </div>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+            <hr />
+            <button class="btn btn-primary btn-lg" style="width: 40%">Save configuration</button>
+        </form>
     </center>
 </div>
 
