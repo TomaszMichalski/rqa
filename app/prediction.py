@@ -34,12 +34,15 @@ def calculate_prediction_data(past_data, date_to):
     for col in past_data.keys():
         if len(list(past_data[col].keys())) > 0:
             m = Prophet()
-            df = pd.DataFrame(list(past_data[col].items()))
+            past_data_with_datetimes = dict()
+            for date_as_string, value in past_data[col].items():
+                past_data_with_datetimes[datetime.strptime(date_as_string, consts.DATE_FORMAT)] = value
+            df = pd.DataFrame(list(past_data_with_datetimes.items()))
             m.fit(df)
             future = m.make_future_dataframe(periods=14, freq='6H')
             forecast = m.predict(future)
             for date, value in forecast.iterrows():
-                past_data[col][date] = value
+                past_data[col][date.strftime(consts.DATE_FORMAT)] = value
 
     return past_data
 
