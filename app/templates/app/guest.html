@@ -1,0 +1,61 @@
+{% extends "app/base.html" %} {% block content %}
+
+<div id="content">
+    <center>
+        <h1>RQA</h1>
+        <h2>Air quality analysis application</h2>
+        <br />
+        <br />
+        Just provide an address!
+        <form action={% url 'guest_generate' %}>
+            <div class="form-group" style="width: 40%">
+                <input type="text" id="location" name="location" class="form-control"><br />
+                <br /><br />
+                <button class="btn btn-primary btn-lg">Try it yourself!</button>
+            </div>
+        </form>
+    </center>>
+</div>
+
+<script type="text/javascript">
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(setLocation);
+        }
+    }
+
+    function encodeData(data) {
+        return Object.keys(data).map(function(key) {
+            return [key, data[key]].map(encodeURIComponent).join("=");
+        }).join("&");
+    } 
+
+    function setLocation(position) {
+        var apiToken = '43cf3f75156b90';
+        var apiBaseUrl = 'https://eu1.locationiq.com/v1/reverse.php?';
+        var data = {
+            key: apiToken,
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+            format: 'json'
+        };
+        var params = encodeData(data);
+        var apiUrl = apiBaseUrl + params;
+
+        fetch(apiUrl)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(jsonResponse) {
+                var road = jsonResponse.address.road;
+                var houseNumber = jsonResponse.address.house_number;
+                var city = jsonResponse.address.city;
+                var address = road + " " + houseNumber + ", " + city;
+                document.getElementById("location").value = address;
+            });
+    }
+
+    getLocation();
+</script>
+
+{% endblock %}

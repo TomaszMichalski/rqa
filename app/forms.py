@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from . import models
 from datetime import datetime, timedelta
+from django.core.exceptions import ValidationError
 
 # form used to gather custom analysis and custom prediction parameters
 class GenerateForm(forms.Form):
@@ -36,6 +37,24 @@ class ConfigurationForm(forms.ModelForm):
             'is_wind': 'Wind',
             'is_clouds': 'Clouds'
         }
+
+# create new group form
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = models.Group
+        fields = ('name', 'key')
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if models.Group.objects.filter(name=name).exists():
+            raise ValidationError("Group with this name already exists")
+        return name
+
+    def clean_key(self):
+        key = self.cleaned_data['key']
+        if models.Group.objects.filter(key=key).exists():
+            raise ValidationError("Group with this key already exists")
+        return key
 
 # register new user form
 class RegisterForm(UserCreationForm):

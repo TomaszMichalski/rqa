@@ -48,6 +48,7 @@ class Configuration(models.Model):
 # user group
 class Group(models.Model):
     name = models.CharField(max_length=64)
+    key = models.CharField(max_length=64)
     analysis_configuration = models.OneToOneField(Configuration, null=True, on_delete=models.SET_NULL, related_name="group_analysis_configuration")
     prediction_configuration = models.OneToOneField(Configuration, null=True, on_delete=models.SET_NULL, related_name="group_prediction_configuration")
 
@@ -56,4 +57,4 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     analysis_configuration = models.OneToOneField(Configuration, null=True, on_delete=models.SET_NULL, related_name="analysis_configuration")
     prediction_configuration = models.OneToOneField(Configuration, null=True, on_delete=models.SET_NULL, related_name="prediction_configuration")
-    group = models.OneToOneField(Group, null=True, on_delete=models.SET_NULL)
+    group = models.ForeignKey(Group, null=True, on_delete=models.SET_NULL)

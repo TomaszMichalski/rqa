@@ -22,6 +22,13 @@ def create_generation_parameters(form):
 
     return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
 
+# creates GenerationParameters model for guest
+def create_guest_generation_parameters(location):
+    date_from = datetime.datetime.now() - datetime.timedelta(days=7)
+    date_to = datetime.datetime.now() + datetime.timedelta(days=7)
+
+    return models.GenerationParameters(location, 5.0, date_from, date_to, True, True, True, True, True, True, True, True)
+
 # converts configuration data to GenerationParameters model
 def convert_to_generation_parameters(configuration, for_prediction=False):
     address = configuration.address
@@ -121,3 +128,21 @@ def get_prediction_datetimes(date_from, date_to):
     datetimes = list(map(lambda x: datetime.datetime.timestamp(x), datetimes))
 
     return datetimes
+
+def get_chart_title(location, date_from, date_to):
+    return "Examination for {0}, {1} to {2}".format(location, date_from.date(), date_to.date())
+
+def get_examination_filename(location, date_from, date_to):
+    return "RQA {0} {1} {2}.png".format(location, date_from.date(), date_to.date())
+
+def extract_factor_data(data):
+    result = dict()
+    for column in consts.AIR_COLUMNS:
+        result[column] = data[column]
+    for column in consts.WEATHER_COLUMNS:
+        result[column] = data[column]
+    
+    return result
+
+def get_factor_name(factor):
+    return consts.COLUMNS_NAMES[factor]
