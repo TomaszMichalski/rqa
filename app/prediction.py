@@ -37,12 +37,12 @@ def calculate_prediction_data(past_data, date_to):
             past_data_with_datetimes = dict()
             for date_as_string, value in past_data[col].items():
                 past_data_with_datetimes[datetime.strptime(date_as_string, consts.DATE_FORMAT)] = value
-            df = pd.DataFrame(list(past_data_with_datetimes.items()))
+            df = pd.DataFrame(list(past_data_with_datetimes.items()), columns=['ds', 'y'])
             m.fit(df)
             future = m.make_future_dataframe(periods=14, freq='6H')
             forecast = m.predict(future)
-            for date, value in forecast.iterrows():
-                past_data[col][date.strftime(consts.DATE_FORMAT)] = value
+            for index, row in forecast.iterrows():
+                past_data[col][row['ds'].strftime(consts.DATE_FORMAT)] = row['yhat']
 
     return past_data
 
