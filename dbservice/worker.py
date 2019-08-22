@@ -1,14 +1,11 @@
 # worker.py
-import os
-
-import psycopg2
-import subprocess
-from database.insertions.misc import insert_nearest_airly_installations
+from database.connection import connection
 from worker_functions import retrieve_and_insert_readings_for_all_addresses
 
 
 def main():
 
+<<<<<<< HEAD
     # remote version
     db_url = os.environ.get('DATABASE_URL')
 
@@ -20,6 +17,9 @@ def main():
     conn = psycopg2.connect(db_url)
     conn.autocommit = True
     cur = conn.cursor()
+=======
+    cur, conn = connection.open_database_connection()
+>>>>>>> develop
 
     retrieve_and_insert_readings_for_all_addresses(cur)
 

@@ -36,13 +36,29 @@
             </li>
         </ul>
     </li>
-    <li class="active">
-        <a href={% url 'configuration' %}>Configuration</a>
+    <li class="dropdown active">
+        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href={% url 'configuration_user' %}>User</a>
+            </li>
+            <li>
+                <a href={% url 'configuration_group' %}>Group</a>
+            </li>
+        </ul>
     </li>
 </ul>
 
 <div id="content">
-    Configuration
+    Here you can manage configuration.
+    <br /> Choose a proper option from
+    <i>Configuration</i> dropdown menu above.
+    <br /> Press
+    <b>User</b> for your user configuration.
+    <br /> Press
+    <b>Group</b> for your group configuration.
 </div>
 
 {% endblock %}

@@ -3,57 +3,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
 
-<ul class="nav nav-tabs">
-    <li>
-        <a href={% url 'home' %}>Home</a>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'analysis_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'analysis_group' %}>Group</a>
-            </li>
-            <li>
-                <a href={% url 'analysis_generate' %}>Custom</a>
-            </li>
-        </ul>
-    </li>
-    <li class="dropdown active">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'prediction' %}>Prediction
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'prediction_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'prediction_group' %}>Group</a>
-            </li>
-            <li>
-                <a href={% url 'prediction_generate' %}>Custom</a>
-            </li>
-        </ul>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'configuration_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'configuration_group' %}>Group</a>
-            </li>
-        </ul>
-    </li>
-</ul>
-
 <div id="content">
     <div class="container">
         <br />
@@ -85,7 +34,7 @@
                         <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="{{ filename }}">Export</a>
                     </div>
                     <div id="description" class="row">
-                        <h4>Prediction information</h4>
+                        <h4>Information</h4>
                         {% for info_line in info %}
                         {{ info_line }}<br />
                         {% endfor %}
