@@ -16,7 +16,7 @@ def predict(past_data, date_from, date_to):
 
     # calculate prediction data
     # TODO PLACEHOLDER
-    data = calculate_placeholder_prediction_data(past_data, date_to)
+    data = calculate_prediction_data(past_data, date_to)
 
     data_cpy = dict()
     date_from_tzinfo_free = date_from.replace(tzinfo=None)
