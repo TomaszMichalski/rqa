@@ -32,7 +32,7 @@ def predict(past_data, date_from, date_to):
 
 def calculate_prediction_data(past_data, date_to):
     for col in past_data.keys():
-        if len(list(past_data[col].keys())) > 0:
+        if len(list(past_data[col].keys())) > 0 and col == 'pm1':
             m = Prophet()
             past_data_with_datetimes = dict()
             for date_as_string, value in past_data[col].items():
