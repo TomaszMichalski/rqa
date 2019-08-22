@@ -4,6 +4,8 @@ from . import util
 from datetime import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
+import pandas as pd
+from fbprophet import Prophet
 
 # calculates prediction data from date_from to date_to using past_data
 # after the process, cuts the (< date_from) part of predicted data so that
@@ -27,6 +29,19 @@ def predict(past_data, date_from, date_to):
     data = data_cpy
 
     return data
+
+def calculate_prediction_data(past_data, date_to):
+    for col in past_data.keys():
+        if len(list(past_data[col].keys())) > 0:
+            m = Prophet()
+            df = pd.DataFrame(list(past_data[col].items()))
+            m.fit(df)
+            future = m.make_future_dataframe(periods=14, freq='6H')
+            forecast = m.predict(future)
+            for date, value in forecast.iterrows():
+                past_data[col][date] = value
+
+    return past_data
 
 # calculates prediction data using linear regression
 # calculations are performed for each column (PM1 etc.) separately
