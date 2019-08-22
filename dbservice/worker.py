@@ -8,7 +8,7 @@ def main():
 
     retrieve_and_insert_readings_for_all_addresses(cur)
 
-    # conn.commit()
+    conn.commit()
     cur.close()
     conn.close()
 
