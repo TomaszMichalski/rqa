@@ -15,7 +15,6 @@ def predict(past_data, date_from, date_to):
     data = db.empty_data()
 
     # calculate prediction data
-    # TODO PLACEHOLDER
     data = calculate_prediction_data(past_data, date_to)
 
     data_cpy = dict()
@@ -31,18 +30,38 @@ def predict(past_data, date_from, date_to):
     return data
 
 def calculate_prediction_data(past_data, date_to):
-    for col in past_data.keys():
-        if len(list(past_data[col].keys())) > 0 and col == 'pm1':
+    data = util.convert_to_past_data_with_datetimes(past_data)
+    data = calculate_weather_prediction_data(data, date_to)
+    for col in data.keys():
+        if len(list(data[col].keys())) > 0 and col in consts.AIR_COLUMNS:
             m = Prophet()
-            past_data_with_datetimes = dict()
-            for date_as_string, value in past_data[col].items():
-                past_data_with_datetimes[datetime.strptime(date_as_string, consts.DATE_FORMAT)] = value
-            df = pd.DataFrame(list(past_data_with_datetimes.items()), columns=['ds', 'y'])
+            df = pd.DataFrame(list(data.items()), columns=['ds', 'y'])
+            # append_additional_regressors(m, data)
+            # need to somehow add regressors data to data frame before fit
+            m.fit(df)
+            future = m.make_future_dataframe(periods=14, freq='6H')
+            forecast = m.predict(future)
+
+    data = util.convert_to_past_data_with_strings(data)
+    return data
+
+def append_additional_regressors(m, data):
+    for col in data.keys():
+        if len(list(data[col].keys())) > 0 and col in consts.WEATHER_COLUMNS:
+            m.add_regressor(col)
+
+    return m
+
+def calculate_weather_prediction_data(past_data, date_to):
+    for col in past_data.keys():
+        if len(list(past_data[col].keys())) > 0 and col in consts.WEATHER_COLUMNS:
+            m = Prophet()
+            df = pd.DataFrame(list(past_data.items()), columns=['ds', 'y'])
             m.fit(df)
             future = m.make_future_dataframe(periods=14, freq='6H')
             forecast = m.predict(future)
             for index, row in forecast.iterrows():
-                past_data[col][row['ds'].strftime(consts.DATE_FORMAT)] = row['yhat']
+                past_data[col][row['ds']] = row['yhat']
 
     return past_data
 

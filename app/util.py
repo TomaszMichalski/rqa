@@ -146,3 +146,21 @@ def extract_factor_data(data):
 
 def get_factor_name(factor):
     return consts.COLUMNS_NAMES[factor]
+
+def convert_to_past_data_with_datetimes(data):
+    result = dict()
+    for col in data.keys():
+        result[col] = dict()
+        for date_as_string, value in past_data[col].items():
+            result[col][datetime.strptime(date_as_string, consts.DATE_FORMAT)] = value
+
+    return result
+
+def convert_to_past_data_with_strings(data):
+    result = dict()
+    for col in data.keys():
+        result[col] = dict()
+        for date_as_datetime, value in past_data[col].items():
+            result[col][date_as_datetime.strftime(consts.DATE_FORMAT)] = value
+    
+    return result
