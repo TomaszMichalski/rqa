@@ -9,6 +9,7 @@ from . import util
 from . import db
 from . import consts
 from . import statistics
+from . import tasks
 import json
 
 def register(request):
@@ -180,11 +181,7 @@ def analysis_user(request):
     profile = models.Profile.objects.get(user=request.user)
     analysis_configuration = profile.analysis_configuration
     generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
-    data = db.get_analysis_data(generation_parameters)
-    info = data['info']
-    info = statistics.append_statistics_info(info, data)
-    stats = statistics.get_statistics_for_data(data)
-    data = json.dumps(data)
+    data, info, stats = tasks.get_analysis_data_async.delay(generation_parameters)
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
@@ -202,11 +199,7 @@ def analysis_group(request):
     else:
         analysis_configuration = group.analysis_configuration
         generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
-        data = db.get_analysis_data(generation_parameters)
-        info = data['info']
-        info = statistics.append_statistics_info(info, data)
-        stats = statistics.get_statistics_for_data(data)
-        data = json.dumps(data)
+        data, info, stats = tasks.get_analysis_data_async.delay(generation_parameters)
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
@@ -217,11 +210,7 @@ def analysis_custom(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
-        data = db.get_analysis_data(generation_parameters)
-        info = data['info']
-        info = statistics.append_statistics_info(info, data)
-        stats = statistics.get_statistics_for_data(data)
-        data = json.dumps(data)
+        data, info, stats = tasks.get_analysis_data_async.delay(generation_parameters)
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
@@ -240,11 +229,7 @@ def prediction_user(request):
     profile = models.Profile.objects.get(user=request.user)
     prediction_configuration = profile.prediction_configuration
     generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
-    data = db.get_prediction_data(generation_parameters)
-    info = data['info']
-    info = statistics.append_statistics_info(info, data)
-    stats = statistics.get_statistics_for_data(data)
-    data = json.dumps(data)
+    data, info, stats = tasks.get_prediction_data_async.delay(generation_parameters)
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
@@ -262,11 +247,7 @@ def prediction_group(request):
     else:
         prediction_configuration = group.prediction_configuration
         generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
-        data = db.get_prediction_data(generation_parameters)
-        info = data['info']
-        info = statistics.append_statistics_info(info, data)
-        stats = statistics.get_statistics_for_data(data)
-        data = json.dumps(data)
+        data, info, stats = tasks.get_prediction_data_async.delay(generation_parameters)
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
@@ -277,11 +258,7 @@ def prediction_custom(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
-        data = db.get_prediction_data(generation_parameters)
-        info = data['info']
-        info = statistics.append_statistics_info(info, data)
-        stats = statistics.get_statistics_for_data(data)
-        data = json.dumps(data)
+        data, info, stats = tasks.get_prediction_data_async.delay(generation_parameters)
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
@@ -295,12 +272,7 @@ def guest_generate(request):
         return redirect('guest')
     
     generation_parameters = util.create_guest_generation_parameters(location)
-    data = db.get_prediction_data(generation_parameters)
-    info = data['info']
-    info.append(consts.GUEST_MESSAGE)
-    info = statistics.append_statistics_info(info, data)
-    stats = statistics.get_statistics_for_data(data)
-    data = json.dumps(data)
+    data, info, stats = tasks.get_prediction_data_async.delay(generation_parameters)
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
