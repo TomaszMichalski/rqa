@@ -8,3 +8,5 @@ numpy
 scikit-learn
 pystan
 fbprophet
+redis
+celery
