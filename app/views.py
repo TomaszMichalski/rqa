@@ -1,8 +1,10 @@
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.core.paginator import Paginator
+from . import email
 from . import forms
 from . import models
 from . import util
@@ -225,7 +227,11 @@ def analysis_custom(request):
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-        return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
+        context = {'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats}
+
+        request.session['analysis_data'] = context
+
+        return render(request, 'app/analysis_chart.html', context)
         
     return render(request, 'app/analysis_generate.html', { 'form': form })
 
@@ -305,3 +311,10 @@ def guest_generate(request):
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
     return render(request, 'app/guest_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
+
+
+@login_required(login_url='user/login')
+def send_email(request):
+    analysis_data = request.session.get('analysis_data', None)
+    email.send_email(request, analysis_data)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
