@@ -190,7 +190,11 @@ def analysis_user(request):
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-    return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
+    context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+
+    request.session['analysis_data'] = context
+
+    return render(request, 'app/analysis_chart.html', context)
 
 @login_required(login_url='user/login')
 def analysis_group(request):
@@ -212,7 +216,11 @@ def analysis_group(request):
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-        return render(request, 'app/analysis_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
+        context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+
+        request.session['analysis_data'] = context
+
+        return render(request, 'app/analysis_chart.html', context)
 
 @login_required(login_url='user/login')
 def analysis_custom(request):
@@ -254,7 +262,11 @@ def prediction_user(request):
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-    return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
+    context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+
+    request.session['prediction_data'] = context
+
+    return render(request, 'app/prediction_chart.html', context)
 
 @login_required(login_url='user/login')
 def prediction_group(request):
@@ -276,7 +288,11 @@ def prediction_group(request):
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-        return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
+        context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+
+        request.session['prediction_data'] = context
+
+        return render(request, 'app/prediction_chart.html', context)
 
 @login_required(login_url='user/login')
 def prediction_custom(request):
@@ -291,7 +307,11 @@ def prediction_custom(request):
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
 
-        return render(request, 'app/prediction_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
+        context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+
+        request.session['prediction_data'] = context
+
+        return render(request, 'app/prediction_chart.html', context)
 
     return render(request, 'app/prediction_generate.html', { 'form': form })
 
@@ -314,7 +334,14 @@ def guest_generate(request):
 
 
 @login_required(login_url='user/login')
-def send_email(request):
+def send_analysis_email(request):
     analysis_data = request.session.get('analysis_data', None)
+    email.send_email(request, analysis_data)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required(login_url='user/login')
+def send_prediction_email(request):
+    analysis_data = request.session.get('prediction_data', None)
     email.send_email(request, analysis_data)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
