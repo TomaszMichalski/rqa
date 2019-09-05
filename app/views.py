@@ -179,6 +179,9 @@ def analysis_generate(request):
 def analysis_user(request):
     profile = models.Profile.objects.get(user=request.user)
     analysis_configuration = profile.analysis_configuration
+    if util.is_configuration_incomplete(analysis_configuration):
+        return render(request, 'app/analysis_missing_configuration.html')
+
     generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
     data = db.get_analysis_data(generation_parameters)
     info = data['info']
@@ -201,6 +204,9 @@ def analysis_group(request):
         return render(request, 'app/analysis_group_no_config.html')
     else:
         analysis_configuration = group.analysis_configuration
+        if util.is_configuration_incomplete(analysis_configuration):
+            return render(request, 'app/analysis_missing_configuration.html')
+
         generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
         data = db.get_analysis_data(generation_parameters)
         info = data['info']
@@ -239,6 +245,9 @@ def prediction_generate(request):
 def prediction_user(request):
     profile = models.Profile.objects.get(user=request.user)
     prediction_configuration = profile.prediction_configuration
+    if util.is_configuration_incomplete(prediction_configuration):
+        return render(request, 'app/prediction_missing_configuration.html')
+
     generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
     data = db.get_prediction_data(generation_parameters)
     info = data['info']
@@ -261,6 +270,9 @@ def prediction_group(request):
         return render(request, 'app/prediction_group_no_config.html')
     else:
         prediction_configuration = group.prediction_configuration
+        if util.is_configuration_incomplete(prediction_configuration):
+            return render(request, 'app/prediction_missing_configuration.html')
+
         generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
         data = db.get_prediction_data(generation_parameters)
         info = data['info']

@@ -47,5 +47,12 @@ PREDICTION_POINTS_NUM_MESSAGE = 'Prediction based on {} point(s) in given area.'
 PREDICTION_INACCURATE_POINTS_NUM_LOW_WARNING = 'Prediction may be inaccurate due to low point number in area.'
 PREDICTION_INACCURATE_POINTS_FAR_FROM_CENTER_WARNING = 'Prediction may be inaccurate due to points being far from area center.'
 
-DAYS_EXCEEDING_PM25_WHO_NORM_MESSAGE = '{0} day(s) when PM2.5 WHO norm was exceeded.'
-DAYS_EXCEEDING_PM10_WHO_NORM_MESSAGE = '{0} day(s) when PM10 WHO norm was exceeded.'
+DAYS_EXCEEDING_PM25_WHO_NORM_MESSAGE = '{0} measurement(s) when PM2.5 WHO norm was exceeded.'
+DAYS_EXCEEDING_PM10_WHO_NORM_MESSAGE = '{0} measurement(s) when PM10 WHO norm was exceeded.'
+
+INVALID_DATE_FROM_MESSAGE = "Date from format is invalid, provide date in format YYYY-MM-DD HH:MM:SS"
+INVALID_DATE_TO_MESSAGE = "Date to format is invalid, provide date in format YYYY-MM-DD HH:MM:SS"
+RADIUS_SHOULD_BE_NUMBER = "Radius should be a number"
+DATE_TO_MUST_BE_GREATER_THAN_DATE_FROM = "Date to must be greater than date from"
+ADDRESS_NOT_RECOGNISED = "Address cannot be recognised"
+ADDRESS_NOT_SUPPORTED = "There are no installations for given address"

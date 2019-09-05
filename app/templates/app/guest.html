@@ -28,7 +28,26 @@
         return Object.keys(data).map(function(key) {
             return [key, data[key]].map(encodeURIComponent).join("=");
         }).join("&");
-    } 
+    }
+
+    function getAddress(road, houseNumber, city) {
+        var address = "";
+        if (typeof road !== 'undefined') {
+            address = address + road;
+            if (typeof houseNumber !== 'undefined') {
+                address = address + " " + houseNumber;
+            }
+        }
+
+        if (typeof city != 'undefined') {
+            if (typeof road !== 'undefined') {
+                address = address + ", ";
+            }
+            address = address + city;
+        }
+
+        return address;
+    }
 
     function setLocation(position) {
         var apiToken = '43cf3f75156b90';
@@ -50,7 +69,7 @@
                 var road = jsonResponse.address.road;
                 var houseNumber = jsonResponse.address.house_number;
                 var city = jsonResponse.address.city;
-                var address = road + " " + houseNumber + ", " + city;
+                var address = getAddress(road, houseNumber, city);
                 document.getElementById("location").value = address;
             });
     }

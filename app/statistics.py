@@ -19,13 +19,22 @@ def get_statistics_for_factor(factor_data):
     return result
 
 def get_mean_for_factor(factor_data):
-    return round(mean(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+    try:
+        return round(mean(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+    except:
+        return 0
 
 def get_median_for_factor(factor_data):
-    return round(median(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+    try:
+        return round(median(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+    except:
+        return 0
 
 def get_stdev_for_factor(factor_data):
-    return round(stdev(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+    try:
+        return round(stdev(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+    except:
+        return 0
 
 def append_statistics_info(info, data):
     info.append(consts.DAYS_EXCEEDING_PM25_WHO_NORM_MESSAGE.format(get_days_exceeding_pm25_who_norm(data)))

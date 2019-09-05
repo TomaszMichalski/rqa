@@ -98,6 +98,28 @@ def get_geo_location(address):
 
 # Get location based on address - END
 
+def is_correct_address(address):
+    data = {
+        'key': api_token,
+        'q': address,
+        'format': 'json'
+    }
+
+    response = requests.get(api_base_url, params=data)
+    if response.status_code == 200:
+        json_response = json.loads(response.content.decode('utf-8'))
+        if isinstance(json_response, list):
+            try:
+                lat = float(json_response[0]['lat'])
+                lon = float(json_response[0]['lon'])
+                return True
+            except:
+                return False
+        else:
+            return False
+    else:
+        return False
+
 # gets first data aggregation datetime (which is 00:00, 06:00, 12:00 or 18:00) after date_from
 # date_from can be both datetime or string, if it is string then it is converted to datetime
 # using consts.DATE_FORMAT
@@ -146,3 +168,16 @@ def extract_factor_data(data):
 
 def get_factor_name(factor):
     return consts.COLUMNS_NAMES[factor]
+
+def is_configuration_incomplete(configuration):
+    return not (is_specified(configuration.address) and is_specified(configuration.radius) and is_specified(configuration.period))
+
+def is_specified(s):
+    return not (s is None or s == "")
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
