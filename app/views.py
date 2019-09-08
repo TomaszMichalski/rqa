@@ -336,12 +336,12 @@ def guest_generate(request):
 @login_required(login_url='user/login')
 def send_analysis_email(request):
     analysis_data = request.session.get('analysis_data', None)
-    email.send_email(request, analysis_data)
+    email.send_analysis_email(request, analysis_data)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required(login_url='user/login')
 def send_prediction_email(request):
-    analysis_data = request.session.get('prediction_data', None)
-    email.send_email(request, analysis_data)
+    prediction_data = request.session.get('prediction_data', None)
+    email.send_prediction_email(request, prediction_data)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
