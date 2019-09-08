@@ -78,35 +78,13 @@
             <div class="col-sm-3">
                 <div id="side-panel">
                     <div id="buttons" class="row">
-                        <a href="#" class="btn btn-primary btn-block" role="button">Email copy</a>
+                        <a href="{% url 'send_prediction_email' %}" class="btn btn-primary btn-block" role="button">Email copy</a>
                         <br />
                         <a href="#" class="btn btn-primary btn-block" role="button">Refresh</a>
                         <br />
                         <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="{{ filename }}">Export</a>
                     </div>
-                    <div id="description" class="row">
-                        <h4>Prediction information</h4>
-                        {% for info_line in info %}
-                        {{ info_line }}<br />
-                        {% endfor %}
-                        <br />
-                        <table class="table table-bordered table-sm">
-                            <tr>
-                                <th><center>Factor</center></th>
-                                <th><center>Mean</center></th>
-                                <th><center>Median</center></th>
-                                <th><center>Standard deviation</center></th>
-                            </tr>
-                            {% for factor, stats in statistics.items %}
-                            <tr>
-                                <td><center>{{ factor }}</center></td>
-                                <td><center>{{ stats.mean }}</center></td>
-                                <td><center>{{ stats.median }}</center></td>
-                                <td><center>{{ stats.stdev }}</center></td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
+                    {% include "app/prediction_table.html" %}
                 </div>
             </div>
         </div>

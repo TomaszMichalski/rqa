@@ -25,4 +25,6 @@ urlpatterns = [
     path('user/login', auth_views.LoginView.as_view(template_name='user/login.html'), name='login'),
     path('user/logout', auth_views.LogoutView.as_view(template_name='user/logout.html'), name='logout'),
     path('guest/generate', views.guest_generate, name='guest_generate'),
+    path('analysis/sendmail', views.send_analysis_email, name='send_analysis_email'),
+    path('prediction/sendmail', views.send_prediction_email, name='send_prediction_email'),
 ]
