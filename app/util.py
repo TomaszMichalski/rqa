@@ -92,9 +92,9 @@ def get_geo_location(address):
             lon = float(json_response[0]['lon'])
             return lat, lon
         else:
-            return None
+            return None, None
     else:
-        return None
+        return None, None
 
 # Get location based on address - END
 
@@ -175,9 +175,9 @@ def is_configuration_incomplete(configuration):
 def is_specified(s):
     return not (s is None or s == "")
 
-def is_number(s):
+def is_positive_number(s):
     try:
         float(s)
-        return True
+        return float(s) > 0
     except ValueError:
         return False

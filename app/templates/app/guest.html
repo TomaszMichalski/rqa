@@ -12,6 +12,12 @@
                 <input type="text" id="location" name="location" class="form-control"><br />
                 <br /><br />
                 <button class="btn btn-primary btn-lg">Try it yourself!</button>
+                <br /><br /><br />
+                {% if error %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endif %}
             </div>
         </form>
     </center>>

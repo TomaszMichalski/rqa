@@ -60,6 +60,20 @@
                 <div class="col-sm-2"></div>
                 <div class="col-sm-4">
                     <h3>Analysis configuration</h3>
+                    {% if analysis_configuration.errors %}
+                        {% for field in analysis_configuration %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in analysis_configuration.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                     <table>
                         {% for field in analysis_configuration %}
                         <div class="form-group">
@@ -73,6 +87,20 @@
                 </div>
                 <div class="col-sm-4">
                     <h3>Prediction configuration</h3>
+                    {% if prediction_configuration.errors %}
+                        {% for field in prediction_configuration %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in prediction_configuration.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                     <table>
                         {% for field in prediction_configuration %}
                         <div class="form-group">

@@ -52,7 +52,8 @@ DAYS_EXCEEDING_PM10_WHO_NORM_MESSAGE = '{0} measurement(s) when PM10 WHO norm wa
 
 INVALID_DATE_FROM_MESSAGE = "Date from format is invalid, provide date in format YYYY-MM-DD HH:MM:SS"
 INVALID_DATE_TO_MESSAGE = "Date to format is invalid, provide date in format YYYY-MM-DD HH:MM:SS"
-RADIUS_SHOULD_BE_NUMBER = "Radius should be a number"
+RADIUS_SHOULD_BE_POSITIVE_NUMBER = "Radius should be a positive number"
+PERIOD_SHOULD_BE_POSITIVE_NUMBER = "Period should be a positive number"
 DATE_TO_MUST_BE_GREATER_THAN_DATE_FROM = "Date to must be greater than date from"
 ADDRESS_NOT_RECOGNISED = "Address cannot be recognised"
 ADDRESS_NOT_SUPPORTED = "There are no installations for given address"

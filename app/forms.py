@@ -32,15 +32,15 @@ class GenerateForm(forms.Form):
 
     def clean_radius(self):
         radius = self.cleaned_data['radius']
-        if not util.is_number(radius):
-            raise ValidationError(consts.RADIUS_SHOULD_BE_NUMBER)
+        if not util.is_positive_number(radius):
+            raise ValidationError(consts.RADIUS_SHOULD_BE_POSITIVE_NUMBER)
         return radius
 
     def clean(self):
         cleaned_data = super().clean()
+
         date_from = cleaned_data.get('date_from')
         date_to = cleaned_data.get('date_to')
-
         if date_from and date_to:
             if date_from >= date_to:
                 raise ValidationError(consts.DATE_TO_MUST_BE_GREATER_THAN_DATE_FROM)
@@ -48,8 +48,11 @@ class GenerateForm(forms.Form):
         address = cleaned_data.get('address')
         radius = cleaned_data.get('radius')
         if address and radius:
-            lat, lon = util.get_geo_location(address)
-            if not db.is_address_supported(lat, lon, float(radius)):
+            try:
+                lat, lon = util.get_geo_location(address)
+            except:
+                return False
+            if not db.is_location_supported(lat, lon, float(radius)):
                 raise ValidationError(consts.ADDRESS_NOT_SUPPORTED)
 
 # form used to display and modify analysis and prediction configuration for user and group
@@ -69,6 +72,31 @@ class ConfigurationForm(forms.ModelForm):
             'is_wind': 'Wind',
             'is_clouds': 'Clouds'
         }
+
+    def clean_radius(self):
+        radius = self.cleaned_data['radius']
+        if not util.is_positive_number(radius):
+            raise ValidationError(consts.RADIUS_SHOULD_BE_POSITIVE_NUMBER)
+        return radius
+
+    def clean_period(self):
+        period = self.cleaned_data['period']
+        if not util.is_positive_number(period):
+            raise ValidationError(consts.PERIOD_SHOULD_BE_POSITIVE_NUMBER)
+        return period
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        address = cleaned_data.get('address')
+        radius = cleaned_data.get('radius')
+        if address and radius:
+            try:
+                lat, lon = util.get_geo_location(address)
+                if not db.is_location_supported(lat, lon, float(radius)):
+                    raise ValidationError(consts.ADDRESS_NOT_SUPPORTED)
+            except:
+                raise ValidationError(consts.ADDRESS_NOT_RECOGNISED)
 
 # create new group form
 class GroupForm(forms.ModelForm):

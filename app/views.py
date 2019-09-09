@@ -307,7 +307,15 @@ def guest_generate(request):
         return redirect('guest')
     
     generation_parameters = util.create_guest_generation_parameters(location)
-    data = db.get_prediction_data(generation_parameters)
+
+    try:
+        data = db.get_prediction_data(generation_parameters)
+    except:
+        return render(request, 'app/guest.html', { 'error': consts.ADDRESS_NOT_RECOGNISED })
+
+    if not db.is_address_supported(generation_parameters, float(generation_parameters.radius)):
+        return render(request, 'app/guest.html', { 'error': consts.ADDRESS_NOT_SUPPORTED })
+        
     info = data['info']
     info.append(consts.GUEST_MESSAGE)
     info = statistics.append_statistics_info(info, data)
