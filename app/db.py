@@ -11,10 +11,28 @@ def get_addresses_within_area(lat, lon, radius):
     all_addresses = reader.get_addresses()
     filtered_addresses = list(filter(lambda address: util.geo_location_distance(address[1], address[2], lat, lon) < radius, all_addresses))
     addresses = list(map(lambda address: models.Address(address[0], address[1], address[2]), filtered_addresses))
-    print("Found {0} of {1} addresses in given area.".format(len(filtered_addresses), len(all_addresses)))
-    print("Returning {0} addresses.".format(len(addresses)))
     
     return addresses
+
+def is_address_supported(addr, radius):
+    try:
+        lat, lon = util.get_geo_location(addr)
+        if not lat or not lon:
+            return False
+        all_addresses = reader.get_addresses()
+        filtered_addresses = list(filter(lambda address: util.geo_location_distance(address[1], address[2], lat, lon) < radius, all_addresses))
+        addresses = list(map(lambda address: models.Address(address[0], address[1], address[2]), filtered_addresses))
+
+        return len(addresses) > 0
+    except:
+        return False
+
+def is_location_supported(lat, lon, radius):
+    all_addresses = reader.get_addresses()
+    filtered_addresses = list(filter(lambda address: util.geo_location_distance(address[1], address[2], lat, lon) < radius, all_addresses))
+    addresses = list(map(lambda address: models.Address(address[0], address[1], address[2]), filtered_addresses))
+
+    return len(addresses) > 0
 
 # returns analysis data based on given GenerationParameters
 def get_analysis_data(parameters):

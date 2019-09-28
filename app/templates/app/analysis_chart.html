@@ -84,7 +84,33 @@
                         <br />
                         <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="{{ filename }}">Export</a>
                     </div>
+<<<<<<< HEAD
+                    <div id="description" class="row">
+                        <h4>Analysis information</h4>
+                        {% for info_line in info %}
+                        {{ info_line }}<br />
+                        {% endfor %}
+                        <br />
+                        <table class="table table-bordered table-sm">
+                            <tr>
+                                <th><center>Factor</center></th>
+                                <th><center>Mean</center></th>
+                                <th><center>Median</center></th>
+                                <th><center>Standard deviation</center></th>
+                            </tr>
+                            {% for factor, stats in statistics.items %}
+                            <tr>
+                                <td><center>{{ factor }}</center></td>
+                                <td><center>{{ stats.mean }}</center></td>
+                                <td><center>{{ stats.median }}</center></td>
+                                <td><center>{{ stats.stdev }}</center></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+=======
                     {% include "app/analysis_table.html" %}
+>>>>>>> ee5e29dee53567b0e9c43c929690eec5fa2283ad
                 </div>
             </div>
         </div>

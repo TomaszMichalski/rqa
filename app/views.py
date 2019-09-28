@@ -181,6 +181,9 @@ def analysis_generate(request):
 def analysis_user(request):
     profile = models.Profile.objects.get(user=request.user)
     analysis_configuration = profile.analysis_configuration
+    if util.is_configuration_incomplete(analysis_configuration):
+        return render(request, 'app/analysis_missing_configuration.html')
+
     generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
     data = db.get_analysis_data(generation_parameters)
     info = data['info']
@@ -207,6 +210,9 @@ def analysis_group(request):
         return render(request, 'app/analysis_group_no_config.html')
     else:
         analysis_configuration = group.analysis_configuration
+        if util.is_configuration_incomplete(analysis_configuration):
+            return render(request, 'app/analysis_missing_configuration.html')
+
         generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
         data = db.get_analysis_data(generation_parameters)
         info = data['info']
@@ -253,6 +259,9 @@ def prediction_generate(request):
 def prediction_user(request):
     profile = models.Profile.objects.get(user=request.user)
     prediction_configuration = profile.prediction_configuration
+    if util.is_configuration_incomplete(prediction_configuration):
+        return render(request, 'app/prediction_missing_configuration.html')
+
     generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
     data = db.get_prediction_data(generation_parameters)
     info = data['info']
@@ -279,6 +288,9 @@ def prediction_group(request):
         return render(request, 'app/prediction_group_no_config.html')
     else:
         prediction_configuration = group.prediction_configuration
+        if util.is_configuration_incomplete(prediction_configuration):
+            return render(request, 'app/prediction_missing_configuration.html')
+
         generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
         data = db.get_prediction_data(generation_parameters)
         info = data['info']
@@ -321,7 +333,15 @@ def guest_generate(request):
         return redirect('guest')
     
     generation_parameters = util.create_guest_generation_parameters(location)
-    data = db.get_prediction_data(generation_parameters)
+
+    try:
+        data = db.get_prediction_data(generation_parameters)
+    except:
+        return render(request, 'app/guest.html', { 'error': consts.ADDRESS_NOT_RECOGNISED })
+
+    if not db.is_address_supported(generation_parameters, float(generation_parameters.radius)):
+        return render(request, 'app/guest.html', { 'error': consts.ADDRESS_NOT_SUPPORTED })
+        
     info = data['info']
     info.append(consts.GUEST_MESSAGE)
     info = statistics.append_statistics_info(info, data)
