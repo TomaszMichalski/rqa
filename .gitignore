@@ -4,3 +4,4 @@ rqa-db-service/__pycache__/
 *pycache*
 *.idea*
 *venv*
+/secrets.json

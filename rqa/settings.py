@@ -12,22 +12,39 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import django_heroku
+import json
+from django.core.exceptions import ImproperlyConfigured
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '&o(+0yxh^p&&n*g()+)ffu%-o3s6&503k#36w8oj(iem$g0@rv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
+    secrets = json.load(secrets_file)
+
+
+def get_secret(setting, secrets=secrets):
+    """Get secret setting or fail with ImproperlyConfigured"""
+    try:
+        return secrets[setting]
+    except KeyError:
+        raise ImproperlyConfigured("Set the {} setting".format(setting))
+
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = get_secret('SECRET_KEY')
 
 # Application definition
 
@@ -86,6 +103,14 @@ DATABASES = {
     }
 }
 
+# Email
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'rqa.notifications@gmail.com'
+EMAIL_HOST_PASSWORD = get_secret('EMAIL_PASSWORD')
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
