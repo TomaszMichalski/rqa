@@ -52,6 +52,39 @@ def convert_to_generation_parameters(configuration, for_prediction=False):
 
     return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
 
+def convert_from_generation_parameters(parameters):
+    result = dict()
+    result['address'] = parameters.address
+    result['radius'] = parameters.radius
+    result['date_from'] = str(parameters.date_from)
+    result['date_to'] = str(parameters.date_to)
+    result['is_pm1'] = parameters.is_pm1
+    result['is_pm25'] = parameters.is_pm25
+    result['is_pm10'] = parameters.is_pm10
+    result['is_temp'] = parameters.is_temp
+    result['is_pressure'] = parameters.is_pressure
+    result['is_humidity'] = parameters.is_humidity
+    result['is_wind'] = parameters.is_wind
+    result['is_clouds'] = parameters.is_clouds
+
+    return result
+
+def convert_json_to_generation_parameters(parameters):
+    address = parameters['address']
+    radius = parameters['radius']
+    date_from = datetime.datetime.strptime(normalize_date_string(parameters['date_from']), consts.DATE_FORMAT)
+    date_to = datetime.datetime.strptime(normalize_date_string(parameters['date_to']), consts.DATE_FORMAT)
+    is_pm1 = parameters['is_pm1']
+    is_pm25 = parameters['is_pm25']
+    is_pm10 = parameters['is_pm10']
+    is_temp = parameters['is_temp']
+    is_pressure = parameters['is_pressure']
+    is_humidity = parameters['is_humidity']
+    is_wind = parameters['is_wind']
+    is_clouds = parameters['is_clouds']
+
+    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
+
 # Measure distance between two locations - START
 
 def deg_to_rad(deg):
@@ -181,3 +214,9 @@ def is_positive_number(s):
         return float(s) > 0
     except ValueError:
         return False
+
+def normalize_date_string(date):
+    date = date.split('+')[0]
+    date = date.split('.')[0]
+
+    return date

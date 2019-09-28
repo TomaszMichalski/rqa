@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
@@ -12,6 +12,7 @@ from . import db
 from . import consts
 from . import statistics
 import json
+import jsonpickle
 
 def register(request):
     if request.user.is_authenticated:
@@ -185,15 +186,12 @@ def analysis_user(request):
         return render(request, 'app/analysis_missing_configuration.html')
 
     generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
-    data = db.get_analysis_data(generation_parameters)
-    info = data['info']
-    info = statistics.append_statistics_info(info, data)
-    stats = statistics.get_statistics_for_data(data)
-    data = json.dumps(data)
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+    generation_parameters = util.convert_from_generation_parameters(generation_parameters)
+    generation_parameters = json.dumps(generation_parameters)
 
-    context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+    context = { 'chart_title': chart_title, 'filename': examination_filename, 'parameters': generation_parameters }
 
     request.session['analysis_data'] = context
 
@@ -214,15 +212,12 @@ def analysis_group(request):
             return render(request, 'app/analysis_missing_configuration.html')
 
         generation_parameters = util.convert_to_generation_parameters(analysis_configuration)
-        data = db.get_analysis_data(generation_parameters)
-        info = data['info']
-        info = statistics.append_statistics_info(info, data)
-        stats = statistics.get_statistics_for_data(data)
-        data = json.dumps(data)
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+        generation_parameters = util.convert_from_generation_parameters(generation_parameters)
+        generation_parameters = json.dumps(generation_parameters)
 
-        context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+        context = { 'chart_title': chart_title, 'filename': examination_filename, 'parameters': generation_parameters }
 
         request.session['analysis_data'] = context
 
@@ -233,15 +228,12 @@ def analysis_custom(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
-        data = db.get_analysis_data(generation_parameters)
-        info = data['info']
-        info = statistics.append_statistics_info(info, data)
-        stats = statistics.get_statistics_for_data(data)
-        data = json.dumps(data)
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+        generation_parameters = util.convert_from_generation_parameters(generation_parameters)
+        generation_parameters = json.dumps(generation_parameters)
 
-        context = {'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats}
+        context = { 'chart_title': chart_title, 'filename': examination_filename, 'parameters': generation_parameters }
 
         request.session['analysis_data'] = context
 
@@ -263,15 +255,12 @@ def prediction_user(request):
         return render(request, 'app/prediction_missing_configuration.html')
 
     generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
-    data = db.get_prediction_data(generation_parameters)
-    info = data['info']
-    info = statistics.append_statistics_info(info, data)
-    stats = statistics.get_statistics_for_data(data)
-    data = json.dumps(data)
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+    generation_parameters = util.convert_from_generation_parameters(generation_parameters)
+    generation_parameters = json.dumps(generation_parameters)
 
-    context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+    context = { 'chart_title': chart_title, 'filename': examination_filename, 'parameters': generation_parameters }
 
     request.session['prediction_data'] = context
 
@@ -292,15 +281,12 @@ def prediction_group(request):
             return render(request, 'app/prediction_missing_configuration.html')
 
         generation_parameters = util.convert_to_generation_parameters(prediction_configuration, True)
-        data = db.get_prediction_data(generation_parameters)
-        info = data['info']
-        info = statistics.append_statistics_info(info, data)
-        stats = statistics.get_statistics_for_data(data)
-        data = json.dumps(data)
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+        generation_parameters = util.convert_from_generation_parameters(generation_parameters)
+        generation_parameters = json.dumps(generation_parameters)
 
-        context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+        context = { 'chart_title': chart_title, 'filename': examination_filename, 'parameters': generation_parameters }
 
         request.session['prediction_data'] = context
 
@@ -311,15 +297,12 @@ def prediction_custom(request):
     form = forms.GenerateForm(request.GET)
     if form.is_valid():
         generation_parameters = util.create_generation_parameters(form)
-        data = db.get_prediction_data(generation_parameters)
-        info = data['info']
-        info = statistics.append_statistics_info(info, data)
-        stats = statistics.get_statistics_for_data(data)
-        data = json.dumps(data)
         chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
         examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+        generation_parameters = util.convert_from_generation_parameters(generation_parameters)
+        generation_parameters = json.dumps(generation_parameters)
 
-        context = { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats }
+        context = { 'chart_title': chart_title, 'filename': examination_filename, 'parameters': generation_parameters }
 
         request.session['prediction_data'] = context
 
@@ -334,23 +317,15 @@ def guest_generate(request):
     
     generation_parameters = util.create_guest_generation_parameters(location)
 
-    try:
-        data = db.get_prediction_data(generation_parameters)
-    except:
-        return render(request, 'app/guest.html', { 'error': consts.ADDRESS_NOT_RECOGNISED })
-
     if not db.is_address_supported(generation_parameters, float(generation_parameters.radius)):
         return render(request, 'app/guest.html', { 'error': consts.ADDRESS_NOT_SUPPORTED })
-        
-    info = data['info']
-    info.append(consts.GUEST_MESSAGE)
-    info = statistics.append_statistics_info(info, data)
-    stats = statistics.get_statistics_for_data(data)
-    data = json.dumps(data)
+
     chart_title = util.get_chart_title(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
     examination_filename = util.get_examination_filename(generation_parameters.address, generation_parameters.date_from, generation_parameters.date_to)
+    generation_parameters = util.convert_from_generation_parameters(generation_parameters)
+    generation_parameters = json.dumps(generation_parameters)
 
-    return render(request, 'app/guest_chart.html', { 'data': data, 'info': info, 'chart_title': chart_title, 'filename': examination_filename, 'statistics': stats })
+    return render(request, 'app/guest_chart.html', { 'chart_title': chart_title, 'filename': examination_filename, 'parameters': generation_parameters })
 
 
 @login_required(login_url='user/login')
@@ -365,3 +340,34 @@ def send_prediction_email(request):
     prediction_data = request.session.get('prediction_data', None)
     email.send_prediction_email(request, prediction_data)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+def async_analysis(request):
+    generation_parameters = json.loads(request.body)
+    generation_parameters = util.convert_json_to_generation_parameters(generation_parameters)
+    data = db.get_analysis_data(generation_parameters)
+    info = data['info']
+    info = statistics.append_statistics_info(info, data)
+    stats = statistics.get_statistics_for_data(data)
+    response = dict()
+    response['data'] = data
+    response['info'] = info
+    response['stats'] = stats
+    response = json.dumps(response)
+
+    return JsonResponse(response, safe=False)
+
+def async_prediction(request):
+    generation_parameters = json.loads(request.body)
+    generation_parameters = util.convert_json_to_generation_parameters(generation_parameters)
+    data = db.get_prediction_data(generation_parameters)
+    info = data['info']
+    info = statistics.append_statistics_info(info, data)
+    stats = statistics.get_statistics_for_data(data)
+    response = dict()
+    response['data'] = data
+    response['info'] = info
+    response['stats'] = stats
+    response = json.dumps(response)
+
+    return JsonResponse(data, safe=False)
+
