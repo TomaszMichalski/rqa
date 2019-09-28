@@ -369,5 +369,5 @@ def async_prediction(request):
     response['stats'] = stats
     response = json.dumps(response)
 
-    return JsonResponse(data, safe=False)
+    return JsonResponse(response, safe=False)
 

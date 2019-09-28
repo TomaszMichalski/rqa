@@ -12,6 +12,10 @@
                 <div id="chart_title">
                     <h3>{{ chart_title }}</h3>
                 </div>
+                <center>
+                    <br /><br />
+                    <div id="loader"></div>
+                </center>
                 <div id="chart">
                     <canvas id="pm1" width="800" height="200"></canvas>
                     <canvas id="pm25" width="800" height="200"></canvas>
@@ -76,21 +80,28 @@
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
             }
+            $('#loader').show();
         }
     });
 
     $.ajax({
         type: 'post',
-        url: '{% url "async_analysis" %}',
+        url: '{% url "async_prediction" %}',
         data: JSON.stringify(JSON.parse('{{ parameters | escapejs }}')),
         dataType: 'json',
         contentType: 'application/json',
+        complete: function() {
+            $('#loader').hide();
+        },
         success: function(response) {
             response = JSON.parse(response);
             drawData(response.data);
             fillInfo(response.info);
             fillStats(response.stats);
             enableButtons();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("There was an error while collecting data. Please try again later");
         }
     });
 
