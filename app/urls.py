@@ -27,4 +27,6 @@ urlpatterns = [
     path('guest/generate', views.guest_generate, name='guest_generate'),
     path('analysis/sendmail', views.send_analysis_email, name='send_analysis_email'),
     path('prediction/sendmail', views.send_prediction_email, name='send_prediction_email'),
+    path('analysis/async', views.async_analysis, name='async_analysis'),
+    path('prediction/async', views.async_prediction, name='async_prediction'),
 ]
