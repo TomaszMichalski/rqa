@@ -4,6 +4,8 @@ from . import util
 from datetime import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
+import pandas as pd
+from fbprophet import Prophet
 
 # calculates prediction data from date_from to date_to using past_data
 # after the process, cuts the (< date_from) part of predicted data so that
@@ -13,8 +15,7 @@ def predict(past_data, date_from, date_to):
     data = db.empty_data()
 
     # calculate prediction data
-    # TODO PLACEHOLDER
-    data = calculate_placeholder_prediction_data(past_data, date_to)
+    data = calculate_prediction_data(past_data, date_to)
 
     data_cpy = dict()
     date_from_tzinfo_free = date_from.replace(tzinfo=None)
@@ -26,6 +27,25 @@ def predict(past_data, date_from, date_to):
 
     data = data_cpy
 
+    return data
+
+def calculate_prediction_data(past_data, date_to):
+    print("Converting data")
+    data = util.convert_to_past_data_with_datetimes(past_data)
+    print("Done")
+    for col in past_data.keys():
+        if len(list(past_data[col].keys())) > 0:
+            print("Starting prediction for column {}".format(col))
+            m = Prophet()
+            df = pd.DataFrame(list(data[col].items()), columns=['ds', 'y'])
+            m.fit(df)
+            future = m.make_future_dataframe(periods=14, freq='6H')
+            forecast = m.predict(future)
+            for index, row in forecast.iterrows():
+                data[col][row['ds']] = row['yhat']
+            print("Finished prediction for column {}".format(col))
+
+    data = util.convert_to_past_data_with_strings(data)
     return data
 
 # calculates prediction data using linear regression

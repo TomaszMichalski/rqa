@@ -220,3 +220,21 @@ def normalize_date_string(date):
     date = date.split('.')[0]
 
     return date
+    
+def convert_to_past_data_with_datetimes(past_data):
+    result = dict()
+    for col in past_data.keys():
+        result[col] = dict()
+        for date_as_string, value in past_data[col].items():
+            result[col][datetime.datetime.strptime(date_as_string, consts.DATE_FORMAT)] = value
+
+    return result
+
+def convert_to_past_data_with_strings(past_data):
+    result = dict()
+    for col in past_data.keys():
+        result[col] = dict()
+        for date_as_datetime, value in past_data[col].items():
+            result[col][date_as_datetime.strftime(consts.DATE_FORMAT)] = value
+
+    return result
