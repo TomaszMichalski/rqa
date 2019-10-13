@@ -238,3 +238,10 @@ def convert_to_past_data_with_strings(past_data):
             result[col][date_as_datetime.strftime(consts.DATE_FORMAT)] = value
 
     return result
+
+def get_prediction_periods(date_to):
+    now = datetime.datetime.now()
+    delta = date_to - now
+    periods = delta / datetime.timedelta(hours=6)
+
+    return int(periods)
