@@ -5,8 +5,14 @@ td {
     text-align: left;
     padding: 5px;
 }
-.bar {
-    border-bottom: 3px solid black;
+
+.navbar-container {
+    background-color: #5E5694;
+}
+
+.navbar {
+    max-width: 1220px;
+    margin: 0 auto;
 }
 .btn-single {
     width: 100%;
@@ -16,7 +22,11 @@ td {
 }
 .title {
     display: inline-block;
+    padding-left: 20px;
+    color: #ffffff;
+    font-weight: bolder;
 }
+
 .auth-buttons {
     float: right;
     margin: 20px;
