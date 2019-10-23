@@ -16,6 +16,11 @@ AIR_COLUMNS = ['pm1', 'pm25', 'pm10']
 # supported weather info columns
 WEATHER_COLUMNS = ['temperature', 'pressure', 'humidity', 'wind_speed', 'wind_degree', 'clouds']
 
+FLOOR_ZERO_COLUMNS = ['pm1', 'pm25', 'pm10', 'pressure', 'humidity', 'wind_speed', 'wind_degree', 'clouds']
+
+PREDICTION_ORDER = ['temperature', 'pressure', 'humidity', 'wind_speed', 'wind_degree', 'clouds', 'pm1', 'pm25', 'pm10']
+MAX_CAP = 9999
+
 COLUMNS_NAMES = {
     'pm1': 'PM1',
     'pm25': 'PM2.5',
