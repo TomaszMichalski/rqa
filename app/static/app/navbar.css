@@ -1,5 +1,15 @@
+
+.auth-button {
+    margin: 5px 10px 5px 10px;
+}
+
 .dropdown {
     display: inline-block;
+}
+
+.dropdown-item:focus {
+    background-color: #5E5694;
+
 }
 
 .navbar {
@@ -11,10 +21,13 @@
     background-color: #5E5694;
 }
 
+.navbar-item {
+    padding-left: 10px;
+    padding-right: 10px;
+}
 
 .title {
     display: inline-block;
-    padding-left: 20px;
     color: #ffffff;
     font-weight: bolder;
     text-decoration: none;

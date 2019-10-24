@@ -5,6 +5,8 @@
     <title>
         RQA
     </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
@@ -18,61 +20,82 @@
 
 <body>
 <div class="navbar-container">
-    <nav class="navbar">
+
+    <nav class="navbar navbar-expand-md navbar-dark">
+
         <h1><a href="{% url 'home' %}" class="title">RQA</a></h1>
-        <div class="navbar-buttons button-group">
 
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
-                    aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        <button class="navbar-toggler" data-toggle="collapse" data-target="#collapse_target">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            {% if user.is_authenticated %}
+        <div class="collapse navbar-collapse text-center" id="collapse_target">
 
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Analysis
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="{% url 'analysis_user' %}">User</a>
-                        <a class="dropdown-item" href="{% url 'analysis_group' %}">Group</a>
-                        <a class="dropdown-item" href="{% url 'analysis_generate' %}">Custom</a>
-                    </div>
-                </div>
+            <ul class="navbar-nav ml-auto justify-content-end">
 
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Prediction
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="{% url 'prediction_user' %}">User</a>
-                        <a class="dropdown-item" href="{% url 'prediction_group' %}">Group</a>
-                        <a class="dropdown-item" href="{% url 'prediction_generate' %}">Custom</a>
-                    </div>
-                </div>
+                {% if user.is_authenticated %}
 
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Configuration
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="{% url 'configuration_user' %}">User</a>
-                        <a class="dropdown-item" href="{% url 'configuration_group' %}">Group</a>
-                    </div>
-                </div>
+                    <li class="nav-item dropdown navbar-item">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="dropdown_target"
+                           href="#">
+                            Analysis
+                            <span class="caret"></span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdown_target">
+                            <a class="dropdown-item" href="{% url 'analysis_user' %}">User</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'analysis_group' %}">Group</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'analysis_generate' %}">Custom</a>
+                        </div>
+                    </li>
 
-                <a href="{% url 'logout' %}" class="btn btn-outline-light" role="button">Log out</a>
+                    <div class="dropdown-divider"></div>
 
-                </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-light" role="button">Sign in</a>
-                <a href="{% url 'register' %}" class="btn btn-outline-light" role="button">Sign up</a>
-            {% endif %}
+                    <li class="nav-item dropdown navbar-item">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="dropdown_target"
+                           href="#">
+                            Prediction
+                            <span class="caret"></span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdown_target">
+                            <a class="dropdown-item" href="{% url 'prediction_user' %}">User</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'prediction_group' %}">Group</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'prediction_generate' %}">Custom</a>
+                        </div>
+                    </li>
 
+                    <div class="dropdown-divider"></div>
+
+                    <li class="nav-item dropdown navbar-item">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="dropdown_target"
+                           href="#">
+                            Configuration
+                            <span class="caret"></span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdown_target">
+                            <a class="dropdown-item" href="{% url 'configuration_user' %}">User</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'configuration_group' %}">Group</a>
+                        </div>
+                    </li>
+
+                    <div class="dropdown-divider"></div>
+
+                    </ul>
+                    <a href="{% url 'logout' %}" class="btn btn-outline-light navbar-item auth-button" role="button">Sign
+                        out</a>
+
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-light navbar-item auth-button" role="button">Sign in</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-light navbar-item auth-button" role="button">Register</a>
+                {% endif %}
+
+        </div>
     </nav>
+
 </div>
 
 {% block content %} {% endblock %}
