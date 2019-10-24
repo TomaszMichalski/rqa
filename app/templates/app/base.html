@@ -5,9 +5,12 @@
     <title>
         RQA
     </title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
     {% load static %}
     <link rel="stylesheet" href={% static 'app/main.css' %}>
 </head>
@@ -15,15 +18,54 @@
 <body>
 <div class="navbar-container">
     <nav class="navbar">
-        <h1 class="title">RQA</h1>
-        <div id="buttons" class="auth-buttons">
+        <h1><a href="{% url 'home' %}" class="title">RQA</a></h1>
+        <div class="navbar-buttons button-group">
+
             {% if user.is_authenticated %}
+
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Analysis
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="{% url 'analysis_user' %}">User</a>
+                        <a class="dropdown-item" href="{% url 'analysis_group' %}">Group</a>
+                        <a class="dropdown-item" href="{% url 'analysis_generate' %}">Custom</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Prediction
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="{% url 'prediction_user' %}">User</a>
+                        <a class="dropdown-item" href="{% url 'prediction_group' %}">Group</a>
+                        <a class="dropdown-item" href="{% url 'prediction_generate' %}">Custom</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Configuration
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="{% url 'configuration_user' %}">User</a>
+                        <a class="dropdown-item" href="{% url 'configuration_group' %}">Group</a>
+                    </div>
+                </div>
+
                 <a href="{% url 'logout' %}" class="btn btn-outline-light" role="button">Log out</a>
+
+                </div>
             {% else %}
                 <a href="{% url 'login' %}" class="btn btn-light" role="button">Sign in</a>
                 <a href="{% url 'register' %}" class="btn btn-outline-light" role="button">Sign up</a>
             {% endif %}
-        </div>
+
     </nav>
 </div>
 
