@@ -13,6 +13,7 @@
             crossorigin="anonymous"></script>
     {% load static %}
     <link rel="stylesheet" href={% static 'app/main.css' %}>
+    <link rel="stylesheet" href={% static 'app/navbar.css' %}>
 </head>
 
 <body>
@@ -20,6 +21,11 @@
     <nav class="navbar">
         <h1><a href="{% url 'home' %}" class="title">RQA</a></h1>
         <div class="navbar-buttons button-group">
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
+                    aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
             {% if user.is_authenticated %}
 

@@ -15,33 +15,6 @@ td {
     width: 30%;
 }
 
-.dropdown {
-    display: inline-block;
-}
-
-.navbar {
-    max-width: 1220px;
-    margin: 0 auto;
-}
-
-.navbar-container {
-    background-color: #5E5694;
-}
-
-
-.title {
-    display: inline-block;
-    padding-left: 20px;
-    color: #ffffff;
-    font-weight: bolder;
-    text-decoration: none;
-}
-
-.title:hover {
-    color: #e2e6ea;
-    text-decoration: none;
-}
-
 
 #loader {
     border: 16px solid #f3f3f3; /* Light grey */
