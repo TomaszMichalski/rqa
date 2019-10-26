@@ -141,7 +141,9 @@
             response = JSON.parse(response);
             drawData(response.data);
             fillInfo(response.info);
-            fillStats(response.stats);
+            fillStats(response.stats.historical, 'historical_stats');
+            fillStats(response.stats.fbprophet, 'fbprophet_stats');
+            fillStats(response.stats.linreg, 'linreg_stats');
             enableButtons();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -149,19 +151,41 @@
         }
     });
 
+    function mergeLabels(first, second) {
+        return Object.keys(first).concat(Object.keys(second));
+    }
+
+    function hasData(data, factor) {
+        return Object.keys(data.historical[factor]).length != 0 || Object.keys(data.fbprophet[factor]) != 0 || Object.keys(data.linreg[factor]).length != 0;
+    }
+
     function drawData(data) {
         /* Hide unused canvas */
-        canvases.map(c => c.style.display = Object.keys(data[c.id]).length === 0 ? "none" : "block")
+        canvases.map(c => c.style.display = hasData(data, c.id) ? "none" : "block")
 
         /* PM1 */
         var pm1 = new Chart(document.getElementById('pm1'), {
             type: 'line',
             data: {
-                labels: Object.keys(data.pm1),
+                labels: mergeLabels(data.historical.pm1, data.linreg.pm1),
                 datasets: [{
-                    data: Object.values(data.pm1),
+                    label: 'Historical data',
+                    data: Object.values(data.historical.pm1),
                     fill: false,
-                    borderColor: 'rgba(0,0,0,0.6)'
+                    backgroundColor: 'rgb(255, 128, 0)',
+                    borderColor: 'rgb(255, 128, 0)'
+                }, {
+                    label: 'FBProphet prediction',
+                    data: Object.values(data.fbprophet.pm1),
+                    fill: false,
+                    backgroundColor: 'rgb(51, 51, 255)',
+                    borderColor: 'rgb(51, 51, 255)'
+                }, {
+                    label: 'Trend analysis prediction',
+                    data: Object.values(data.linreg.pm1),
+                    fill: false,
+                    backgroundColor: 'rgb(153, 153, 0)',
+                    borderColor: 'rgb(153, 153, 0)'
                 }]
             },
             options: {
@@ -202,11 +226,25 @@
         var pm25 = new Chart(document.getElementById('pm25'), {
             type: 'line',
             data: {
-                labels: Object.keys(data.pm25),
+                labels: mergeLabels(data.historical.pm25, data.linreg.pm25),
                 datasets: [{
-                    data: Object.values(data.pm25),
+                    label: 'Historical data',
+                    data: Object.values(data.historical.pm25),
                     fill: false,
-                    borderColor: 'rgba(0,0,0,0.6)'
+                    backgroundColor: 'rgb(255, 128, 0)',
+                    borderColor: 'rgb(255, 128, 0)'
+                }, {
+                    label: 'FBProphet prediction',
+                    data: Object.values(data.fbprophet.pm25),
+                    fill: false,
+                    backgroundColor: 'rgb(51, 51, 255)',
+                    borderColor: 'rgb(51, 51, 255)'
+                }, {
+                    label: 'Trend analysis prediction',
+                    data: Object.values(data.linreg.pm25),
+                    fill: false,
+                    backgroundColor: 'rgb(153, 153, 0)',
+                    borderColor: 'rgb(153, 153, 0)'
                 }]
             },
             options: {
@@ -265,11 +303,25 @@
         var pm10 = new Chart(document.getElementById('pm10'), {
             type: 'line',
             data: {
-                labels: Object.keys(data.pm10),
+                labels: mergeLabels(data.historical.pm10, data.linreg.pm10),
                 datasets: [{
-                    data: Object.values(data.pm10),
+                    label: 'Historical data',
+                    data: Object.values(data.historical.pm10),
                     fill: false,
-                    borderColor: 'rgba(0,0,0,0.6)'
+                    backgroundColor: 'rgb(255, 128, 0)',
+                    borderColor: 'rgb(255, 128, 0)'
+                }, {
+                    label: 'FBProphet prediction',
+                    data: Object.values(data.fbprophet.pm10),
+                    fill: false,
+                    backgroundColor: 'rgb(51, 51, 255)',
+                    borderColor: 'rgb(51, 51, 255)'
+                }, {
+                    label: 'Trend analysis prediction',
+                    data: Object.values(data.linreg.pm10),
+                    fill: false,
+                    backgroundColor: 'rgb(153, 153, 0)',
+                    borderColor: 'rgb(153, 153, 0)'
                 }]
             },
             options: {
@@ -325,11 +377,25 @@
         var temperature = new Chart(document.getElementById('temperature'), {
             type: 'line',
             data: {
-                labels: Object.keys(data.temperature),
+                labels: mergeLabels(data.historical.temperature, data.linreg.temperature),
                 datasets: [{
-                    data: Object.values(data.temperature),
+                    label: 'Historical data',
+                    data: Object.values(data.historical.temperature),
                     fill: false,
-                    borderColor: 'rgba(0,0,0,0.6)'
+                    backgroundColor: 'rgb(255, 128, 0)',
+                    borderColor: 'rgb(255, 128, 0)'
+                }, {
+                    label: 'FBProphet prediction',
+                    data: Object.values(data.fbprophet.temperature),
+                    fill: false,
+                    backgroundColor: 'rgb(51, 51, 255)',
+                    borderColor: 'rgb(51, 51, 255)'
+                }, {
+                    label: 'Trend analysis prediction',
+                    data: Object.values(data.linreg.temperature),
+                    fill: false,
+                    backgroundColor: 'rgb(153, 153, 0)',
+                    borderColor: 'rgb(153, 153, 0)'
                 }]
             },
             options: {
@@ -367,11 +433,25 @@
         var pressure = new Chart(document.getElementById('pressure'), {
             type: 'line',
             data: {
-                labels: Object.keys(data.pressure),
+                labels: mergeLabels(data.historical.pressure, data.linreg.pressure),
                 datasets: [{
-                    data: Object.values(data.pressure),
+                    label: 'Historical data',
+                    data: Object.values(data.historical.pressure),
                     fill: false,
-                    borderColor: 'rgba(0,0,0,0.6)'
+                    backgroundColor: 'rgb(255, 128, 0)',
+                    borderColor: 'rgb(255, 128, 0)'
+                }, {
+                    label: 'FBProphet prediction',
+                    data: Object.values(data.fbprophet.pressure),
+                    fill: false,
+                    backgroundColor: 'rgb(51, 51, 255)',
+                    borderColor: 'rgb(51, 51, 255)'
+                }, {
+                    label: 'Trend analysis prediction',
+                    data: Object.values(data.linreg.pressure),
+                    fill: false,
+                    backgroundColor: 'rgb(153, 153, 0)',
+                    borderColor: 'rgb(153, 153, 0)'
                 }]
             },
             options: {
@@ -409,11 +489,25 @@
         var humidity = new Chart(document.getElementById('humidity'), {
             type: 'bar',
             data: {
-                labels: Object.keys(data.humidity),
+                labels: mergeLabels(data.historical.humidity, data.linreg.humidity),
                 datasets: [{
-                    data: Object.values(data.humidity),
+                    label: 'Historical data',
+                    data: Object.values(data.historical.humidity),
                     fill: false,
-                    backgroundColor: 'rgb(128,128,128)'
+                    backgroundColor: 'rgb(255, 128, 0)',
+                    borderColor: 'rgb(255, 128, 0)'
+                }, {
+                    label: 'FBProphet prediction',
+                    data: Object.values(data.fbprophet.humidity),
+                    fill: false,
+                    backgroundColor: 'rgb(51, 51, 255)',
+                    borderColor: 'rgb(51, 51, 255)'
+                }, {
+                    label: 'Trend analysis prediction',
+                    data: Object.values(data.linreg.humidity),
+                    fill: false,
+                    backgroundColor: 'rgb(153, 153, 0)',
+                    borderColor: 'rgb(153, 153, 0)'
                 }]
             },
             options: {
@@ -457,11 +551,25 @@
         var wind_speed = new Chart(document.getElementById('wind_speed'), {
             type: 'line',
             data: {
-                labels: Object.keys(data.wind_speed),
+                labels: mergeLabels(data.historical.wind_speed, data.linreg.wind_speed),
                 datasets: [{
-                    data: Object.values(data.wind_speed),
+                    label: 'Historical data',
+                    data: Object.values(data.historical.wind_speed),
                     fill: false,
-                    borderColor: 'rgba(0,0,0,0.6)'
+                    backgroundColor: 'rgb(255, 128, 0)',
+                    borderColor: 'rgb(255, 128, 0)'
+                }, {
+                    label: 'FBProphet prediction',
+                    data: Object.values(data.fbprophet.wind_speed),
+                    fill: false,
+                    backgroundColor: 'rgb(51, 51, 255)',
+                    borderColor: 'rgb(51, 51, 255)'
+                }, {
+                    label: 'Trend analysis prediction',
+                    data: Object.values(data.linreg.wind_speed),
+                    fill: false,
+                    backgroundColor: 'rgb(153, 153, 0)',
+                    borderColor: 'rgb(153, 153, 0)'
                 }]
             },
             options: {
@@ -529,11 +637,25 @@
         var clouds = new Chart(document.getElementById('clouds'), {
             type: 'bar',
             data: {
-                labels: Object.keys(data.clouds),
+                labels: mergeLabels(data.historical.clouds, data.linreg.clouds),
                 datasets: [{
-                    data: Object.values(data.clouds),
+                    label: 'Historical data',
+                    data: Object.values(data.historical.clouds),
                     fill: false,
-                    backgroundColor: 'rgb(128,128,128)'
+                    backgroundColor: 'rgb(255, 128, 0)',
+                    borderColor: 'rgb(255, 128, 0)'
+                }, {
+                    label: 'FBProphet prediction',
+                    data: Object.values(data.fbprophet.clouds),
+                    fill: false,
+                    backgroundColor: 'rgb(51, 51, 255)',
+                    borderColor: 'rgb(51, 51, 255)'
+                }, {
+                    label: 'Trend analysis prediction',
+                    data: Object.values(data.linreg.clouds),
+                    fill: false,
+                    backgroundColor: 'rgb(153, 153, 0)',
+                    borderColor: 'rgb(153, 153, 0)'
                 }]
             },
             options: {
@@ -578,8 +700,8 @@
         document.getElementById('info').innerText = info.join('\n');
     }
 
-    function fillStats(stats) {
-        var table = document.getElementById('stats');
+    function fillStats(stats, name) {
+        var table = document.getElementById(name);
         for (var factor in stats) {
             var row = table.insertRow();
             row.insertCell().appendChild(document.createTextNode(factor));

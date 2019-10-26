@@ -361,12 +361,19 @@ def async_prediction(request):
     generation_parameters = util.convert_json_to_generation_parameters(generation_parameters)
     data = db.get_prediction_data(generation_parameters)
     info = data['info']
-    info = statistics.append_statistics_info(info, data)
-    stats = statistics.get_statistics_for_data(data)
+    info = statistics.append_statistics_info(info, data['historical'])
+    info = statistics.append_prediction_statistics_info(info, data['fbprophet'], 'FBProphet')
+    info = statistics.append_prediction_statistics_info(info, data['linreg'], 'trend analysis')
+    historical_stats = statistics.get_statistics_for_data(data['historical'])
+    fbprophet_stats = statistics.get_statistics_for_data(data['fbprophet'])
+    linreg_stats = statistics.get_statistics_for_data(data['linreg'])
     response = dict()
     response['data'] = data
     response['info'] = info
-    response['stats'] = stats
+    response['stats'] = dict()
+    response['stats']['historical'] = historical_stats
+    response['stats']['fbprophet'] = fbprophet_stats
+    response['stats']['linreg'] = linreg_stats
     response = json.dumps(response)
 
     return JsonResponse(response, safe=False)

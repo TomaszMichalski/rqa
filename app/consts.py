@@ -20,6 +20,10 @@ FLOOR_ZERO_COLUMNS = ['pm1', 'pm25', 'pm10', 'pressure', 'humidity', 'wind_speed
 
 PREDICTION_ORDER = ['temperature', 'pressure', 'humidity', 'wind_speed', 'wind_degree', 'clouds', 'pm1', 'pm25', 'pm10']
 MAX_CAP = 9999
+FULL_WEIGHT = 0.15
+QUARTER_WEIGHT = 0.25
+MONTH_WEIGHT = 0.30
+WEEK_WEIGHT = 0.30
 
 COLUMNS_NAMES = {
     'pm1': 'PM1',
@@ -52,8 +56,10 @@ PREDICTION_POINTS_NUM_MESSAGE = 'Prediction based on {} point(s) in given area.'
 PREDICTION_INACCURATE_POINTS_NUM_LOW_WARNING = 'Prediction may be inaccurate due to low point number in area.'
 PREDICTION_INACCURATE_POINTS_FAR_FROM_CENTER_WARNING = 'Prediction may be inaccurate due to points being far from area center.'
 
-DAYS_EXCEEDING_PM25_WHO_NORM_MESSAGE = '{0} measurement(s) when PM2.5 WHO norm was exceeded.'
-DAYS_EXCEEDING_PM10_WHO_NORM_MESSAGE = '{0} measurement(s) when PM10 WHO norm was exceeded.'
+MEASUREMENTS_EXCEEDING_PM25_WHO_NORM_MESSAGE = '{0} measurement(s) when PM2.5 WHO norm was exceeded.'
+MEASUREMENTS_EXCEEDING_PM10_WHO_NORM_MESSAGE = '{0} measurement(s) when PM10 WHO norm was exceeded.'
+MEASUREMENTS_EXCEEDING_PM25_WHO_NORM_MESSAGE_WITH_ALGORITHM = '{0} measurement(s) when PM2.5 WHO norm will be exceeded, according to {1}.'
+MEASUREMENTS_EXCEEDING_PM10_WHO_NORM_MESSAGE_WITH_ALGORITHM = '{0} measurement(s) when PM10 WHO norm will be exceeded, according to {1}.'
 
 INVALID_DATE_FROM_MESSAGE = "Date from format is invalid, provide date in format YYYY-MM-DD HH:MM:SS"
 INVALID_DATE_TO_MESSAGE = "Date to format is invalid, provide date in format YYYY-MM-DD HH:MM:SS"
