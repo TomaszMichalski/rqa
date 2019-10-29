@@ -93,11 +93,15 @@ def get_prediction_data(parameters):
     for k, v in weather_data.items():
         past_data[k] = v
 
-    historical_data, fbprophet_data, linreg_data = prediction.predict(past_data, date_from, date_to)
+    if consts.ENABLE_HEAVY_COMPUTING:
+        historical_data, fbprophet_data, linreg_data = prediction.predict(past_data, date_from, date_to)
+    else:
+        historical_data, linreg_data = prediction.predict(past_data, date_from, date_to)
     
     data = dict()
     data['historical'] = historical_data
-    data['fbprophet'] = fbprophet_data
+    if consts.ENABLE_HEAVY_COMPUTING:
+        data['fbprophet'] = fbprophet_data
     data['linreg'] = linreg_data
 
     # fill information data

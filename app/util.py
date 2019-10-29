@@ -1,6 +1,6 @@
 from . import consts
 from . import models
-from math import pi, sqrt, sin, cos, atan2
+from math import pi, sqrt, sin, cos, atan2, ceil
 import requests
 import datetime
 import json
@@ -193,9 +193,11 @@ def get_examination_filename(location, date_from, date_to):
 def extract_factor_data(data):
     result = dict()
     for column in consts.AIR_COLUMNS:
-        result[column] = data[column]
+        if column in data:
+            result[column] = data[column]
     for column in consts.WEATHER_COLUMNS:
-        result[column] = data[column]
+        if column in data:
+            result[column] = data[column]
     
     return result
 
@@ -245,3 +247,13 @@ def get_prediction_periods(date_to):
     periods = delta / datetime.timedelta(hours=6)
 
     return int(periods)
+
+def get_prediction_offset(date_from):
+    now = datetime.datetime.now()
+    if now < date_from:
+        return 0
+        
+    delta = now - date_from
+    offset = delta / datetime.timedelta(hours=6)
+
+    return int(ceil(offset))

@@ -137,12 +137,19 @@
             $('#loader').hide();
         },
         success: function(response) {
-            console.log("xd");
             response = JSON.parse(response);
-            drawData(response.data);
+            drawData(response.data, response['prediction_offset']);
             fillInfo(response.info);
-            fillStats(response.stats.historical, 'historical_stats');
-            fillStats(response.stats.fbprophet, 'fbprophet_stats');
+            if (hasHistoricalData(response.data)) {
+                fillStats(response.stats.historical, 'historical_stats');
+            } else {
+                hideHistoricalStats();
+            }
+            if (response['enable_heavy_computing']) {
+                fillStats(response.stats.fbprophet, 'fbprophet_stats');
+            } else {
+                hideHeavyComputingStats();
+            }
             fillStats(response.stats.linreg, 'linreg_stats');
             enableButtons();
         },
@@ -151,42 +158,99 @@
         }
     });
 
-    function mergeLabels(first, second) {
-        return Object.keys(first).concat(Object.keys(second));
+    function hasHistoricalData(data) {
+        var historicalData = data.historical;
+        var factors = Object.keys(historicalData);
+        for (var i = 0; i < factors.length; i++) {
+            if (Object.values(historicalData[factors[i]]).length != 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function hideHistoricalStats() {
+        document.getElementById("historical_stats_header").style.display = "none";
+        document.getElementById("historical_stats").style.display= "none";
+    }
+
+    function hideHeavyComputingStats() {
+        document.getElementById("fbprophet_stats_header").style.display = "none";
+        document.getElementById("fbprophet_stats").style.display= "none";
+    }
+
+    function mergeLabels(data, factor) {
+        first = [];
+        second = [];
+        if (Object.keys(data.historical).includes(factor)) {
+            first = Object.keys(data.historical[factor]);
+        }
+        if (Object.keys(data.linreg).includes(factor)) {
+            second = Object.keys(data.linreg[factor]);
+        }
+
+        return first.concat(second);
     }
 
     function hasData(data, factor) {
-        return Object.keys(data.historical[factor]).length != 0 || Object.keys(data.fbprophet[factor]) != 0 || Object.keys(data.linreg[factor]).length != 0;
+        if (data['enable_heavy_computing']) {
+            return Object.keys(data.historical).includes(factor) && Object.keys(data.historical[factor]).length != 0 || 
+                    Object.keys(data.fbprophet).includes(factor) && Object.keys(data.fbprophet[factor]) != 0 || 
+                    Object.keys(data.linreg).includes(factor) && Object.keys(data.linreg[factor]).length != 0;
+        } else {
+            return Object.keys(data.historical[factor]).length != 0 || 
+                    Object.keys(data.linreg).includes(factor) && Object.keys(data.linreg[factor]).length != 0;
+        }
     }
 
-    function drawData(data) {
+    function applyPredictionOffset(data, offset) {
+        return Array(offset).fill(null).concat(data);
+    }
+
+    function getDatasets(data, factor, predictionOffset) {
+        datasets = [];
+        if (Object.keys(data.historical).includes(factor)) {
+            datasets.push({
+                        label: 'Historical data',
+                        data: Object.values(data.historical[factor]),
+                        fill: false,
+                        backgroundColor: 'rgb(255, 128, 0)',
+                        borderColor: 'rgb(255, 128, 0)'
+                    });
+        }
+        if (Object.keys(data.linreg).includes(factor)) {
+            datasets.push({
+                        label: 'Trend analysis prediction',
+                        data: applyPredictionOffset(Object.values(data.linreg[factor]), predictionOffset),
+                        fill: false,
+                        backgroundColor: 'rgb(153, 153, 0)',
+                        borderColor: 'rgb(153, 153, 0)'
+                    });
+        }
+        if (data['enable_heavy_computing'] && Object.keys(data.fbprophet).include(factor)) {
+            datasets.push({
+                        label: 'FBProphet prediction',
+                        data: applyPredictionOffset(Object.values(data.fbprophet[factor]), predictionOffset),
+                        fill: false,
+                        backgroundColor: 'rgb(51, 51, 255)',
+                        borderColor: 'rgb(51, 51, 255)'
+                    });
+        }
+
+        return datasets;
+    }
+
+    function drawData(data, predictionOffset) {
         /* Hide unused canvas */
-        canvases.map(c => c.style.display = hasData(data, c.id) ? "none" : "block")
+        canvases.map(c => c.style.display = hasData(data, c.id) ? "block" : "none")
 
         /* PM1 */
         var pm1 = new Chart(document.getElementById('pm1'), {
             type: 'line',
             data: {
-                labels: mergeLabels(data.historical.pm1, data.linreg.pm1),
-                datasets: [{
-                    label: 'Historical data',
-                    data: Object.values(data.historical.pm1),
-                    fill: false,
-                    backgroundColor: 'rgb(255, 128, 0)',
-                    borderColor: 'rgb(255, 128, 0)'
-                }, {
-                    label: 'FBProphet prediction',
-                    data: Object.values(data.fbprophet.pm1),
-                    fill: false,
-                    backgroundColor: 'rgb(51, 51, 255)',
-                    borderColor: 'rgb(51, 51, 255)'
-                }, {
-                    label: 'Trend analysis prediction',
-                    data: Object.values(data.linreg.pm1),
-                    fill: false,
-                    backgroundColor: 'rgb(153, 153, 0)',
-                    borderColor: 'rgb(153, 153, 0)'
-                }]
+                labels: mergeLabels(data, 'pm1'),
+                datasets: getDatasets(data, 'pm1', predictionOffset)
             },
             options: {
                 legend: {
@@ -226,26 +290,8 @@
         var pm25 = new Chart(document.getElementById('pm25'), {
             type: 'line',
             data: {
-                labels: mergeLabels(data.historical.pm25, data.linreg.pm25),
-                datasets: [{
-                    label: 'Historical data',
-                    data: Object.values(data.historical.pm25),
-                    fill: false,
-                    backgroundColor: 'rgb(255, 128, 0)',
-                    borderColor: 'rgb(255, 128, 0)'
-                }, {
-                    label: 'FBProphet prediction',
-                    data: Object.values(data.fbprophet.pm25),
-                    fill: false,
-                    backgroundColor: 'rgb(51, 51, 255)',
-                    borderColor: 'rgb(51, 51, 255)'
-                }, {
-                    label: 'Trend analysis prediction',
-                    data: Object.values(data.linreg.pm25),
-                    fill: false,
-                    backgroundColor: 'rgb(153, 153, 0)',
-                    borderColor: 'rgb(153, 153, 0)'
-                }]
+                labels: mergeLabels(data, 'pm25'),
+                datasets: getDatasets(data, 'pm25', predictionOffset)
             },
             options: {
                 legend: {
@@ -303,26 +349,8 @@
         var pm10 = new Chart(document.getElementById('pm10'), {
             type: 'line',
             data: {
-                labels: mergeLabels(data.historical.pm10, data.linreg.pm10),
-                datasets: [{
-                    label: 'Historical data',
-                    data: Object.values(data.historical.pm10),
-                    fill: false,
-                    backgroundColor: 'rgb(255, 128, 0)',
-                    borderColor: 'rgb(255, 128, 0)'
-                }, {
-                    label: 'FBProphet prediction',
-                    data: Object.values(data.fbprophet.pm10),
-                    fill: false,
-                    backgroundColor: 'rgb(51, 51, 255)',
-                    borderColor: 'rgb(51, 51, 255)'
-                }, {
-                    label: 'Trend analysis prediction',
-                    data: Object.values(data.linreg.pm10),
-                    fill: false,
-                    backgroundColor: 'rgb(153, 153, 0)',
-                    borderColor: 'rgb(153, 153, 0)'
-                }]
+                labels: mergeLabels(data, 'pm10'),
+                datasets: getDatasets(data, 'pm10', predictionOffset)
             },
             options: {
                 legend: {
@@ -377,26 +405,8 @@
         var temperature = new Chart(document.getElementById('temperature'), {
             type: 'line',
             data: {
-                labels: mergeLabels(data.historical.temperature, data.linreg.temperature),
-                datasets: [{
-                    label: 'Historical data',
-                    data: Object.values(data.historical.temperature),
-                    fill: false,
-                    backgroundColor: 'rgb(255, 128, 0)',
-                    borderColor: 'rgb(255, 128, 0)'
-                }, {
-                    label: 'FBProphet prediction',
-                    data: Object.values(data.fbprophet.temperature),
-                    fill: false,
-                    backgroundColor: 'rgb(51, 51, 255)',
-                    borderColor: 'rgb(51, 51, 255)'
-                }, {
-                    label: 'Trend analysis prediction',
-                    data: Object.values(data.linreg.temperature),
-                    fill: false,
-                    backgroundColor: 'rgb(153, 153, 0)',
-                    borderColor: 'rgb(153, 153, 0)'
-                }]
+                labels: mergeLabels(data, 'temperature'),
+                datasets: getDatasets(data, 'temperature', predictionOffset)
             },
             options: {
                 legend: {
@@ -433,26 +443,8 @@
         var pressure = new Chart(document.getElementById('pressure'), {
             type: 'line',
             data: {
-                labels: mergeLabels(data.historical.pressure, data.linreg.pressure),
-                datasets: [{
-                    label: 'Historical data',
-                    data: Object.values(data.historical.pressure),
-                    fill: false,
-                    backgroundColor: 'rgb(255, 128, 0)',
-                    borderColor: 'rgb(255, 128, 0)'
-                }, {
-                    label: 'FBProphet prediction',
-                    data: Object.values(data.fbprophet.pressure),
-                    fill: false,
-                    backgroundColor: 'rgb(51, 51, 255)',
-                    borderColor: 'rgb(51, 51, 255)'
-                }, {
-                    label: 'Trend analysis prediction',
-                    data: Object.values(data.linreg.pressure),
-                    fill: false,
-                    backgroundColor: 'rgb(153, 153, 0)',
-                    borderColor: 'rgb(153, 153, 0)'
-                }]
+                labels: mergeLabels(data, 'pressure'),
+                datasets: getDatasets(data, 'pressure', predictionOffset)
             },
             options: {
                 legend: {
@@ -489,26 +481,8 @@
         var humidity = new Chart(document.getElementById('humidity'), {
             type: 'bar',
             data: {
-                labels: mergeLabels(data.historical.humidity, data.linreg.humidity),
-                datasets: [{
-                    label: 'Historical data',
-                    data: Object.values(data.historical.humidity),
-                    fill: false,
-                    backgroundColor: 'rgb(255, 128, 0)',
-                    borderColor: 'rgb(255, 128, 0)'
-                }, {
-                    label: 'FBProphet prediction',
-                    data: Object.values(data.fbprophet.humidity),
-                    fill: false,
-                    backgroundColor: 'rgb(51, 51, 255)',
-                    borderColor: 'rgb(51, 51, 255)'
-                }, {
-                    label: 'Trend analysis prediction',
-                    data: Object.values(data.linreg.humidity),
-                    fill: false,
-                    backgroundColor: 'rgb(153, 153, 0)',
-                    borderColor: 'rgb(153, 153, 0)'
-                }]
+                labels: mergeLabels(data, 'humidity'),
+                datasets: getDatasets(data, 'humidity', predictionOffset)
             },
             options: {
                 legend: {
@@ -551,26 +525,8 @@
         var wind_speed = new Chart(document.getElementById('wind_speed'), {
             type: 'line',
             data: {
-                labels: mergeLabels(data.historical.wind_speed, data.linreg.wind_speed),
-                datasets: [{
-                    label: 'Historical data',
-                    data: Object.values(data.historical.wind_speed),
-                    fill: false,
-                    backgroundColor: 'rgb(255, 128, 0)',
-                    borderColor: 'rgb(255, 128, 0)'
-                }, {
-                    label: 'FBProphet prediction',
-                    data: Object.values(data.fbprophet.wind_speed),
-                    fill: false,
-                    backgroundColor: 'rgb(51, 51, 255)',
-                    borderColor: 'rgb(51, 51, 255)'
-                }, {
-                    label: 'Trend analysis prediction',
-                    data: Object.values(data.linreg.wind_speed),
-                    fill: false,
-                    backgroundColor: 'rgb(153, 153, 0)',
-                    borderColor: 'rgb(153, 153, 0)'
-                }]
+                labels: mergeLabels(data, 'wind_speed'),
+                datasets: getDatasets(data, 'wind_speed', predictionOffset)
             },
             options: {
                 legend: {
@@ -637,26 +593,8 @@
         var clouds = new Chart(document.getElementById('clouds'), {
             type: 'bar',
             data: {
-                labels: mergeLabels(data.historical.clouds, data.linreg.clouds),
-                datasets: [{
-                    label: 'Historical data',
-                    data: Object.values(data.historical.clouds),
-                    fill: false,
-                    backgroundColor: 'rgb(255, 128, 0)',
-                    borderColor: 'rgb(255, 128, 0)'
-                }, {
-                    label: 'FBProphet prediction',
-                    data: Object.values(data.fbprophet.clouds),
-                    fill: false,
-                    backgroundColor: 'rgb(51, 51, 255)',
-                    borderColor: 'rgb(51, 51, 255)'
-                }, {
-                    label: 'Trend analysis prediction',
-                    data: Object.values(data.linreg.clouds),
-                    fill: false,
-                    backgroundColor: 'rgb(153, 153, 0)',
-                    borderColor: 'rgb(153, 153, 0)'
-                }]
+                labels: mergeLabels(data, 'clouds'),
+                datasets: getDatasets(data, 'clouds', predictionOffset)
             },
             options: {
                 legend: {

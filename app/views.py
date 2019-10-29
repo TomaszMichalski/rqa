@@ -119,6 +119,8 @@ def configuration_group_create(request):
                 form.save()
                 created_group_key = form.cleaned_data.get('key')
                 created_group = models.Group.objects.get(key=created_group_key)
+                created_group.analysis_configuration = models.Configuration()
+                created_group.prediction_configuration = models.Configuration()
                 profile.group = created_group
                 profile.save()
                 return redirect('configuration_group')
@@ -362,18 +364,23 @@ def async_prediction(request):
     data = db.get_prediction_data(generation_parameters)
     info = data['info']
     info = statistics.append_statistics_info(info, data['historical'])
-    info = statistics.append_prediction_statistics_info(info, data['fbprophet'], 'FBProphet')
+    if consts.ENABLE_HEAVY_COMPUTING:
+        info = statistics.append_prediction_statistics_info(info, data['fbprophet'], 'FBProphet')
     info = statistics.append_prediction_statistics_info(info, data['linreg'], 'trend analysis')
     historical_stats = statistics.get_statistics_for_data(data['historical'])
-    fbprophet_stats = statistics.get_statistics_for_data(data['fbprophet'])
+    if consts.ENABLE_HEAVY_COMPUTING:
+        fbprophet_stats = statistics.get_statistics_for_data(data['fbprophet'])
     linreg_stats = statistics.get_statistics_for_data(data['linreg'])
     response = dict()
     response['data'] = data
     response['info'] = info
     response['stats'] = dict()
     response['stats']['historical'] = historical_stats
-    response['stats']['fbprophet'] = fbprophet_stats
+    if consts.ENABLE_HEAVY_COMPUTING:
+        response['stats']['fbprophet'] = fbprophet_stats
     response['stats']['linreg'] = linreg_stats
+    response['enable_heavy_computing'] = consts.ENABLE_HEAVY_COMPUTING
+    response['prediction_offset'] = util.get_prediction_offset(generation_parameters.date_from)
     response = json.dumps(response)
 
     return JsonResponse(response, safe=False)

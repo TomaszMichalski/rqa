@@ -15,12 +15,13 @@ def predict(past_data, date_from, date_to):
     past_data_month = get_past_data_month(past_data)
     past_data_week = get_past_data_week(past_data)
 
-    fbprophet_full = calculate_prediction_data_fbprophet(past_data, date_to)
-    fbprophet_quarter = calculate_prediction_data_fbprophet(past_data_quarter, date_to)
-    fbprophet_month = calculate_prediction_data_fbprophet(past_data_month, date_to)
-    fbprophet_week = calculate_prediction_data_fbprophet(past_data_week, date_to)
-    fbprophet_prediction = aggregate_prediction(fbprophet_full, fbprophet_quarter, fbprophet_month, fbprophet_week)
-    fbprophet_prediction = get_sorted_data(fbprophet_prediction)
+    if consts.ENABLE_HEAVY_COMPUTING:
+        fbprophet_full = calculate_prediction_data_fbprophet(past_data, date_to)
+        fbprophet_quarter = calculate_prediction_data_fbprophet(past_data_quarter, date_to)
+        fbprophet_month = calculate_prediction_data_fbprophet(past_data_month, date_to)
+        fbprophet_week = calculate_prediction_data_fbprophet(past_data_week, date_to)
+        fbprophet_prediction = aggregate_prediction(fbprophet_full, fbprophet_quarter, fbprophet_month, fbprophet_week)
+        fbprophet_prediction = get_sorted_data(fbprophet_prediction)
 
     linreg_full = calculate_prediction_data_linreg(past_data, date_to)
     linreg_quarter = calculate_prediction_data_linreg(past_data, date_to)
@@ -32,7 +33,10 @@ def predict(past_data, date_from, date_to):
     historical_data = get_historical_data(past_data, date_from)
     historical_data = get_sorted_data(historical_data)
 
-    return historical_data, fbprophet_prediction, linreg_prediction
+    if consts.ENABLE_HEAVY_COMPUTING:
+        return historical_data, fbprophet_prediction, linreg_prediction
+    
+    return historical_data, linreg_prediction
 
 def aggregate_prediction(full, quarter, month, week):
     result = dict()
