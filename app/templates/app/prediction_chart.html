@@ -228,7 +228,7 @@
                         borderColor: 'rgb(153, 153, 0)'
                     });
         }
-        if (enableHeavyComputing && Object.keys(data.fbprophet).include(factor)) {
+        if (enableHeavyComputing && Object.keys(data.fbprophet).includes(factor)) {
             datasets.push({
                         label: 'FBProphet prediction',
                         data: applyPredictionOffset(Object.values(data.fbprophet[factor]), predictionOffset),
