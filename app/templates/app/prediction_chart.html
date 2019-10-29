@@ -138,7 +138,7 @@
         },
         success: function(response) {
             response = JSON.parse(response);
-            drawData(response.data, response['prediction_offset']);
+            drawData(response.data, response['prediction_offset'], response['enable_heavy_computing']);
             fillInfo(response.info);
             if (hasHistoricalData(response.data)) {
                 fillStats(response.stats.historical, 'historical_stats');
@@ -193,8 +193,8 @@
         return first.concat(second);
     }
 
-    function hasData(data, factor) {
-        if (data['enable_heavy_computing']) {
+    function hasData(data, factor, enableHeavyComputing) {
+        if (enableHeavyComputing) {
             return Object.keys(data.historical).includes(factor) && Object.keys(data.historical[factor]).length != 0 || 
                     Object.keys(data.fbprophet).includes(factor) && Object.keys(data.fbprophet[factor]) != 0 || 
                     Object.keys(data.linreg).includes(factor) && Object.keys(data.linreg[factor]).length != 0;
@@ -208,7 +208,7 @@
         return Array(offset).fill(null).concat(data);
     }
 
-    function getDatasets(data, factor, predictionOffset) {
+    function getDatasets(data, factor, predictionOffset, enableHeavyComputing) {
         datasets = [];
         if (Object.keys(data.historical).includes(factor)) {
             datasets.push({
@@ -228,7 +228,7 @@
                         borderColor: 'rgb(153, 153, 0)'
                     });
         }
-        if (data['enable_heavy_computing'] && Object.keys(data.fbprophet).include(factor)) {
+        if (enableHeavyComputing && Object.keys(data.fbprophet).include(factor)) {
             datasets.push({
                         label: 'FBProphet prediction',
                         data: applyPredictionOffset(Object.values(data.fbprophet[factor]), predictionOffset),
@@ -241,16 +241,16 @@
         return datasets;
     }
 
-    function drawData(data, predictionOffset) {
+    function drawData(data, predictionOffset, enableHeavyComputing) {
         /* Hide unused canvas */
-        canvases.map(c => c.style.display = hasData(data, c.id) ? "block" : "none")
+        canvases.map(c => c.style.display = hasData(data, c.id, enableHeavyComputing) ? "block" : "none")
 
         /* PM1 */
         var pm1 = new Chart(document.getElementById('pm1'), {
             type: 'line',
             data: {
                 labels: mergeLabels(data, 'pm1'),
-                datasets: getDatasets(data, 'pm1', predictionOffset)
+                datasets: getDatasets(data, 'pm1', predictionOffset, enableHeavyComputing)
             },
             options: {
                 legend: {
