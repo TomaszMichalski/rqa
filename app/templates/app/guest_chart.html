@@ -250,7 +250,7 @@
             type: 'line',
             data: {
                 labels: mergeLabels(data, 'pm25'),
-                datasets: getDatasets(data, 'pm25', predictionOffset)
+                datasets: getDatasets(data, 'pm25', predictionOffset, enableHeavyComputing)
             },
             options: {
                 legend: {
@@ -309,7 +309,7 @@
             type: 'line',
             data: {
                 labels: mergeLabels(data, 'pm10'),
-                datasets: getDatasets(data, 'pm10', predictionOffset)
+                datasets: getDatasets(data, 'pm10', predictionOffset, enableHeavyComputing)
             },
             options: {
                 legend: {
@@ -365,7 +365,7 @@
             type: 'line',
             data: {
                 labels: mergeLabels(data, 'temperature'),
-                datasets: getDatasets(data, 'temperature', predictionOffset)
+                datasets: getDatasets(data, 'temperature', predictionOffset, enableHeavyComputing)
             },
             options: {
                 legend: {
@@ -403,7 +403,7 @@
             type: 'line',
             data: {
                 labels: mergeLabels(data, 'pressure'),
-                datasets: getDatasets(data, 'pressure', predictionOffset)
+                datasets: getDatasets(data, 'pressure', predictionOffset, enableHeavyComputing)
             },
             options: {
                 legend: {
@@ -441,7 +441,7 @@
             type: 'bar',
             data: {
                 labels: mergeLabels(data, 'humidity'),
-                datasets: getDatasets(data, 'humidity', predictionOffset)
+                datasets: getDatasets(data, 'humidity', predictionOffset, enableHeavyComputing)
             },
             options: {
                 legend: {
@@ -485,7 +485,7 @@
             type: 'line',
             data: {
                 labels: mergeLabels(data, 'wind_speed'),
-                datasets: getDatasets(data, 'wind_speed', predictionOffset)
+                datasets: getDatasets(data, 'wind_speed', predictionOffset, enableHeavyComputing)
             },
             options: {
                 legend: {
@@ -553,7 +553,7 @@
             type: 'bar',
             data: {
                 labels: mergeLabels(data, 'clouds'),
-                datasets: getDatasets(data, 'clouds', predictionOffset)
+                datasets: getDatasets(data, 'clouds', predictionOffset, enableHeavyComputing)
             },
             options: {
                 legend: {
