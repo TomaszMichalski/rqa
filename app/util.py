@@ -257,3 +257,18 @@ def get_prediction_offset(date_from):
     offset = delta / datetime.timedelta(hours=6)
 
     return int(ceil(offset))
+
+def interpolate_data(data, date_from, date_to):
+    result = dict()
+    for col in data.keys():
+        result[col] = dict()
+        interpolation_date = get_data_aggregation_starting_datetime(date_from)
+        while interpolation_date < date_to:
+            if interpolation_date.strftime(consts.DATE_FORMAT) in data[col].keys():
+                result[col][interpolation_date.strftime(consts.DATE_FORMAT)] = data[col][interpolation_date.strftime(consts.DATE_FORMAT)]
+            else:
+                result[col][interpolation_date.strftime(consts.DATE_FORMAT)] = None
+            interpolation_date = interpolation_date + datetime.timedelta(hours=6)
+
+    return result
+            

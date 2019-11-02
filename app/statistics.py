@@ -20,19 +20,22 @@ def get_statistics_for_factor(factor_data):
 
 def get_mean_for_factor(factor_data):
     try:
-        return round(mean(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+        data = list(filter(lambda val: val is not None, factor_data.values()))
+        return round(mean(data), consts.STATISTIC_DATA_DEC_PLACES)
     except:
         return 0
 
 def get_median_for_factor(factor_data):
     try:
-        return round(median(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+        data = list(filter(lambda val: val is not None, factor_data.values()))
+        return round(median(data), consts.STATISTIC_DATA_DEC_PLACES)
     except:
         return 0
 
 def get_stdev_for_factor(factor_data):
     try:
-        return round(stdev(factor_data.values()), consts.STATISTIC_DATA_DEC_PLACES)
+        data = list(filter(lambda val: val is not None, factor_data.values()))
+        return round(stdev(data), consts.STATISTIC_DATA_DEC_PLACES)
     except:
         return 0
 
@@ -49,7 +52,7 @@ def append_prediction_statistics_info(info, data, algorithm):
     return info
 
 def get_measurements_exceeding_pm25_who_norm(data):
-    return len(list(filter(lambda val: val > consts.PM25_WHO_NORM, data['pm25'].values())))
+    return len(list(filter(lambda val: val is not None and val > consts.PM25_WHO_NORM, data['pm25'].values())))
 
 def get_measurements_exceeding_pm10_who_norm(data):
-    return len(list(filter(lambda val: val > consts.PM10_WHO_NORM, data['pm10'].values())))
+    return len(list(filter(lambda val: val is not None and val > consts.PM10_WHO_NORM, data['pm10'].values())))

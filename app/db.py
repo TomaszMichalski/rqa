@@ -60,6 +60,8 @@ def get_analysis_data(parameters):
     for k, v in weather_data.items():
         data[k] = v
 
+    data = util.interpolate_data(data, date_from, date_to)
+
     # fill information data
     data['info'] = get_analysis_data_info(addresses, lat, lon, radius)
     data['pm25_norm'] = consts.PM25_WHO_NORM
@@ -108,6 +110,8 @@ def get_prediction_data(parameters):
     data['info'] = get_prediction_data_info(addresses, lat, lon, radius)
     data['pm25_norm'] = consts.PM25_WHO_NORM
     data['pm10_norm'] = consts.PM10_WHO_NORM
+
+    data['historical'] = util.interpolate_data(data['historical'], date_from, date_to)
 
     return data
 
