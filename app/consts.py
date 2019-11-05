@@ -70,3 +70,4 @@ ADDRESS_NOT_RECOGNISED = "Address cannot be recognised"
 ADDRESS_NOT_SUPPORTED = "There are no installations for given address"
 
 ENABLE_HEAVY_COMPUTING = False
+ENABLE_MOCK_DATA = True
