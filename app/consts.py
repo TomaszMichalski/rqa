@@ -69,5 +69,5 @@ DATE_TO_MUST_BE_GREATER_THAN_DATE_FROM = "Date to must be greater than date from
 ADDRESS_NOT_RECOGNISED = "Address cannot be recognised"
 ADDRESS_NOT_SUPPORTED = "There are no installations for given address"
 
-ENABLE_HEAVY_COMPUTING = False
-ENABLE_MOCK_DATA = True
+ENABLE_HEAVY_COMPUTING = True
+ENABLE_MOCK_DATA = False

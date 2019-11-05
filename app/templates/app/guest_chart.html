@@ -2,6 +2,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
+<script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
 
 <div id="content">
     <div class="container">
@@ -24,7 +25,7 @@
                     <canvas id="pressure" width="800" height="200"></canvas>
                     <canvas id="humidity" width="800" height="150"></canvas>
                     <canvas id="wind_speed" width="800" height="150"></canvas>
-                    <canvas id="wind_degree" width="800" height="150"></canvas>
+                    <canvas id="wind_degree" width="800" height="150" style="display: none;"></canvas>
                     <canvas id="clouds" width="800" height="150"></canvas>
                 </div>
             </div>
@@ -33,26 +34,18 @@
                     <div id="buttons" class="row">
                         <a href="#" id="btn-refresh" class="btn btn-primary btn-block" role="button">Refresh</a>
                         <br />
-                        <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="{{ filename }}">Export</a>
-                    </div>
-                    <div id="description" class="row">
-                        <h4>Information</h4>
-                        <div id="info"></div>
+                        <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="{{ filename }}.png">Export to PNG</a>
                         <br />
-                        <table id="stats" class="table table-bordered table-sm">
-                            <tr>
-                                <th><center>Factor</center></th>
-                                <th><center>Mean</center></th>
-                                <th><center>Median</center></th>
-                                <th><center>Standard deviation</center></th>
-                            </tr>
-                        </table>
+                        <a href="#" id="btn-export-xls" class="btn btn-primary btn-block" role="button" download="{{ filename }}.xls">Export to XLS</a>
                     </div>
+                    {% include "app/prediction_table.html" %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<table id="datatable" hidden></table>
 
 <script type="text/javascript">
     function csrfSafeMethod(method) {
@@ -60,12 +53,12 @@
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
 
-    document.getElementById('btn-email').disabled = true;
     document.getElementById('btn-refresh').disabled = true;
     document.getElementById('btn-export').disabled = true;
-    document.getElementById('btn-email').setAttribute("disabled", "");
+    document.getElementById('btn-export-xls').disabled = true;
     document.getElementById('btn-refresh').setAttribute("disabled", "");
     document.getElementById('btn-export').setAttribute("disabled", "");
+    document.getElementById('btn-export-xls').setAttribute("disabled", "");
 
     var canvases = [document.getElementById('pm1'),
         document.getElementById('pm25'),
@@ -74,7 +67,6 @@
         document.getElementById('pressure'),
         document.getElementById('humidity'),
         document.getElementById('wind_speed'),
-        document.getElementById('wind_degree'),
         document.getElementById('clouds')];
 
     $.ajaxSetup({
@@ -100,16 +92,17 @@
             drawData(response.data, response['prediction_offset'], response['enable_heavy_computing']);
             fillInfo(response.info);
             if (hasHistoricalData(response.data)) {
-                fillStats(response.stats.historical, 'historical_stats');
+                fillStats(response.data.historical, response.stats.historical, 'historical_stats');
             } else {
                 hideHistoricalStats();
             }
             if (response['enable_heavy_computing']) {
-                fillStats(response.stats.fbprophet, 'fbprophet_stats');
+                fillStats(response.data.fbprophet, response.stats.fbprophet, 'fbprophet_stats');
             } else {
                 hideHeavyComputingStats();
             }
-            fillStats(response.stats.linreg, 'linreg_stats');
+            fillStats(response.data.linreg, response.stats.linreg, 'linreg_stats');
+            fillDataTable(response.data, response['enable_heavy_computing']);
             enableButtons();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -117,11 +110,24 @@
         }
     });
 
+    function hasFactorData(data, factor) {
+        if (Object.keys(data).includes(factor)) {
+            var dates = Object.keys(data[factor]);
+            for (var i = 0; i < dates.length; i++) {
+                if (data[factor][dates[i]] != null) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     function hasHistoricalData(data) {
         var historicalData = data.historical;
         var factors = Object.keys(historicalData);
         for (var i = 0; i < factors.length; i++) {
-            if (Object.values(historicalData[factors[i]]).length != 0) {
+            if (hasFactorData(historicalData, factors[i])) {
                 return true;
             }
         }
@@ -154,12 +160,12 @@
 
     function hasData(data, factor, enableHeavyComputing) {
         if (enableHeavyComputing) {
-            return Object.keys(data.historical).includes(factor) && Object.keys(data.historical[factor]).length != 0 || 
-                    Object.keys(data.fbprophet).includes(factor) && Object.keys(data.fbprophet[factor]) != 0 || 
-                    Object.keys(data.linreg).includes(factor) && Object.keys(data.linreg[factor]).length != 0;
+            return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) || 
+                    Object.keys(data.fbprophet).includes(factor) && hasFactorData(data.fbprophet, factor) || 
+                    Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor);
         } else {
-            return Object.keys(data.historical[factor]).length != 0 || 
-                    Object.keys(data.linreg).includes(factor) && Object.keys(data.linreg[factor]).length != 0;
+            return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) || 
+                    Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor);
         }
     }
 
@@ -597,25 +603,87 @@
         document.getElementById('info').innerText = info.join('\n');
     }
 
-    function fillStats(stats, name) {
+    function fillStats(data, stats, name) {
         var table = document.getElementById(name);
         for (var factor in stats) {
-            var row = table.insertRow();
-            row.insertCell().appendChild(document.createTextNode(factor));
-            row.insertCell().appendChild(document.createTextNode(stats[factor].mean));
-            row.insertCell().appendChild(document.createTextNode(stats[factor].median));
-            row.insertCell().appendChild(document.createTextNode(stats[factor].stdev));
+            if (hasFactorData(data, factor.toLowerCase().split(" ").join("_").split(".").join(""))) {
+                var row = table.insertRow();
+                row.insertCell().appendChild(document.createTextNode(factor));
+                row.insertCell().appendChild(document.createTextNode(stats[factor].mean));
+                row.insertCell().appendChild(document.createTextNode(stats[factor].median));
+                row.insertCell().appendChild(document.createTextNode(stats[factor].stdev));
+            }
         }
     }
 
+    function fillDataTable(data, enableHeavyComputing) {
+        var table = document.getElementById('datatable');
+        var factors = ['pm1', 'pm25', 'pm10', 'temperature', 'pressure', 'humidity', 'wind_speed', 'wind_degree', 'clouds'];
+        var sources = [];
+        if (hasHistoricalData(data)) {
+            sources.push('historical');
+        }
+        sources.push('linreg');
+        if (enableHeavyComputing) {
+            sources.push('fbprophet');
+        }
+        var sourcesFactorsData = {};
+        for (var i = 0; i < sources.length; i++) {
+            var factorsData = {};
+            for (var j = 0; j < factors.length; j++) {
+                if (hasFactorData(data[sources[i]], factors[j])) {
+                    factorsData[factors[j]] = data[sources[i]][factors[j]];
+                }
+            }
+            sourcesFactorsData[sources[i]] = factorsData;
+        }
+        if (hasAnyFactor(sourcesFactorsData)) {
+            var sourceRow = table.insertRow();
+            sourceRow.insertCell().appendChild(document.createTextNode(""));
+            presentFactors = Object.keys(sourcesFactorsData['linreg']);
+            for (var i = 0; i < sources.length; i++) {
+                sourceRow.insertCell().appendChild(document.createTextNode(sources[i]));
+                for (var j = 0; j < presentFactors.length - 1; j++) {
+                    sourceRow.insertCell().appendChild(document.createTextNode(""));
+                }
+            }
+
+            var headerRow = table.insertRow();
+            headerRow.insertCell().appendChild(document.createTextNode("datetime"));
+            for (var i = 0; i < sources.length; i++) {
+                for (var j = 0; j < presentFactors.length; j++) {
+                    headerRow.insertCell().appendChild(document.createTextNode(presentFactors[j]));
+                }
+            }
+
+            var dates = mergeLabels(sourcesFactorsData, presentFactors[0]);
+            for (var i = 0; i < dates.length; i++) {
+                var row = table.insertRow();
+                row.insertCell().appendChild(document.createTextNode(dates[i]));
+                for (var j = 0; j < sources.length; j++) {
+                    for (var k = 0; k < presentFactors.length; k++) {
+                        var isUndefined = typeof sourcesFactorsData[sources[j]][presentFactors[k]][dates[i]] === 'undefined';
+                        var cellData = isUndefined ? null : sourcesFactorsData[sources[j]][presentFactors[k]][dates[i]];
+                        row.insertCell().appendChild(document.createTextNode(cellData));
+                    }
+                }
+            }
+        }
+    }
+
+    function hasAnyFactor(sourcesFactorsData) {
+        return Object.keys(sourcesFactorsData['linreg']).length > 0;
+    }
+
     function enableButtons() {
-        document.getElementById('btn-email').disabled = false;
         document.getElementById('btn-refresh').disabled = false;
         document.getElementById('btn-export').disabled = false;
-        document.getElementById('btn-email').removeAttribute("disabled");
+        document.getElementById('btn-export-xls').disabled = false;
         document.getElementById('btn-refresh').removeAttribute("disabled");
         document.getElementById('btn-export').removeAttribute("disabled");
+        document.getElementById('btn-export-xls').removeAttribute("disabled");
         addExportButtonHandler();
+        addExportXlsButtonHandler();
     }
 
     /* Helper functions */
@@ -645,6 +713,16 @@
             }
             var dataUrl = canvas.toDataURL('image/png');
             exportBtn.href = dataUrl;
+        });
+    }
+
+    function addExportXlsButtonHandler() {
+        var exportXlsBtn = document.getElementById('btn-export-xls');
+        exportXlsBtn.addEventListener('click', function (e) {
+            $('#datatable').table2excel({
+                name: "{{ filename }}",
+                filename: "{{ filename }}.xls"
+            });
         });
     }
 </script> {% endblock %}

@@ -188,7 +188,7 @@ def get_chart_title(location, date_from, date_to):
     return "Examination for {0}, {1} to {2}".format(location, date_from.date(), date_to.date())
 
 def get_examination_filename(location, date_from, date_to):
-    return "RQA {0} {1} {2}.png".format(location, date_from.date(), date_to.date())
+    return "RQA {0} {1} {2}".format(location, date_from.date(), date_to.date())
 
 def extract_factor_data(data):
     result = dict()
@@ -256,7 +256,7 @@ def get_prediction_offset(date_from):
     delta = now - date_from
     offset = delta / datetime.timedelta(hours=6)
 
-    return int(ceil(offset))
+    return int(ceil(offset)) - 1
 
 def interpolate_data(data, date_from, date_to):
     result = dict()
