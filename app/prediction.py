@@ -19,15 +19,14 @@ def predict(past_data, date_from, date_to):
         fbprophet_full = calculate_prediction_data_fbprophet(past_data, date_to)
         fbprophet_quarter = calculate_prediction_data_fbprophet(past_data_quarter, date_to)
         fbprophet_month = calculate_prediction_data_fbprophet(past_data_month, date_to)
-        fbprophet_week = calculate_prediction_data_fbprophet(past_data_week, date_to)
-        fbprophet_prediction = aggregate_prediction(fbprophet_full, fbprophet_quarter, fbprophet_month, fbprophet_week)
+        fbprophet_prediction = aggregate_prediction_3(fbprophet_full, fbprophet_quarter, fbprophet_month)
         fbprophet_prediction = get_sorted_data(fbprophet_prediction)
 
     linreg_full = calculate_prediction_data_linreg(past_data, date_to)
     linreg_quarter = calculate_prediction_data_linreg(past_data, date_to)
     linreg_month = calculate_prediction_data_linreg(past_data, date_to)
     linreg_week = calculate_prediction_data_linreg(past_data, date_to)
-    linreg_prediction = aggregate_prediction(linreg_full, linreg_quarter, linreg_month, linreg_week)
+    linreg_prediction = aggregate_prediction_4(linreg_full, linreg_quarter, linreg_month, linreg_week)
     linreg_prediction = get_sorted_data(linreg_prediction)
 
     historical_data = get_historical_data(past_data, date_from)
@@ -38,7 +37,17 @@ def predict(past_data, date_from, date_to):
     
     return historical_data, linreg_prediction
 
-def aggregate_prediction(full, quarter, month, week):
+def aggregate_prediction_3(full, quarter, month):
+    result = dict()
+    for col in full.keys():
+        result[col] = dict()
+        for date in full[col].keys():
+            aggregated_value = (consts.FULL_WEIGHT * full[col][date] + consts.QUARTER_WEIGHT * quarter[col][date] + consts.MONTH_WEIGHT * month[col][date]) / (consts.FULL_WEIGHT + consts.QUARTER_WEIGHT + consts.MONTH_WEIGHT)
+            result[col][date] = aggregated_value
+
+    return result
+
+def aggregate_prediction_4(full, quarter, month, week):
     result = dict()
     for col in full.keys():
         result[col] = dict()

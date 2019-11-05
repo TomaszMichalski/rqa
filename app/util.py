@@ -176,7 +176,7 @@ def get_prediction_datetimes(date_from, date_to):
     dt = get_data_aggregation_starting_datetime(date_from)
     date_to_tzinfo_free = date_to.replace(tzinfo=None)
     datetimes = []
-    while dt <= date_to_tzinfo_free:
+    while dt < date_to_tzinfo_free:
         datetimes.append(dt)
         dt = dt + consts.DATA_TIMEDELTA
 
