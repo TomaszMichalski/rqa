@@ -1,38 +1,51 @@
-{% extends "app/base.html" %} {% block content %}
+{% extends "app/base.html" %}
 
-<div id="content">
-    <center>
-        <div class="custom-form">
-            <h2>Generate for</h2>
-            {% if form.errors %}
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        <div class="alert alert-danger">
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/forms.css' %}>
+{% endblock additional_css %}
+
+{% block content %}
+
+    <div id="content">
+        <div class="form-container">
+            <div class="shadow p-3 mb-5 bg-light rounded">
+                <h3 class="form-element form-title">Generate for</h3>
+                <form method="get" action={% url 'analysis_custom' %}>
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            {% if field.field.is_checkbox %}
+                                <div class="form-checkbox-line">
+                                    {{ field }}
+                                    <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <div class="form-element">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button class="btn btn-secondary custom-button btn-lg form-element">Generate
+                    </button>
+                </form>
+                {% if form.errors %}
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger form-element">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger form-element">
                             <strong>{{ error|escape }}</strong>
                         </div>
                     {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        <strong>{{ error|escape }}</strong>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            <form method="get" action={% url 'analysis_custom' %}>
-                <table>
-                    {% for field in form %}
-                    <div class="form-group">
-                        <tr>
-                            <td>{{ field.label_tag }}</td>
-                            <td>{{ field }}</td>
-                        </tr>
-                    </div>
-                    {% endfor %}
-                </table>
-                <button class="btn btn-primary btn-single">Generate</button>
-            </form>
+                {% endif %}
+            </div>
         </div>
-    </center>
-</div>
+    </div>
 
 {% endblock %}

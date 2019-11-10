@@ -1,25 +1,35 @@
-{% extends "app/base.html" %} {% block content %}
+{% extends "app/base.html" %}
 
-<div id="content">
-    <center>
-        <br />
-        <div style="width: 30%">
-            <h4>Provide key for group {{ group_name }}</h4>
-            <form method="post" action={% url 'configuration_group_join' %}>
-                {% csrf_token %}
-                <input type="hidden" value={{ group_name }} name="group_name">
-                <table>
-                    <div class="form-group">
-                        <tr>
-                            <td style="text-align: left;">Key</td>
-                            <td style="text-align: left;"><input type="text" name="group_key"></td>
-                        </tr>
-                    </div>
-                </table>
-                <button class="btn btn-primary btn-lg" style="width: 100%">Join</button>
-            </form>
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/forms.css' %}>
+{% endblock additional_css %}
+
+{% block content %}
+
+    <div id="content">
+        <div>
+            <div class="form-container">
+                <div class="shadow p-3 mb-5 bg-light rounded">
+                    <h3 class="form-element form-title">Provide key for group {{ group_name }}</h3>
+                    <form method="post" action={% url 'configuration_group_join' %}>
+                        {% csrf_token %}
+                        <input type="hidden" value={{ group_name }} name="group_name">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="group_key">
+                        </div>
+                        <button class="btn btn-secondary custom-button btn-lg form-element">Join
+                        </button>
+                    </form>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger form-element">Invalid username or password, please try again
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
         </div>
-    </center>
-</div>
+    </div>
 
 {% endblock %}

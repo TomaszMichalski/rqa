@@ -11,6 +11,10 @@ td {
     width: 100%;
 }
 
+.form-input {
+    width: 100%;
+}
+
 .custom-form {
     width: 30%;
 }
@@ -18,11 +22,17 @@ td {
 .custom-button {
     background-color: #5E5694;
     border-color: #5E5694;
+    width: 100%;
 }
 
 .custom-button:hover {
     background-color: #4D4583;
     border-color: #4D4583;
+}
+
+.blank-page-info-text {
+    text-align: center;
+    margin: 20vh auto;
 }
 
 #content {

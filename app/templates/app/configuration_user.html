@@ -1,71 +1,85 @@
-{% extends "app/base.html" %} {% block content %}
+{% extends "app/base.html" %}
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/user/auth.css' %}>
+    <link rel="stylesheet" href={% static 'app/forms.css' %}>
+{% endblock additional_css %}
 
-<div id="content">
-    <center>
-        <form method="post" action={% url 'configuration_user' %}>
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-sm-2"></div>
-                <div class="col-sm-4">
-                    <h3>Analysis configuration</h3>
+{% block content %}
+
+    <div id="content">
+        <div class="form-container-conf">
+            <form method="post" action={% url 'configuration_user' %}>
+                <div class="shadow p-3 mb-5 bg-light rounded form-container-left">
+                    <h3 class="form-element form-title">Analysis configuration</h3>
+                    {% csrf_token %}
+                    {% for field in analysis_configuration %}
+                        <div class="form-group">
+                            {% if field.field.is_checkbox %}
+                                <div class="form-checkbox-line">
+                                    {{ field }}
+                                    <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <div class="form-element">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                     {% if analysis_configuration.errors %}
                         {% for field in analysis_configuration %}
                             {% for error in field.errors %}
-                                <div class="alert alert-danger">
+                                <div class="alert alert-danger form-element">
                                     <strong>{{ error|escape }}</strong>
                                 </div>
                             {% endfor %}
                         {% endfor %}
                         {% for error in analysis_configuration.non_field_errors %}
-                            <div class="alert alert-danger">
+                            <div class="alert alert-danger form-element">
                                 <strong>{{ error|escape }}</strong>
                             </div>
                         {% endfor %}
                     {% endif %}
-                    <table>
-                        {% for field in analysis_configuration %}
-                        <div class="form-group">
-                            <tr>
-                                <td style="text-align: left;">{{ field.label_tag }}</td>
-                                <td style="text-align: left;">{{ field }}</td>
-                            </tr>
-                        </div>
-                        {% endfor %}
-                    </table>
                 </div>
-                <div class="col-sm-4">
-                    <h3>Prediction configuration</h3>
+
+                <div class="shadow p-3 mb-5 bg-light rounded form-container-right">
+                    <h3 class="form-element form-title">Prediction configuration</h3>
+                    {% csrf_token %}
+                    {% for field in prediction_configuration %}
+                        <div class="form-group">
+                            {% if field.field.is_checkbox %}
+                                <div class="form-checkbox-line">
+                                    {{ field }}
+                                    <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <div class="form-element">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                     {% if prediction_configuration.errors %}
                         {% for field in prediction_configuration %}
                             {% for error in field.errors %}
-                                <div class="alert alert-danger">
+                                <div class="alert alert-danger form-element">
                                     <strong>{{ error|escape }}</strong>
                                 </div>
                             {% endfor %}
                         {% endfor %}
                         {% for error in prediction_configuration.non_field_errors %}
-                            <div class="alert alert-danger">
+                            <div class="alert alert-danger form-element">
                                 <strong>{{ error|escape }}</strong>
                             </div>
                         {% endfor %}
                     {% endif %}
-                    <table>
-                        {% for field in prediction_configuration %}
-                        <div class="form-group">
-                            <tr>
-                                <td style="text-align: left;">{{ field.label_tag }}</td>
-                                <td style="text-align: left;">{{ field }}</td>
-                            </tr>
-                        </div>
-                        {% endfor %}
-                    </table>
                 </div>
-                <div class="col-sm-2"></div>
-            </div>
-            <hr />
-            <button class="btn btn-primary btn-lg" style="width: 40%">Save configuration</button>
-        </form>
-    </center>
-</div>
+                <button class="btn btn-secondary btn-lg custom-button">Save configuration</button>
+
+            </form>
+        </div>
+
+    </div>
 
 {% endblock %}

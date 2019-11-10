@@ -1,11 +1,18 @@
 {% extends "app/base.html" %} {% block content %}
 
-<div id="content">
-    <center>
-        <br /><br /><br />
-        You are not a member of any group. <br />
-        <b><a href={% url 'configuration_group_create' %}>Create</a></b> or <b><a href={% url 'configuration_group_list' %}>join</a></b> a group.
-    </center>
-</div>
+    {% load static %}
+    {% block additional_css %}
+        <link rel="stylesheet" href={% static 'app/groups.css' %}>
+    {% endblock additional_css %}
+
+
+    <div id="content">
+        <div class="blank-page-info-text">
+            You are not a member of any group. <br/>
+            <b><a class="group-link" href={% url 'configuration_group_create' %}>Create</a></b>
+            or
+            <b><a class="group-link" href={% url 'configuration_group_list' %}>join</a></b> a group.
+        </div>
+    </div>
 
 {% endblock %}

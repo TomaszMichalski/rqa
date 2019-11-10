@@ -3,6 +3,7 @@
 {% load static %}
 {% block additional_css %}
     <link rel="stylesheet" href={% static 'app/user/auth.css' %}>
+    <link rel="stylesheet" href={% static 'app/forms.css' %}>
 {% endblock additional_css %}
 
 {% block content %}
@@ -11,7 +12,7 @@
         <div>
             <div class="form-container">
                 <div class="shadow p-3 mb-5 bg-light rounded">
-                    <h3 class="form-element">Register</h3>
+                    <h3 class="form-element form-title">Register</h3>
                     <form method="post">
                         {% csrf_token %}
                         {% for field in form %}
