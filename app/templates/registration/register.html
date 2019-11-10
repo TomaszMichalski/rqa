@@ -1,0 +1,35 @@
+{% extends "app/base.html" %}
+
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/user/auth.css' %}>
+{% endblock additional_css %}
+
+{% block content %}
+
+    <div id="content">
+        <div>
+            <div class="form-container">
+                <div class="shadow p-3 mb-5 bg-light rounded">
+                    <h3 class="form-element">Register</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-group">
+                                <div class="form-element">{{ field }}</div>
+                            </div>
+                        {% endfor %}
+                        <button class="btn btn-secondary custom-button btn-lg form-element">Register
+                        </button>
+                    </form>
+                    {% if form.errors %}
+                        {% for key,value in form.errors.items %}
+                            <div class="alert alert-danger form-element">{{ value|escape }}</div>
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

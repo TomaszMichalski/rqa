@@ -13,8 +13,8 @@
                 <form action={% url 'guest_generate' %}>
                     <div class="form-group" >
                         <div class="form-message form-element">Just provide an address!</div>
-                        <input type="text" id="location" name="location" class="form-control form-element">
-                        <button id="try-it-yourself" class="btn btn-primary btn-lg custom-button form-element" >Try it yourself!
+                        <input type="text" id="location" placeholder="Address" name="location" class="form-control form-element">
+                        <button id="try-it-yourself" class="btn btn-secondary btn-lg custom-button form-element" >Try it yourself!
                         </button>
                         {% if error %}
                             <div class="alert alert-danger form-element">

@@ -34,7 +34,7 @@ def register(request):
             return redirect('home')
     else:
         form = forms.RegisterForm()
-    return render(request, 'user/register.html', { 'form': form })
+    return render(request, 'registration/register.html', { 'form': form })
 
 def login(request):
     if request.user.is_authenticated:
@@ -49,7 +49,7 @@ def logout(request):
 def home(request):
     if request.user.is_authenticated:
         return render(request, 'app/home.html')
-    
+
     return render(request, 'app/guest.html')
 
 @login_required(login_url='user/login')
@@ -78,7 +78,7 @@ def configuration_user(request):
     else:
         analysis_configuration_form = forms.ConfigurationForm(instance=analysis_configuration, prefix='analysis')
         prediction_configuration_form = forms.ConfigurationForm(instance=prediction_configuration, prefix='prediction')
-    
+
     return render(request, 'app/configuration_user.html', { 'analysis_configuration': analysis_configuration_form, 'prediction_configuration': prediction_configuration_form })
 
 def configuration_group(request):
@@ -102,7 +102,7 @@ def configuration_group(request):
         else:
             analysis_configuration_form = forms.ConfigurationForm(instance=analysis_configuration, prefix='analysis')
             prediction_configuration_form = forms.ConfigurationForm(instance=prediction_configuration, prefix='prediction')
-        
+
         return render(request, 'app/configuration_group.html', { 'analysis_configuration': analysis_configuration_form, 'prediction_configuration': prediction_configuration_form, 'group_name': group.name })
 
 @login_required(login_url='user/login')
@@ -203,7 +203,7 @@ def analysis_group(request):
     info = []
     profile = models.Profile.objects.get(user=request.user)
     group = profile.group
-    
+
     if group is None:
         return render(request, 'app/analysis_group_no_config.html')
     else:
@@ -238,7 +238,7 @@ def analysis_custom(request):
         request.session['analysis_data'] = context
 
         return render(request, 'app/analysis_chart.html', context)
-        
+
     return render(request, 'app/analysis_generate.html', { 'form': form })
 
 @login_required(login_url='user/login')
@@ -314,7 +314,7 @@ def guest_generate(request):
     location = request.GET.get('location', None)
     if location is None:
         return redirect('guest')
-    
+
     generation_parameters = util.create_guest_generation_parameters(location)
 
     if not db.is_address_supported(generation_parameters, float(generation_parameters.radius)):

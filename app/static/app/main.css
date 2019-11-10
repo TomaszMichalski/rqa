@@ -20,6 +20,11 @@ td {
     border-color: #5E5694;
 }
 
+.custom-button:hover {
+    background-color: #4D4583;
+    border-color: #4D4583;
+}
+
 #content {
     max-width: 1220px;
     margin: 0 auto;

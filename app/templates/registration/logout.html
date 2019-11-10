@@ -1,0 +1,23 @@
+{% extends "app/base.html" %}
+
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/user/auth.css' %}>
+{% endblock additional_css %}
+
+{% block content %}
+
+    <div id="content">
+        <div class="logout-message">
+            <p>You were successfully logged out.</p>
+            <p>Redirecting to front page...</p>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(function () {
+            window.location.href = '/';
+        }, 2000);
+    </script>
+
+{% endblock %}

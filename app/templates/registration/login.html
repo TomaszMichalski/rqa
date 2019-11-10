@@ -1,0 +1,37 @@
+{% extends "app/base.html" %}
+
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/user/auth.css' %}>
+{% endblock additional_css %}
+
+{% block content %}
+
+    <div id="content">
+        <div>
+
+            <div class="form-container">
+                <div class="shadow p-3 mb-5 bg-light rounded">
+                    <h3 class="form-element">Sign in</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-group">
+                                <div class="form-element">{{ field }}</div>
+                            </div>
+                        {% endfor %}
+                        <button class="btn btn-secondary custom-button btn-lg form-element" >Sign in
+                        </button>
+                    </form>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger form-element">Invalid username or password, please try again
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
