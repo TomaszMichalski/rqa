@@ -1,4 +1,22 @@
-.content {
-    margin: 5px;
+.home-welcome {
     text-align: center;
+    margin: 10px auto;
 }
+
+.form-element {
+    margin: 10px auto;
+}
+
+.form-message {
+}
+
+.form-container {
+    text-align: center;
+    max-width: 300px;
+    margin: 20vh auto;
+}
+
+.form-group {
+    margin: 0 auto;
+}
+
