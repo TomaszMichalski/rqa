@@ -16,6 +16,8 @@
     {% load static %}
     <link rel="stylesheet" href={% static 'app/main.css' %}>
     <link rel="stylesheet" href={% static 'app/navbar.css' %}>
+    {% block additional_css %}
+    {% endblock additional_css %}
 </head>
 
 <body>

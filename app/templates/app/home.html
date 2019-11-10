@@ -1,6 +1,14 @@
-{% extends "app/base.html" %} {% block content %}
+{% extends "app/base.html" %}
 
-<div id="content">
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/home.css' %}>
+{% endblock additional_css %}
+
+{% block content %}
+
+
+<div class="content">
     <h2>Welcome to RQA!</h2>
     <h3>Air Quality Analysis application</h3>
     Press
