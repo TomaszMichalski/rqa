@@ -119,6 +119,8 @@ def configuration_group_create(request):
                 form.save()
                 created_group_key = form.cleaned_data.get('key')
                 created_group = models.Group.objects.get(key=created_group_key)
+                created_group.analysis_configuration = models.Configuration()
+                created_group.prediction_configuration = models.Configuration()
                 profile.group = created_group
                 profile.save()
                 return redirect('configuration_group')
@@ -361,12 +363,27 @@ def async_prediction(request):
     generation_parameters = util.convert_json_to_generation_parameters(generation_parameters)
     data = db.get_prediction_data(generation_parameters)
     info = data['info']
-    info = statistics.append_statistics_info(info, data)
-    stats = statistics.get_statistics_for_data(data)
+    info = statistics.append_statistics_info(info, data['historical'])
+    if consts.ENABLE_HEAVY_COMPUTING:
+        info = statistics.append_prediction_statistics_info(info, data['fbprophet'], 'FBProphet')
+    info = statistics.append_prediction_statistics_info(info, data['linreg'], 'trend analysis')
+    info = statistics.append_prediction_statistics_info(info, data['arima'], 'ARIMA')
+    historical_stats = statistics.get_statistics_for_data(data['historical'])
+    if consts.ENABLE_HEAVY_COMPUTING:
+        fbprophet_stats = statistics.get_statistics_for_data(data['fbprophet'])
+    linreg_stats = statistics.get_statistics_for_data(data['linreg'])
+    arima_stats = statistics.get_statistics_for_data(data['arima'])
     response = dict()
     response['data'] = data
     response['info'] = info
-    response['stats'] = stats
+    response['stats'] = dict()
+    response['stats']['historical'] = historical_stats
+    if consts.ENABLE_HEAVY_COMPUTING:
+        response['stats']['fbprophet'] = fbprophet_stats
+    response['stats']['linreg'] = linreg_stats
+    response['stats']['arima'] = arima_stats
+    response['enable_heavy_computing'] = consts.ENABLE_HEAVY_COMPUTING
+    response['prediction_offset'] = util.get_prediction_offset(generation_parameters.date_from)
     response = json.dumps(response)
 
     return JsonResponse(response, safe=False)
