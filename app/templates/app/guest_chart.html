@@ -12,10 +12,7 @@
                 <div id="chart_title">
                     <h3>{{ chart_title }}</h3>
                 </div>
-                <center>
-                    <br /><br />
                     <div id="loader"></div>
-                </center>
                 <div id="chart">
                     <canvas id="pm1" width="800" height="200"></canvas>
                     <canvas id="pm25" width="800" height="200"></canvas>
@@ -31,20 +28,19 @@
             <div class="col-sm-3">
                 <div id="side-panel">
                     <div id="buttons" class="row">
-                        <a href="#" id="btn-refresh" class="btn btn-primary btn-block" role="button">Refresh</a>
-                        <br />
-                        <a href="#" id="btn-export" class="btn btn-primary btn-block" role="button" download="{{ filename }}">Export</a>
+                        <a href="#" id="btn-refresh" class="btn btn-secondary btn-block custom-button" role="button">Refresh</a>
+                        <a href="#" id="btn-export" class="btn btn-secondary btn-block custom-button" role="button" download="{{ filename }}">Export</a>
                     </div>
                     <div id="description" class="row">
-                        <h4>Information</h4>
-                        <div id="info"></div>
+                        <h4 class="side-panel-title">Information</h4>
+                        <div id="info" class="alert alert-dark"></div>
                         <br />
                         <table id="stats" class="table table-bordered table-sm">
                             <tr>
-                                <th><center>Factor</center></th>
-                                <th><center>Mean</center></th>
-                                <th><center>Median</center></th>
-                                <th><center>Standard deviation</center></th>
+                                <th style="text-align: center;">Factor</th>
+                                <th style="text-align: center;">Mean</th>
+                                <th style="text-align: center;">Median</th>
+                                <th style="text-align: center;">Standard deviation</th>
                             </tr>
                         </table>
                     </div>
