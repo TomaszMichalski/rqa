@@ -1,0 +1,20 @@
+{% extends "app/base.html" %}
+
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/css/user/auth.css' %}>
+    <link rel="stylesheet" href={% static 'app/css/forms.css' %}>
+{% endblock additional_css %}
+
+{% block content %}
+
+    <div id="content">
+        <div class="logout-message alert alert-dark form-container">
+            <p>You were successfully logged out.</p>
+            <p>Redirecting to front page...</p>
+        </div>
+    </div>
+
+    <script src="{% static 'app/js/user/logout.js' %}"></script>
+
+{% endblock %}

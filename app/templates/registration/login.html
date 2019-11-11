@@ -2,6 +2,7 @@
 
 {% load static %}
 {% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/css/user/auth.css' %}>
     <link rel="stylesheet" href={% static 'app/css/forms.css' %}>
 {% endblock additional_css %}
 
@@ -9,16 +10,18 @@
 
     <div id="content">
         <div>
+
             <div class="form-container">
                 <div class="shadow p-3 mb-5 bg-light rounded">
-                    <h3 class="form-element form-title">Provide key for group {{ group_name }}</h3>
-                    <form method="post" action={% url 'configuration_group_join' %}>
+                    <h3 class="form-element form-title">Sign in</h3>
+                    <form method="post">
                         {% csrf_token %}
-                        <input type="hidden" value={{ group_name }} name="group_name">
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="group_key">
-                        </div>
-                        <button class="btn btn-secondary custom-button btn-lg form-element">Join
+                        {% for field in form %}
+                            <div class="form-group">
+                                <div class="form-element">{{ field }}</div>
+                            </div>
+                        {% endfor %}
+                        <button class="btn btn-secondary custom-button btn-lg form-element" >Sign in
                         </button>
                     </form>
 
