@@ -1,6 +1,8 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.forms import TextInput, PasswordInput, EmailInput, DateInput, CheckboxInput, Field
+
 from . import consts
 from . import db
 from . import models
@@ -8,20 +10,50 @@ from . import util
 from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
 
+# used to check if field is a checkbox
+setattr(Field, 'is_checkbox', lambda self: isinstance(self.widget, forms.CheckboxInput))
+
+
 # form used to gather custom analysis and custom prediction parameters
 class GenerateForm(forms.Form):
-    address = forms.CharField(label='Address')
-    radius = forms.CharField(label='Radius (km)')
-    date_from = forms.DateTimeField(label='From', error_messages={ 'invalid': consts.INVALID_DATE_FROM_MESSAGE })
-    date_to = forms.DateTimeField(label='To', error_messages={ 'invalid': consts.INVALID_DATE_TO_MESSAGE })
-    is_pm1 = forms.BooleanField(label='PM1', required=False, initial=True)
-    is_pm25 = forms.BooleanField(label='PM2.5', required=False, initial=True)
-    is_pm10 = forms.BooleanField(label='PM10', required=False, initial=True)
-    is_temp = forms.BooleanField(label='Temperature', required=False, initial=True)
-    is_pressure = forms.BooleanField(label='Pressure', required=False, initial=True)
-    is_humidity = forms.BooleanField(label='Humidity', required=False, initial=True)
-    is_wind = forms.BooleanField(label='Wind', required=False, initial=True)
-    is_clouds = forms.BooleanField(label='Clouds', required=False, initial=True)
+    address = forms.CharField(label='Address',
+                              widget=TextInput(attrs={'class': 'validate form-control', 'placeholder': 'Address'}))
+    radius = forms.CharField(label='Radius (km)',
+                             widget=TextInput(attrs={'class': ' form-control validate', 'placeholder': 'Radius (km)'}))
+
+    date_from = forms.DateTimeField(label='From',
+                                    error_messages={'invalid': consts.INVALID_DATE_FROM_MESSAGE},
+                                    widget=DateInput(
+                                        attrs={'class': 'form-control', 'type': 'date', 'placeholder': 'From Date'}))
+    date_to = forms.DateTimeField(label='To',
+                                  error_messages={'invalid': consts.INVALID_DATE_FROM_MESSAGE},
+                                  widget=DateInput(
+                                      attrs={'class': 'form-control', 'type': 'date', 'placeholder': 'To Date'}))
+
+    is_pm1 = forms.BooleanField(label='PM1', required=False, initial=True,
+                                widget=CheckboxInput(
+                                    attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_pm1'}))
+    is_pm25 = forms.BooleanField(label='PM2.5', required=False, initial=True,
+                                 widget=CheckboxInput(
+                                     attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_pm25'}))
+    is_pm10 = forms.BooleanField(label='PM10', required=False, initial=True,
+                                 widget=CheckboxInput(
+                                     attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_pm10'}))
+    is_temp = forms.BooleanField(label='Temperature', required=False, initial=True,
+                                 widget=CheckboxInput(
+                                     attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_temp'}))
+    is_pressure = forms.BooleanField(label='Pressure', required=False, initial=True,
+                                     widget=CheckboxInput(
+                                         attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_pressure'}))
+    is_humidity = forms.BooleanField(label='Humidity', required=False, initial=True,
+                                     widget=CheckboxInput(
+                                         attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_humidity'}))
+    is_wind = forms.BooleanField(label='Wind', required=False, initial=True,
+                                 widget=CheckboxInput(
+                                     attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_wind'}))
+    is_clouds = forms.BooleanField(label='Clouds', required=False, initial=True,
+                                   widget=CheckboxInput(
+                                       attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_clouds'}))
 
     def clean_address(self):
         address = self.cleaned_data['address']
@@ -55,11 +87,48 @@ class GenerateForm(forms.Form):
             if not db.is_location_supported(lat, lon, float(radius)):
                 raise ValidationError(consts.ADDRESS_NOT_SUPPORTED)
 
+
 # form used to display and modify analysis and prediction configuration for user and group
 class ConfigurationForm(forms.ModelForm):
+
+    address = forms.CharField(label='Address',
+                              widget=TextInput(attrs={'class': 'validate form-control', 'placeholder': 'Address'}))
+    radius = forms.CharField(label='Radius (km)',
+                             widget=TextInput(attrs={'class': ' form-control validate', 'placeholder': 'Radius (km)'}))
+
+    period = forms.CharField(label='Period (days)',
+                             widget=TextInput(attrs={'class': ' form-control validate', 'placeholder': 'Period (days)'}))
+
+    is_pm1 = forms.BooleanField(label='PM1', required=False, initial=True,
+                                widget=CheckboxInput(
+                                    attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_pm1'}))
+    is_pm25 = forms.BooleanField(label='PM2.5', required=False, initial=True,
+                                 widget=CheckboxInput(
+                                     attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_pm25'}))
+    is_pm10 = forms.BooleanField(label='PM10', required=False, initial=True,
+                                 widget=CheckboxInput(
+                                     attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_pm10'}))
+    is_temp = forms.BooleanField(label='Temperature', required=False, initial=True,
+                                 widget=CheckboxInput(
+                                     attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_temp'}))
+    is_pressure = forms.BooleanField(label='Pressure', required=False, initial=True,
+                                     widget=CheckboxInput(
+                                         attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_pressure'}))
+    is_humidity = forms.BooleanField(label='Humidity', required=False, initial=True,
+                                     widget=CheckboxInput(
+                                         attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_humidity'}))
+    is_wind = forms.BooleanField(label='Wind', required=False, initial=True,
+                                 widget=CheckboxInput(
+                                     attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_wind'}))
+    is_clouds = forms.BooleanField(label='Clouds', required=False, initial=True,
+                                   widget=CheckboxInput(
+                                       attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_clouds'}))
+
     class Meta:
         model = models.Configuration
-        fields = ('address', 'radius', 'period', 'is_pm1', 'is_pm25', 'is_pm10', 'is_temp', 'is_pressure', 'is_humidity', 'is_wind', 'is_clouds')
+        fields = (
+            'address', 'radius', 'period', 'is_pm1', 'is_pm25', 'is_pm10', 'is_temp', 'is_pressure', 'is_humidity',
+            'is_wind', 'is_clouds')
         labels = {
             'radius': 'Radius (km)',
             'period': 'Period (days)',
@@ -98,8 +167,12 @@ class ConfigurationForm(forms.ModelForm):
             except:
                 raise ValidationError(consts.ADDRESS_NOT_RECOGNISED)
 
+
 # create new group form
 class GroupForm(forms.ModelForm):
+    name = forms.CharField(widget=TextInput(attrs={'class': 'validate', 'placeholder': 'Name'}))
+    key = forms.CharField(widget=TextInput(attrs={'class': 'validate', 'placeholder': 'Key'}))
+
     class Meta:
         model = models.Group
         fields = ('name', 'key')
@@ -116,13 +189,24 @@ class GroupForm(forms.ModelForm):
             raise ValidationError("Group with this key already exists")
         return key
 
+
 # register new user form
 class RegisterForm(UserCreationForm):
-    first_name = forms.CharField(max_length=32)
-    last_name = forms.CharField(max_length=32)
-    email = forms.EmailField(max_length=128)
+    username = forms.CharField(widget=TextInput(attrs={'class': 'validate form-control ', 'placeholder': 'Username'}))
+    first_name = forms.CharField(
+        widget=TextInput(attrs={'class': 'validate form-control', 'placeholder': 'First Name'}))
+    last_name = forms.CharField(widget=TextInput(attrs={'class': 'validate form-control', 'placeholder': 'Last Name'}))
+    email = forms.CharField(widget=EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
+    password1 = forms.CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
+    password2 = forms.CharField(
+        widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}))
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', )
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2',)
 
+
+# sign in user form
+class CustomLoginForm(AuthenticationForm):
+    username = forms.CharField(widget=TextInput(attrs={'class': 'validate form-control', 'placeholder': 'Username'}))
+    password = forms.CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
