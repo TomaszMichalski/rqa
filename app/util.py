@@ -184,6 +184,16 @@ def get_prediction_datetimes(date_from, date_to):
 
     return datetimes
 
+def get_prediction_datetimes_dt(date_from, date_to):
+    dt = get_data_aggregation_starting_datetime(date_from)
+    date_to_tzinfo_free = date_to.replace(tzinfo=None)
+    datetimes = []
+    while dt < date_to_tzinfo_free:
+        datetimes.append(dt)
+        dt = dt + consts.DATA_TIMEDELTA
+
+    return datetimes
+
 def get_chart_title(location, date_from, date_to):
     return "Examination for {0}, {1} to {2}".format(location, date_from.date(), date_to.date())
 

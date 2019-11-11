@@ -367,10 +367,12 @@ def async_prediction(request):
     if consts.ENABLE_HEAVY_COMPUTING:
         info = statistics.append_prediction_statistics_info(info, data['fbprophet'], 'FBProphet')
     info = statistics.append_prediction_statistics_info(info, data['linreg'], 'trend analysis')
+    info = statistics.append_prediction_statistics_info(info, data['arima'], 'ARIMA')
     historical_stats = statistics.get_statistics_for_data(data['historical'])
     if consts.ENABLE_HEAVY_COMPUTING:
         fbprophet_stats = statistics.get_statistics_for_data(data['fbprophet'])
     linreg_stats = statistics.get_statistics_for_data(data['linreg'])
+    arima_stats = statistics.get_statistics_for_data(data['arima'])
     response = dict()
     response['data'] = data
     response['info'] = info
@@ -379,6 +381,7 @@ def async_prediction(request):
     if consts.ENABLE_HEAVY_COMPUTING:
         response['stats']['fbprophet'] = fbprophet_stats
     response['stats']['linreg'] = linreg_stats
+    response['stats']['arima'] = arima_stats
     response['enable_heavy_computing'] = consts.ENABLE_HEAVY_COMPUTING
     response['prediction_offset'] = util.get_prediction_offset(generation_parameters.date_from)
     response = json.dumps(response)

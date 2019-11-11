@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 from fbprophet import Prophet
+from pyramid.arima import auto_arima
 
 # calculates prediction data from date_from to date_to using past_data
 # after the process, cuts the (< date_from) part of predicted data so that
@@ -23,19 +24,22 @@ def predict(past_data, date_from, date_to):
         fbprophet_prediction = get_sorted_data(fbprophet_prediction)
 
     linreg_full = calculate_prediction_data_linreg(past_data, date_to)
-    linreg_quarter = calculate_prediction_data_linreg(past_data, date_to)
-    linreg_month = calculate_prediction_data_linreg(past_data, date_to)
-    linreg_week = calculate_prediction_data_linreg(past_data, date_to)
+    linreg_quarter = calculate_prediction_data_linreg(past_data_quarter, date_to)
+    linreg_month = calculate_prediction_data_linreg(past_data_month, date_to)
+    linreg_week = calculate_prediction_data_linreg(past_data_week, date_to)
     linreg_prediction = aggregate_prediction_4(linreg_full, linreg_quarter, linreg_month, linreg_week)
     linreg_prediction = get_sorted_data(linreg_prediction)
+
+    arima_prediction = calculate_prediction_data_arima(past_data_month, date_to)
+    arima_prediction = get_sorted_data(arima_prediction)
 
     historical_data = get_historical_data(past_data, date_from)
     historical_data = get_sorted_data(historical_data)
 
     if consts.ENABLE_HEAVY_COMPUTING:
-        return historical_data, fbprophet_prediction, linreg_prediction
+        return historical_data, fbprophet_prediction, linreg_prediction, arima_prediction
     
-    return historical_data, linreg_prediction
+    return historical_data, linreg_prediction, arima_prediction
 
 def aggregate_prediction_3(full, quarter, month):
     result = dict()
@@ -103,6 +107,37 @@ def get_past_data_week(past_data):
 
     return result
 
+def filter_unrealistic_values(data):
+    result = dict()
+    for col in data.keys():
+        result[col] = dict()
+        for date, value in data[col].items():
+            if value < consts.BOUNDARY_VALUES[col][0]:
+                value = consts.BOUNDARY_VALUES[col][0]
+            elif value > consts.BOUNDARY_VALUES[col][1]:
+                value = consts.BOUNDARY_VALUES[col][1]
+            result[col][date] = value
+
+    return result
+
+def calculate_prediction_data_arima(past_data, date_to):
+    result = dict()
+    for col in past_data.keys():
+        if len(list(past_data[col].keys())) > 0:
+            result[col] = dict()
+            factor = pd.DataFrame.from_dict(past_data[col], orient='index')
+            factor.index = pd.to_datetime(factor.index)
+            stepwise_model = auto_arima(factor, start_p=1, start_q=1, max_p=3, max_q=3, m=12, start_P=0, seasonal=True, d=1, D=1, trace=True, error_action='ignore', suppress_warnings=True, stepwise=True)
+            stepwise_model.fit(factor)
+            future = stepwise_model.predict(n_periods=util.get_prediction_periods(date_to))
+            future_dt = util.get_prediction_datetimes_dt(datetime.now(), date_to)
+            for i in range(len(future_dt)):
+                result[col][future_dt[i].strftime(consts.DATE_FORMAT)] = future[i]
+
+    result = filter_unrealistic_values(result)
+
+    return result
+
 def calculate_prediction_data_linreg(past_data, date_to):
     result = dict()
     for col in past_data.keys():
@@ -115,6 +150,8 @@ def calculate_prediction_data_linreg(past_data, date_to):
             y_pred = model.predict(x_pred)
             for i in range(x_pred.size):
                 result[col][str(datetime.fromtimestamp(x_pred.item(i)))] = y_pred.item(i)
+
+    result = filter_unrealistic_values(result)
 
     return result
 
@@ -152,6 +189,8 @@ def calculate_prediction_data_fbprophet(past_data, date_to):
             print("Finished prediction for column {}".format(col))
 
     result = util.convert_to_past_data_with_strings(result)
+    result = filter_unrealistic_values(result)
+
     return result
 
 def apply_cap_floor(df, col):

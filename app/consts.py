@@ -69,5 +69,17 @@ DATE_TO_MUST_BE_GREATER_THAN_DATE_FROM = "Date to must be greater than date from
 ADDRESS_NOT_RECOGNISED = "Address cannot be recognised"
 ADDRESS_NOT_SUPPORTED = "There are no installations for given address"
 
-ENABLE_HEAVY_COMPUTING = True
+ENABLE_HEAVY_COMPUTING = False
 ENABLE_MOCK_DATA = False
+
+BOUNDARY_VALUES = {
+    'pm1': [0.0, 1000.0],
+    'pm25': [0.0, 1000.0],
+    'pm10': [0.0, 1000.0],
+    'temperature': [-50.0, 50.0],
+    'pressure': [900.0, 1100.0],
+    'humidity': [0.0, 100.0],
+    'wind_speed': [0.0, 200.0],
+    'wind_degree': [0.0, 360.0],
+    'clouds': [0.0, 100.0]
+}

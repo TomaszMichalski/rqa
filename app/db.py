@@ -95,6 +95,7 @@ def get_prediction_data(parameters):
         if consts.ENABLE_HEAVY_COMPUTING:
             fbprophet_data = mock.get_mock_data(datetime.now(), date_to)
         linreg_data = mock.get_mock_data(datetime.now(), date_to)
+        arima_data = mock.get_mock_data(datetime.now(), date_to)
     else:
         # get past data
         air_data = get_air_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), air_columns, lat, lon, radius)
@@ -106,15 +107,16 @@ def get_prediction_data(parameters):
             past_data[k] = v
 
         if consts.ENABLE_HEAVY_COMPUTING:
-            historical_data, fbprophet_data, linreg_data = prediction.predict(past_data, date_from, date_to)
+            historical_data, fbprophet_data, linreg_data, arima_data = prediction.predict(past_data, date_from, date_to)
         else:
-            historical_data, linreg_data = prediction.predict(past_data, date_from, date_to)
+            historical_data, linreg_data, arima_data = prediction.predict(past_data, date_from, date_to)
     
     data = dict()
     data['historical'] = historical_data
     if consts.ENABLE_HEAVY_COMPUTING:
         data['fbprophet'] = fbprophet_data
     data['linreg'] = linreg_data
+    data['arima'] = arima_data
 
     # fill information data
     data['info'] = get_prediction_data_info(addresses, lat, lon, radius)
