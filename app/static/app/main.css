@@ -35,12 +35,39 @@ td {
     margin: 20vh auto;
 }
 
+.side-panel-title {
+    text-align: center;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#chart_title {
+    margin: 30px auto;
+    text-align: center;
+}
+
+#info {
+    margin: 30px auto;
+    text-align: center;
+}
+
+#stats {
+    margin: 30px auto;
+    text-align: center;
+}
+
+#side-panel {
+    margin: 100px auto;
+}
+
 #content {
     max-width: 1220px;
     margin: 0 auto;
 }
 
 #loader {
+    margin: 20vh auto;
+    text-align: center;
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #5E5694; /* Purple-ish */
     border-radius: 50%;
