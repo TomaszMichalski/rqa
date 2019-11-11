@@ -2,8 +2,8 @@
 
 {% load static %}
 {% block additional_css %}
-    <link rel="stylesheet" href={% static 'app/user/auth.css' %}>
-    <link rel="stylesheet" href={% static 'app/forms.css' %}>
+    <link rel="stylesheet" href={% static 'app/css/user/auth.css' %}>
+    <link rel="stylesheet" href={% static 'app/css/forms.css' %}>
 {% endblock additional_css %}
 
 {% block content %}
@@ -15,10 +15,6 @@
         </div>
     </div>
 
-    <script>
-        setTimeout(function () {
-            window.location.href = '/';
-        }, 2000);
-    </script>
+    <script src="{% static 'app/js/user/logout.js' %}"></script>
 
 {% endblock %}
