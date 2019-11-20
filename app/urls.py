@@ -1,5 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+
+from app.forms import CustomLoginForm
 from . import views
 
 urlpatterns = [
@@ -22,7 +24,11 @@ urlpatterns = [
     path('configuration/group/join', views.configuration_group_join, name='configuration_group_join'),
     path('configuration/group/leave', views.configuration_group_leave, name='configuration_group_leave'),
     path('user/register', views.register, name='register'),
-    path('user/login', auth_views.LoginView.as_view(template_name='user/login.html'), name='login'),
-    path('user/logout', auth_views.LogoutView.as_view(template_name='user/logout.html'), name='logout'),
+    path('user/login', auth_views.LoginView.as_view(authentication_form=CustomLoginForm), name='login'),
+    path('user/logout', auth_views.LogoutView.as_view(template_name='registration/logout.html'), name='logout'),
     path('guest/generate', views.guest_generate, name='guest_generate'),
+    path('analysis/sendmail', views.send_analysis_email, name='send_analysis_email'),
+    path('prediction/sendmail', views.send_prediction_email, name='send_prediction_email'),
+    path('analysis/async', views.async_analysis, name='async_analysis'),
+    path('prediction/async', views.async_prediction, name='async_prediction'),
 ]

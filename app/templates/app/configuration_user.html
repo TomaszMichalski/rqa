@@ -1,94 +1,85 @@
-{% extends "app/base.html" %} {% block content %}
+{% extends "app/base.html" %}
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/css/user/auth.css' %}>
+    <link rel="stylesheet" href={% static 'app/css/forms.css' %}>
+{% endblock additional_css %}
 
-<ul class="nav nav-tabs">
-    <li>
-        <a href={% url 'home' %}>Home</a>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'analysis_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'analysis_group' %}>Group</a>
-            </li>
-            <li>
-                <a href={% url 'analysis_generate' %}>Custom</a>
-            </li>
-        </ul>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'prediction' %}>Prediction
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'prediction_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'prediction_group' %}>Group</a>
-            </li>
-            <li>
-                <a href={% url 'prediction_generate' %}>Custom</a>
-            </li>
-        </ul>
-    </li>
-    <li class="dropdown active">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'configuration_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'configuration_group' %}>Group</a>
-            </li>
-        </ul>
-    </li>
-</ul>
+{% block content %}
 
-<div id="content">
-    <center>
-        <form method="post" action={% url 'configuration_user' %}>
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-sm-2"></div>
-                <div class="col-sm-4">
-                    <h3>Analysis configuration</h3>
-                    <table>
+    <div id="content">
+        <div class="form-container-conf">
+            <form method="post" action={% url 'configuration_user' %}>
+                <div class="shadow p-3 mb-5 bg-light rounded form-container-left">
+                    <h3 class="form-element form-title">Analysis configuration</h3>
+                    {% csrf_token %}
+                    {% for field in analysis_configuration %}
+                        <div class="form-group">
+                            {% if field.field.is_checkbox %}
+                                <div class="form-checkbox-line">
+                                    {{ field }}
+                                    <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <div class="form-element">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    {% if analysis_configuration.errors %}
                         {% for field in analysis_configuration %}
-                        <div class="form-group">
-                            <tr>
-                                <td style="text-align: left;">{{ field.label_tag }}</td>
-                                <td style="text-align: left;">{{ field }}</td>
-                            </tr>
-                        </div>
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger form-element">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
                         {% endfor %}
-                    </table>
+                        {% for error in analysis_configuration.non_field_errors %}
+                            <div class="alert alert-danger form-element">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
-                <div class="col-sm-4">
-                    <h3>Prediction configuration</h3>
-                    <table>
+
+                <div class="shadow p-3 mb-5 bg-light rounded form-container-right">
+                    <h3 class="form-element form-title">Prediction configuration</h3>
+                    {% csrf_token %}
+                    {% for field in prediction_configuration %}
+                        <div class="form-group">
+                            {% if field.field.is_checkbox %}
+                                <div class="form-checkbox-line">
+                                    {{ field }}
+                                    <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <div class="form-element">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    {% if prediction_configuration.errors %}
                         {% for field in prediction_configuration %}
-                        <div class="form-group">
-                            <tr>
-                                <td style="text-align: left;">{{ field.label_tag }}</td>
-                                <td style="text-align: left;">{{ field }}</td>
-                            </tr>
-                        </div>
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger form-element">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
                         {% endfor %}
-                    </table>
+                        {% for error in prediction_configuration.non_field_errors %}
+                            <div class="alert alert-danger form-element">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
-                <div class="col-sm-2"></div>
-            </div>
-            <hr />
-            <button class="btn btn-primary btn-lg" style="width: 40%">Save configuration</button>
-        </form>
-    </center>
-</div>
+                <button class="btn btn-secondary btn-lg custom-button">Save configuration</button>
+
+            </form>
+        </div>
+
+    </div>
 
 {% endblock %}

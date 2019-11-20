@@ -1,75 +1,51 @@
-{% extends "app/base.html" %} {% block content %}
+{% extends "app/base.html" %}
 
-<ul class="nav nav-tabs">
-    <li>
-        <a href={% url 'home' %}>Home</a>
-    </li>
-    <li class="dropdown active">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'analysis_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'analysis_group' %}>Group</a>
-            </li>
-            <li>
-                <a href={% url 'analysis_generate' %}>Custom</a>
-            </li>
-        </ul>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'prediction' %}>Prediction
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'prediction_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'prediction_group' %}>Group</a>
-            </li>
-            <li>
-                <a href={% url 'prediction_generate' %}>Custom</a>
-            </li>
-        </ul>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'configuration_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'configuration_group' %}>Group</a>
-            </li>
-        </ul>
-    </li>
-</ul>
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/css/forms.css' %}>
+{% endblock additional_css %}
 
-<div id="content">
-    <center>
-        <div class="custom-form">
-            <h2>Generate for</h2>
-            <form method="get" action={% url 'analysis_custom' %}>
-                <table>
+{% block content %}
+
+    <div id="content">
+        <div class="form-container">
+            <div class="shadow p-3 mb-5 bg-light rounded">
+                <h3 class="form-element form-title">Generate for</h3>
+                <form method="get" action={% url 'analysis_custom' %}>
+                    {% csrf_token %}
                     {% for field in form %}
-                    <div class="form-group">
-                        <tr>
-                            <td>{{ field.label_tag }}</td>
-                            <td>{{ field }}</td>
-                        </tr>
-                    </div>
+                        <div class="form-group">
+                            {% if field.field.is_checkbox %}
+                                <div class="form-checkbox-line">
+                                    {{ field }}
+                                    <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <div class="form-element">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        </div>
                     {% endfor %}
-                </table>
-                <button class="btn btn-primary btn-single">Generate</button>
-            </form>
+                    <button class="btn btn-secondary custom-button btn-lg form-element">Generate
+                    </button>
+                </form>
+                {% if form.errors %}
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger form-element">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger form-element">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
-    </center>
-</div>
+    </div>
 
 {% endblock %}

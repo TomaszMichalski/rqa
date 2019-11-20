@@ -2,6 +2,7 @@ from . import models
 from . import util
 from . import consts
 from . import prediction
+from . import mock
 from dbservice.database.readers import reader
 from datetime import datetime
 
@@ -11,10 +12,28 @@ def get_addresses_within_area(lat, lon, radius):
     all_addresses = reader.get_addresses()
     filtered_addresses = list(filter(lambda address: util.geo_location_distance(address[1], address[2], lat, lon) < radius, all_addresses))
     addresses = list(map(lambda address: models.Address(address[0], address[1], address[2]), filtered_addresses))
-    print("Found {0} of {1} addresses in given area.".format(len(filtered_addresses), len(all_addresses)))
-    print("Returning {0} addresses.".format(len(addresses)))
     
     return addresses
+
+def is_address_supported(addr, radius):
+    try:
+        lat, lon = util.get_geo_location(addr)
+        if not lat or not lon:
+            return False
+        all_addresses = reader.get_addresses()
+        filtered_addresses = list(filter(lambda address: util.geo_location_distance(address[1], address[2], lat, lon) < radius, all_addresses))
+        addresses = list(map(lambda address: models.Address(address[0], address[1], address[2]), filtered_addresses))
+
+        return len(addresses) > 0
+    except:
+        return False
+
+def is_location_supported(lat, lon, radius):
+    all_addresses = reader.get_addresses()
+    filtered_addresses = list(filter(lambda address: util.geo_location_distance(address[1], address[2], lat, lon) < radius, all_addresses))
+    addresses = list(map(lambda address: models.Address(address[0], address[1], address[2]), filtered_addresses))
+
+    return len(addresses) > 0
 
 # returns analysis data based on given GenerationParameters
 def get_analysis_data(parameters):
@@ -33,14 +52,19 @@ def get_analysis_data(parameters):
     # create data object
     data = empty_data()
 
-    # get analysis data
-    air_data = get_air_data(addresses, date_from, date_to, air_columns, lat, lon, radius)
-    weather_data = get_weather_data(addresses, date_from, date_to, weather_columns, lat, lon, radius)
-    # combine data
-    for k, v in air_data.items():
-        data[k] = v
-    for k, v in weather_data.items():
-        data[k] = v
+    if consts.ENABLE_MOCK_DATA:
+        data = mock.get_mock_data(date_from, date_to)
+    else:
+        # get analysis data
+        air_data = get_air_data(addresses, date_from, date_to, air_columns, lat, lon, radius)
+        weather_data = get_weather_data(addresses, date_from, date_to, weather_columns, lat, lon, radius)
+        # combine data
+        for k, v in air_data.items():
+            data[k] = v
+        for k, v in weather_data.items():
+            data[k] = v
+
+    data = util.interpolate_data(data, date_from, date_to)
 
     # fill information data
     data['info'] = get_analysis_data_info(addresses, lat, lon, radius)
@@ -66,21 +90,40 @@ def get_prediction_data(parameters):
     # create past data object
     past_data = empty_data()
 
-    # get past data
-    air_data = get_air_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), air_columns, lat, lon, radius)
-    weather_data = get_weather_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), weather_columns, lat, lon, radius)
-    # combine data
-    for k, v in air_data.items():
-        past_data[k] = v
-    for k, v in weather_data.items():
-        past_data[k] = v
+    if consts.ENABLE_MOCK_DATA:
+        historical_data = mock.get_mock_data(date_from, datetime.now())
+        if consts.ENABLE_HEAVY_COMPUTING:
+            fbprophet_data = mock.get_mock_data(datetime.now(), date_to)
+        linreg_data = mock.get_mock_data(datetime.now(), date_to)
+        arima_data = mock.get_mock_data(datetime.now(), date_to)
+    else:
+        # get past data
+        air_data = get_air_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), air_columns, lat, lon, radius)
+        weather_data = get_weather_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), weather_columns, lat, lon, radius)
+        # combine data
+        for k, v in air_data.items():
+            past_data[k] = v
+        for k, v in weather_data.items():
+            past_data[k] = v
 
-    data = prediction.predict(past_data, date_from, date_to)
+        if consts.ENABLE_HEAVY_COMPUTING:
+            historical_data, fbprophet_data, linreg_data, arima_data = prediction.predict(past_data, date_from, date_to)
+        else:
+            historical_data, linreg_data, arima_data = prediction.predict(past_data, date_from, date_to)
+    
+    data = dict()
+    data['historical'] = historical_data
+    if consts.ENABLE_HEAVY_COMPUTING:
+        data['fbprophet'] = fbprophet_data
+    data['linreg'] = linreg_data
+    data['arima'] = arima_data
 
     # fill information data
     data['info'] = get_prediction_data_info(addresses, lat, lon, radius)
     data['pm25_norm'] = consts.PM25_WHO_NORM
     data['pm10_norm'] = consts.PM10_WHO_NORM
+
+    data['historical'] = util.interpolate_data(data['historical'], date_from, date_to)
 
     return data
 

@@ -12,7 +12,7 @@
         <div>
             <div class="form-container">
                 <div class="shadow p-3 mb-5 bg-light rounded">
-                    <h3 class="form-element form-title">Create group</h3>
+                    <h3 class="form-element form-title">Register</h3>
                     <form method="post">
                         {% csrf_token %}
                         {% for field in form %}
@@ -20,7 +20,7 @@
                                 <div class="form-element">{{ field }}</div>
                             </div>
                         {% endfor %}
-                        <button class="btn btn-secondary custom-button btn-lg form-element">Create group
+                        <button class="btn btn-secondary custom-button btn-lg form-element">Register
                         </button>
                     </form>
                     {% if form.errors %}

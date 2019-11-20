@@ -1,65 +1,25 @@
-{% extends "app/base.html" %} {% block content %}
+{% extends "app/base.html" %}
 
-<ul class="nav nav-tabs">
-    <li class="active">
-        <a href={% url 'home' %}>Home</a>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'analysis' %}>Analysis
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'analysis_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'analysis_group' %}>Group</a>
-            </li>
-            <li>
-                <a href={% url 'analysis_generate' %}>Custom</a>
-            </li>
-        </ul>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'prediction' %}>Prediction
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'prediction_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'prediction_group' %}>Group</a>
-            </li>
-            <li>
-                <a href={% url 'prediction_generate' %}>Custom</a>
-            </li>
-        </ul>
-    </li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href={% url 'configuration' %}>Configuration
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li>
-                <a href={% url 'configuration_user' %}>User</a>
-            </li>
-            <li>
-                <a href={% url 'configuration_group' %}>Group</a>
-            </li>
-        </ul>
-    </li>
-</ul>
+{% load static %}
+{% block additional_css %}
+    <link rel="stylesheet" href={% static 'app/css/home.css' %}>
+    <link rel="stylesheet" href={% static 'app/css/forms.css' %}>
+{% endblock additional_css %}
 
-<div id="content">
-    <h2>Welcome to RQA!</h2>
-    <h3>Air Quality Analysis application</h3>
-    Press
-    <b>Analysis</b> for air quality analysis.
-    <br /> Press
-    <b>Prediction</b> for air quality prediction.
-    <br /> Press
-    <b>Configuration</b> to view and edit your user configuration.
-</div>
+{% block content %}
+
+
+    <div id="content">
+        <div class="home-welcome">
+            <h2>Welcome to RQA!</h2>
+            <h3>Air Quality Analysis application</h3>
+            Press
+            <b>Analysis</b> for air quality analysis.
+            <br/> Press
+            <b>Prediction</b> for air quality prediction.
+            <br/> Press
+            <b>Configuration</b> to view and edit your user configuration.
+        </div>
+    </div>
 
 {% endblock %}

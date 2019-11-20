@@ -1,6 +1,6 @@
 from . import consts
 from . import models
-from math import pi, sqrt, sin, cos, atan2
+from math import pi, sqrt, sin, cos, atan2, ceil
 import requests
 import datetime
 import json
@@ -52,6 +52,39 @@ def convert_to_generation_parameters(configuration, for_prediction=False):
 
     return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
 
+def convert_from_generation_parameters(parameters):
+    result = dict()
+    result['address'] = parameters.address
+    result['radius'] = parameters.radius
+    result['date_from'] = str(parameters.date_from)
+    result['date_to'] = str(parameters.date_to)
+    result['is_pm1'] = parameters.is_pm1
+    result['is_pm25'] = parameters.is_pm25
+    result['is_pm10'] = parameters.is_pm10
+    result['is_temp'] = parameters.is_temp
+    result['is_pressure'] = parameters.is_pressure
+    result['is_humidity'] = parameters.is_humidity
+    result['is_wind'] = parameters.is_wind
+    result['is_clouds'] = parameters.is_clouds
+
+    return result
+
+def convert_json_to_generation_parameters(parameters):
+    address = parameters['address']
+    radius = parameters['radius']
+    date_from = datetime.datetime.strptime(normalize_date_string(parameters['date_from']), consts.DATE_FORMAT)
+    date_to = datetime.datetime.strptime(normalize_date_string(parameters['date_to']), consts.DATE_FORMAT)
+    is_pm1 = parameters['is_pm1']
+    is_pm25 = parameters['is_pm25']
+    is_pm10 = parameters['is_pm10']
+    is_temp = parameters['is_temp']
+    is_pressure = parameters['is_pressure']
+    is_humidity = parameters['is_humidity']
+    is_wind = parameters['is_wind']
+    is_clouds = parameters['is_clouds']
+
+    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
+
 # Measure distance between two locations - START
 
 def deg_to_rad(deg):
@@ -92,11 +125,33 @@ def get_geo_location(address):
             lon = float(json_response[0]['lon'])
             return lat, lon
         else:
-            return None
+            return None, None
     else:
-        return None
+        return None, None
 
 # Get location based on address - END
+
+def is_correct_address(address):
+    data = {
+        'key': api_token,
+        'q': address,
+        'format': 'json'
+    }
+
+    response = requests.get(api_base_url, params=data)
+    if response.status_code == 200:
+        json_response = json.loads(response.content.decode('utf-8'))
+        if isinstance(json_response, list):
+            try:
+                lat = float(json_response[0]['lat'])
+                lon = float(json_response[0]['lon'])
+                return True
+            except:
+                return False
+        else:
+            return False
+    else:
+        return False
 
 # gets first data aggregation datetime (which is 00:00, 06:00, 12:00 or 18:00) after date_from
 # date_from can be both datetime or string, if it is string then it is converted to datetime
@@ -121,7 +176,7 @@ def get_prediction_datetimes(date_from, date_to):
     dt = get_data_aggregation_starting_datetime(date_from)
     date_to_tzinfo_free = date_to.replace(tzinfo=None)
     datetimes = []
-    while dt <= date_to_tzinfo_free:
+    while dt < date_to_tzinfo_free:
         datetimes.append(dt)
         dt = dt + consts.DATA_TIMEDELTA
 
@@ -129,20 +184,101 @@ def get_prediction_datetimes(date_from, date_to):
 
     return datetimes
 
+def get_prediction_datetimes_dt(date_from, date_to):
+    dt = get_data_aggregation_starting_datetime(date_from)
+    date_to_tzinfo_free = date_to.replace(tzinfo=None)
+    datetimes = []
+    while dt < date_to_tzinfo_free:
+        datetimes.append(dt)
+        dt = dt + consts.DATA_TIMEDELTA
+
+    return datetimes
+
 def get_chart_title(location, date_from, date_to):
     return "Examination for {0}, {1} to {2}".format(location, date_from.date(), date_to.date())
 
 def get_examination_filename(location, date_from, date_to):
-    return "RQA {0} {1} {2}.png".format(location, date_from.date(), date_to.date())
+    return "RQA {0} {1} {2}".format(location, date_from.date(), date_to.date())
 
 def extract_factor_data(data):
     result = dict()
     for column in consts.AIR_COLUMNS:
-        result[column] = data[column]
+        if column in data:
+            result[column] = data[column]
     for column in consts.WEATHER_COLUMNS:
-        result[column] = data[column]
+        if column in data:
+            result[column] = data[column]
     
     return result
 
 def get_factor_name(factor):
     return consts.COLUMNS_NAMES[factor]
+
+def is_configuration_incomplete(configuration):
+    return not (is_specified(configuration.address) and is_specified(configuration.radius) and is_specified(configuration.period))
+
+def is_specified(s):
+    return not (s is None or s == "")
+
+def is_positive_number(s):
+    try:
+        float(s)
+        return float(s) > 0
+    except ValueError:
+        return False
+
+def normalize_date_string(date):
+    date = date.split('+')[0]
+    date = date.split('.')[0]
+
+    return date
+    
+def convert_to_past_data_with_datetimes(past_data):
+    result = dict()
+    for col in past_data.keys():
+        result[col] = dict()
+        for date_as_string, value in past_data[col].items():
+            result[col][datetime.datetime.strptime(date_as_string, consts.DATE_FORMAT)] = value
+
+    return result
+
+def convert_to_past_data_with_strings(past_data):
+    result = dict()
+    for col in past_data.keys():
+        result[col] = dict()
+        for date_as_datetime, value in past_data[col].items():
+            result[col][date_as_datetime.strftime(consts.DATE_FORMAT)] = value
+
+    return result
+
+def get_prediction_periods(date_to):
+    now = datetime.datetime.now()
+    delta = date_to - now
+    periods = delta / datetime.timedelta(hours=6)
+
+    return int(periods)
+
+def get_prediction_offset(date_from):
+    now = datetime.datetime.now()
+    if now < date_from:
+        return 0
+        
+    delta = now - date_from
+    offset = delta / datetime.timedelta(hours=6)
+
+    return int(ceil(offset)) - 1
+
+def interpolate_data(data, date_from, date_to):
+    result = dict()
+    for col in data.keys():
+        result[col] = dict()
+        interpolation_date = get_data_aggregation_starting_datetime(date_from)
+        while interpolation_date < date_to:
+            if interpolation_date.strftime(consts.DATE_FORMAT) in data[col].keys():
+                result[col][interpolation_date.strftime(consts.DATE_FORMAT)] = data[col][interpolation_date.strftime(consts.DATE_FORMAT)]
+            else:
+                result[col][interpolation_date.strftime(consts.DATE_FORMAT)] = None
+            interpolation_date = interpolation_date + datetime.timedelta(hours=6)
+
+    return result
+            
