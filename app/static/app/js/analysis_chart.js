@@ -6,9 +6,11 @@ function csrfSafeMethod(method) {
 document.getElementById('btn-email').disabled = true;
 document.getElementById('btn-refresh').disabled = true;
 document.getElementById('btn-export').disabled = true;
+document.getElementById('btn-export-xls').disabled = true;
 document.getElementById('btn-email').setAttribute("disabled", "");
 document.getElementById('btn-refresh').setAttribute("disabled", "");
 document.getElementById('btn-export').setAttribute("disabled", "");
+document.getElementById('btn-export-xls').setAttribute("disabled", "");
 
 var canvases = [document.getElementById('pm1'),
     document.getElementById('pm25'),
@@ -17,7 +19,6 @@ var canvases = [document.getElementById('pm1'),
     document.getElementById('pressure'),
     document.getElementById('humidity'),
     document.getElementById('wind_speed'),
-    document.getElementById('wind_degree'),
     document.getElementById('clouds')];
 
 $.ajaxSetup({
@@ -42,7 +43,8 @@ $.ajax({
         response = JSON.parse(response);
         drawData(response.data);
         fillInfo(response.info);
-        fillStats(response.stats);
+        fillStats(response.data, response.stats);
+        fillDataTable(response.data);
         enableButtons();
     },
     error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -52,7 +54,7 @@ $.ajax({
 
 function drawData(data) {
     /* Hide unused canvas */
-    canvases.map(c => c.style.display = Object.keys(data[c.id]).length === 0 ? "none" : "block")
+    canvases.map(c => c.style.display = hasFactorData(data, c.id) ? "block" : "none")
 
     /* PM1 */
     var pm1 = new Chart(document.getElementById('pm1'), {
@@ -97,7 +99,7 @@ function drawData(data) {
                 }]
             }
         }
-    });
+    })
 
     /* PM25 */
     var pm25 = new Chart(document.getElementById('pm25'), {
@@ -477,14 +479,55 @@ function fillInfo(info) {
     document.getElementById('info').innerText = info.join('\n');
 }
 
-function fillStats(stats) {
+function fillStats(data, stats) {
     var table = document.getElementById('stats');
     for (var factor in stats) {
-        var row = table.insertRow();
-        row.insertCell().appendChild(document.createTextNode(factor));
-        row.insertCell().appendChild(document.createTextNode(stats[factor].mean));
-        row.insertCell().appendChild(document.createTextNode(stats[factor].median));
-        row.insertCell().appendChild(document.createTextNode(stats[factor].stdev));
+        if (hasFactorData(data, factor.toLowerCase().split(" ").join("_").split(".").join(""))) {
+            var row = table.insertRow();
+            row.insertCell().appendChild(document.createTextNode(factor));
+            row.insertCell().appendChild(document.createTextNode(stats[factor].mean));
+            row.insertCell().appendChild(document.createTextNode(stats[factor].median));
+            row.insertCell().appendChild(document.createTextNode(stats[factor].stdev));
+        }
+    }
+}
+
+function hasFactorData(data, factor) {
+    var dates = Object.keys(data[factor]);
+    for (var i = 0; i < dates.length; i++) {
+        if (data[factor][dates[i]] != null) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function fillDataTable(data) {
+    var table = document.getElementById('datatable');
+    var factors = ['pm1', 'pm25', 'pm10', 'temperature', 'pressure', 'humidity', 'wind_speed', 'wind_degree', 'clouds'];
+    var factorsData = {};
+    for (var i = 0; i < factors.length; i++) {
+        if (hasFactorData(data, factors[i])) {
+            factorsData[factors[i]] = data[factors[i]];
+        }
+    }
+    if (Object.keys(factorsData).length > 0) {
+        var headerRow = table.insertRow();
+        headerRow.insertCell().appendChild(document.createTextNode("datetime"));
+        presentFactors = Object.keys(factorsData);
+        for (var i = 0; i < presentFactors.length; i++) {
+            headerRow.insertCell().appendChild(document.createTextNode(presentFactors[i]));
+        }
+
+        var dates = Object.keys(factorsData[presentFactors[0]]);
+        for (var i = 0; i < dates.length; i++) {
+            var row = table.insertRow();
+            row.insertCell().appendChild(document.createTextNode(dates[i]));
+            for (var j = 0; j < presentFactors.length; j++) {
+                row.insertCell().appendChild(document.createTextNode(factorsData[presentFactors[j]][dates[i]]));
+            }
+        }
     }
 }
 
@@ -492,10 +535,13 @@ function enableButtons() {
     document.getElementById('btn-email').disabled = false;
     document.getElementById('btn-refresh').disabled = false;
     document.getElementById('btn-export').disabled = false;
+    document.getElementById('btn-export-xls').disabled = false;
     document.getElementById('btn-email').removeAttribute("disabled");
     document.getElementById('btn-refresh').removeAttribute("disabled");
     document.getElementById('btn-export').removeAttribute("disabled");
+    document.getElementById('btn-export-xls').removeAttribute("disabled");
     addExportButtonHandler();
+    addExportXlsButtonHandler();
 }
 
 /* Helper functions */
@@ -525,5 +571,15 @@ function addExportButtonHandler() {
         }
         var dataUrl = canvas.toDataURL('image/png');
         exportBtn.href = dataUrl;
+    });
+}
+
+function addExportXlsButtonHandler() {
+    var exportXlsBtn = document.getElementById('btn-export-xls');
+    exportXlsBtn.addEventListener('click', function (e) {
+        $('#datatable').table2excel({
+            name: filename,
+            filename: filename + '.xls'
+        });
     });
 }

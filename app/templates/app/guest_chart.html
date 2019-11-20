@@ -1,54 +1,49 @@
 {% extends "app/base.html" %} {% block content %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
+    <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
 
-<div id="content">
-    <div class="container">
-        <br />
-        <br />
-        <div class="row">
-            <div class="col-sm-9">
-                <div id="chart_title">
-                    <h3>{{ chart_title }}</h3>
-                </div>
-                    <div id="loader"></div>
-                <div id="chart">
-                    <canvas id="pm1" width="800" height="200"></canvas>
-                    <canvas id="pm25" width="800" height="200"></canvas>
-                    <canvas id="pm10" width="800" height="200"></canvas>
-                    <canvas id="temperature" width="800" height="200"></canvas>
-                    <canvas id="pressure" width="800" height="200"></canvas>
-                    <canvas id="humidity" width="800" height="150"></canvas>
-                    <canvas id="wind_speed" width="800" height="150"></canvas>
-                    <canvas id="wind_degree" width="800" height="150"></canvas>
-                    <canvas id="clouds" width="800" height="150"></canvas>
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div id="side-panel">
-                    <div id="buttons" class="row">
-                        <a href="#" id="btn-refresh" class="btn btn-secondary btn-block custom-button" role="button">Refresh</a>
-                        <a href="#" id="btn-export" class="btn btn-secondary btn-block custom-button" role="button" download="{{ filename }}">Export</a>
+    <div id="content">
+        <div class="container">
+            <br/>
+            <br/>
+            <div class="row">
+                <div class="col-sm-9">
+                    <div id="chart_title">
+                        <h3>{{ chart_title }}</h3>
                     </div>
-                    <div id="description" class="row">
-                        <h4 class="side-panel-title">Information</h4>
-                        <div id="info" class="alert alert-dark"></div>
-                        <br />
-                        <table id="stats" class="table table-bordered table-sm">
-                            <tr>
-                                <th style="text-align: center;">Factor</th>
-                                <th style="text-align: center;">Mean</th>
-                                <th style="text-align: center;">Median</th>
-                                <th style="text-align: center;">Standard deviation</th>
-                            </tr>
-                        </table>
+                    <div id="loader"></div>
+                    <div id="chart">
+                        <canvas id="pm1" width="800" height="200"></canvas>
+                        <canvas id="pm25" width="800" height="200"></canvas>
+                        <canvas id="pm10" width="800" height="200"></canvas>
+                        <canvas id="temperature" width="800" height="200"></canvas>
+                        <canvas id="pressure" width="800" height="200"></canvas>
+                        <canvas id="humidity" width="800" height="150"></canvas>
+                        <canvas id="wind_speed" width="800" height="150"></canvas>
+                        <canvas id="wind_degree" width="800" height="150" style="display: none;"></canvas>
+                        <canvas id="clouds" width="800" height="150"></canvas>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div id="side-panel">
+                        <div id="buttons" class="row">
+                            <a href="#" id="btn-refresh" class="btn btn-secondary btn-block custom-button"
+                               role="button">Refresh</a>
+                            <a href="#" id="btn-export" class="btn btn-secondary btn-block custom-button" role="button"
+                               download="{{ filename }}.png">Export to PNG</a>
+                            <a href="#" id="btn-export-xls" class="btn btn-secondary btn-block custom-button"
+                               role="button" download="{{ filename }}.xls">Export to XLS</a>
+                        </div>
+                        {% include "app/prediction_table.html" %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <table id="datatable" hidden></table>
 
     {% load  static %}
     <script type="text/javascript">
@@ -56,6 +51,7 @@
             var jsonData = '{{ parameters | escapejs }}';
             var csrfToken = '{{ csrf_token }}';
             var url = '{% url "async_prediction" %}';
+            var filename = '{{ filename }}';
         }
     </script>
     <script type="text/javascript" src="{% static 'app/js/guest_chart.js' %}"></script>

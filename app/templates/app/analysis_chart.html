@@ -2,6 +2,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
+<script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
 
 <div id="content">
     <div class="container">
@@ -19,7 +20,7 @@
                     <canvas id="pressure" width="800" height="200"></canvas>
                     <canvas id="humidity" width="800" height="150"></canvas>
                     <canvas id="wind_speed" width="800" height="150"></canvas>
-                    <canvas id="wind_degree" width="800" height="150"></canvas>
+                    <canvas id="wind_degree" width="800" height="150" style="display: none;"></canvas>
                     <canvas id="clouds" width="800" height="150"></canvas>
                 </div>
             </div>
@@ -28,7 +29,8 @@
                     <div id="buttons" class="row">
                         <a href="{% url 'send_analysis_email' %}" id="btn-email" class="btn btn-secondary btn-block custom-button" role="button">Email copy</a>
                         <a href="#" id="btn-refresh" class="btn btn-secondary btn-block custom-button" role="button">Refresh</a>
-                        <a href="#" id="btn-export" class="btn btn-secondary btn-block custom-button" role="button" download="{{ filename }}">Export</a>
+                        <a href="#" id="btn-export" class="btn btn-secondary btn-block custom-button" role="button" download="{{ filename }}.png">Export to PNG</a>
+                        <a href="#" id="btn-export-xls" class="btn btn-secondary btn-block custom-button" role="button">Export to XLS</a>
                     </div>
                     {% include "app/analysis_table.html" %}
                 </div>
@@ -37,12 +39,14 @@
     </div>
 </div>
 
+<table id="datatable" hidden></table>
     {% load  static %}
     <script type="text/javascript">
         {
             var jsonData = '{{ parameters | escapejs }}';
             var csrfToken = '{{ csrf_token }}';
             var url = '{% url "async_analysis" %}';
+            var filename = '{{ filename }}';
         }
     </script>
     <script type="text/javascript" src="{% static 'app/js/analysis_chart.js' %}"></script>

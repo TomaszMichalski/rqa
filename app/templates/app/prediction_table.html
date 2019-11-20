@@ -1,8 +1,60 @@
 {% block content %}
     <div id="description" class="row">
-            <h4 class="side-panel-title">Prediction information</h4>
+        <h4 class="side-panel-title">Prediction information</h4>
         <div id="info" class="alert alert-dark"></div>
-        <table id="stats" class="table table-bordered table-sm">
+        <h5 id="historical_stats_header" class="side-panel-title">Historical statistics</h5>
+        <table id="historical_stats" class="table table-bordered table-sm stats">
+            <tr>
+                <th>
+                    <div>Factor</div>
+                </th>
+                <th>
+                    <div>Mean</div>
+                </th>
+                <th>
+                    <div>Median</div>
+                </th>
+                <th>
+                    <div> Standard deviation</div>
+                </th>
+            </tr>
+        </table>
+        <h5 id="fbprophet_stats_header" class="side-panel-title">FBProphet statistics</h5>
+        <table id="fbprophet_stats" class="table table-bordered table-sm stats">
+            <tr>
+                <th>
+                    <div>Factor</div>
+                </th>
+                <th>
+                    <div>Mean</div>
+                </th>
+                <th>
+                    <div>Median</div>
+                </th>
+                <th>
+                    <div> Standard deviation</div>
+                </th>
+            </tr>
+        </table>
+        <h5 id="linreg_stats_header" class="side-panel-title">Trend analysis statistics</h5>
+        <table id="linreg_stats" class="table table-bordered table-sm stats">
+            <tr>
+                <th>
+                    <div>Factor</div>
+                </th>
+                <th>
+                    <div>Mean</div>
+                </th>
+                <th>
+                    <div>Median</div>
+                </th>
+                <th>
+                    <div> Standard deviation</div>
+                </th>
+            </tr>
+        </table>
+        <h5 id="arima_stats_header" class="side-panel-title">ARIMA statistics</h5>
+        <table id="arima_stats" class="table table-bordered table-sm stats">
             <tr>
                 <th>
                     <div>Factor</div>
