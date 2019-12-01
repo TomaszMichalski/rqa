@@ -99,7 +99,7 @@ function hideHeavyComputingStats() {
 function mergeLabels(data, factor) {
     first = [];
     second = [];
-    if (Object.keys(data.historical).includes(factor)) {
+    if (Object.keys(data).includes("historical") && Object.keys(data.historical).includes(factor)) {
         first = Object.keys(data.historical[factor]);
     }
     if (Object.keys(data.linreg).includes(factor)) {
