@@ -123,7 +123,7 @@ def get_prediction_data(parameters):
     data['pm25_norm'] = consts.PM25_WHO_NORM
     data['pm10_norm'] = consts.PM10_WHO_NORM
 
-    data['historical'] = util.interpolate_data(data['historical'], date_from, date_to)
+    data['historical'] = util.interpolate_data(data['historical'], date_from, datetime.now())
 
     return data
 
