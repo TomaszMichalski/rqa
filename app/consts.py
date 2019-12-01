@@ -70,7 +70,7 @@ ADDRESS_NOT_RECOGNISED = "Address cannot be recognised"
 ADDRESS_NOT_SUPPORTED = "There are no installations for given address"
 
 ENABLE_HEAVY_COMPUTING = True
-ENABLE_MOCK_DATA = False
+ENABLE_MOCK_DATA = True
 
 BOUNDARY_VALUES = {
     'pm1': [0.0, 1000.0],
