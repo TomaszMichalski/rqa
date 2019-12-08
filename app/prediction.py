@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 from fbprophet import Prophet
-from pyramid.arima import auto_arima
+from pmdarima import auto_arima
 
 # calculates prediction data from date_from to date_to using past_data
 # after the process, cuts the (< date_from) part of predicted data so that

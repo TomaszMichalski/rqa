@@ -12,6 +12,23 @@
                         <h3>{{ chart_title }}</h3>
                     </div>
                     <div id="loader"></div>
+                    <div id="algo-checkboxes">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="fbprophet" value="option1"
+                                   checked="checked" onchange="onCheckboxChange()">
+                            <label class="form-check-label" for="fbprophet">FBProphet</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="arima" value="option2" checked="checked"
+                                   onchange="onCheckboxChange()">
+                            <label class="form-check-label" for="arima">Arima</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="trend" value="option3" checked="checked"
+                                   onchange="onCheckboxChange()">
+                            <label class="form-check-label" for="trend">Trend Analysis</label>
+                        </div>
+                    </div>
                     <div id="chart">
                         <canvas id="pm1" width="800" height="200"></canvas>
                         <canvas id="pm25" width="800" height="200"></canvas>
