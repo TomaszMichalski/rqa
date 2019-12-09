@@ -115,15 +115,24 @@
     }
 
     function hasData(data, factor, enableHeavyComputing) {
-        if (enableHeavyComputing) {
+        if (enableHeavyComputing && data.fbprophet) {
+            if(data.arima) {
+                return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
+                    Object.keys(data.fbprophet).includes(factor) && hasFactorData(data.fbprophet, factor) ||
+                    Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor) ||
+                    Object.keys(data.arima).includes(factor) && hasFactorData(data.arima, factor);
+            } else {
+                return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
+                    Object.keys(data.fbprophet).includes(factor) && hasFactorData(data.fbprophet, factor) ||
+                    Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor);
+            }
+        } else if (data.arima) {
             return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
-                Object.keys(data.fbprophet).includes(factor) && hasFactorData(data.fbprophet, factor) ||
                 Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor) ||
                 Object.keys(data.arima).includes(factor) && hasFactorData(data.arima, factor);
         } else {
             return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
-                Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor) ||
-                Object.keys(data.arima).includes(factor) && hasFactorData(data.arima, factor);
+                Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor);
         }
     }
 
@@ -156,7 +165,7 @@
                 borderColor: 'rgb(153, 153, 0)'
             });
         }
-        if (enableHeavyComputing && Object.keys(data.fbprophet).includes(factor) && fbprophetCheckbox) {
+        if (enableHeavyComputing && data.fbprophet && Object.keys(data.fbprophet).includes(factor) && fbprophetCheckbox) {
             datasets.push({
                 label: 'FBProphet prediction',
                 data: applyPredictionOffset(Object.values(data.fbprophet[factor]), predictionOffset),
@@ -165,7 +174,7 @@
                 borderColor: 'rgb(51, 51, 255)'
             });
         }
-        if (Object.keys(data.arima).includes(factor) && arimaCheckbox) {
+        if (data.arima && Object.keys(data.arima).includes(factor) && arimaCheckbox) {
             datasets.push({
                 label: 'ARIMA prediction',
                 data: applyPredictionOffset(Object.values(data.arima[factor]), predictionOffset),
@@ -594,8 +603,9 @@
             sources.push('historical');
         }
         sources.push('linreg');
-        sources.push('arima');
-        if (enableHeavyComputing) {
+        if(data.arima)
+            sources.push('arima');
+        if (enableHeavyComputing && data.fbprophet) {
             sources.push('fbprophet');
         }
         var sourcesFactorsData = {};

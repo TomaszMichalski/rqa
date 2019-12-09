@@ -16,6 +16,9 @@
                     {% for field in form %}
                         <div class="form-group">
                             {% if field.field.is_checkbox %}
+                                {% if field.name == 'calc_fbprophet' %}
+                                    <div class="select-algos-separator"></div>
+                                    {% endif %}
                                 <div class="form-checkbox-line">
                                     {{ field }}
                                     <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>

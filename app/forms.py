@@ -54,6 +54,12 @@ class GenerateForm(forms.Form):
     is_clouds = forms.BooleanField(label='Clouds', required=False, initial=True,
                                    widget=CheckboxInput(
                                        attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'is_clouds'}))
+    calc_fbprophet = forms.BooleanField(label='Calculate FBProphet', required=False, initial=True,
+                                   widget=CheckboxInput(
+                                       attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'calc_fbprophet'}))
+    calc_arima = forms.BooleanField(label='Calculate Arima', required=False, initial=True,
+                                   widget=CheckboxInput(
+                                       attrs={'type': 'checkbox', 'class': 'form-check-input', 'id': 'calc_arima'}))
 
     def clean_address(self):
         address = self.cleaned_data['address']

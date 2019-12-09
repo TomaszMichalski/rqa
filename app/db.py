@@ -90,12 +90,21 @@ def get_prediction_data(parameters):
     # create past data object
     past_data = empty_data()
 
+    calc_fbprophet = parameters.calc_fbprophet
+    calc_arima = parameters.calc_arima
+
     if consts.ENABLE_MOCK_DATA:
         historical_data = mock.get_mock_data(date_from, datetime.now())
         if consts.ENABLE_HEAVY_COMPUTING:
-            fbprophet_data = mock.get_mock_data(datetime.now(), date_to)
+            if calc_fbprophet:
+                fbprophet_data = mock.get_mock_data(datetime.now(), date_to)
+            else:
+                fbprophet_data = None
         linreg_data = mock.get_mock_data(datetime.now(), date_to)
-        arima_data = mock.get_mock_data(datetime.now(), date_to)
+        if calc_arima:
+            arima_data = mock.get_mock_data(datetime.now(), date_to)
+        else:
+            arima_data = None
     else:
         # get past data
         air_data = get_air_data(addresses, consts.PREDICTION_PAST_DATA_START, datetime.now(), air_columns, lat, lon, radius)
@@ -107,9 +116,9 @@ def get_prediction_data(parameters):
             past_data[k] = v
 
         if consts.ENABLE_HEAVY_COMPUTING:
-            historical_data, fbprophet_data, linreg_data, arima_data = prediction.predict(past_data, date_from, date_to)
+            historical_data, fbprophet_data, linreg_data, arima_data = prediction.predict(past_data, date_from, date_to, calc_fbprophet, calc_arima)
         else:
-            historical_data, linreg_data, arima_data = prediction.predict(past_data, date_from, date_to)
+            historical_data, linreg_data, arima_data = prediction.predict(past_data, date_from, date_to, calc_fbprophet, calc_arima)
     
     data = dict()
     data['historical'] = historical_data
