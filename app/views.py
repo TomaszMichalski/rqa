@@ -364,15 +364,27 @@ def async_prediction(request):
     data = db.get_prediction_data(generation_parameters)
     info = data['info']
     info = statistics.append_statistics_info(info, data['historical'])
+
+    calc_fbprophet = generation_parameters.calc_fbprophet
+    calc_arima = generation_parameters.calc_arima
+
     if consts.ENABLE_HEAVY_COMPUTING:
-        info = statistics.append_prediction_statistics_info(info, data['fbprophet'], 'FBProphet')
+        if calc_fbprophet:
+            info = statistics.append_prediction_statistics_info(info, data['fbprophet'], 'FBProphet')
     info = statistics.append_prediction_statistics_info(info, data['linreg'], 'trend analysis')
-    info = statistics.append_prediction_statistics_info(info, data['arima'], 'ARIMA')
+    if calc_arima:
+        info = statistics.append_prediction_statistics_info(info, data['arima'], 'ARIMA')
     historical_stats = statistics.get_statistics_for_data(data['historical'])
     if consts.ENABLE_HEAVY_COMPUTING:
-        fbprophet_stats = statistics.get_statistics_for_data(data['fbprophet'])
+        if calc_fbprophet:
+            fbprophet_stats = statistics.get_statistics_for_data(data['fbprophet'])
+        else:
+            fbprophet_stats = []
     linreg_stats = statistics.get_statistics_for_data(data['linreg'])
-    arima_stats = statistics.get_statistics_for_data(data['arima'])
+    if calc_arima:
+        arima_stats = statistics.get_statistics_for_data(data['arima'])
+    else:
+        arima_stats = []
     response = dict()
     response['data'] = data
     response['info'] = info

@@ -1,3 +1,5 @@
+    var globalResponse;
+
     function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
@@ -22,7 +24,7 @@
         document.getElementById('clouds')];
 
     $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
+        beforeSend: function (xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", csrfToken);
             }
@@ -36,10 +38,11 @@
         data: JSON.stringify(JSON.parse(jsonData)),
         dataType: 'json',
         contentType: 'application/json',
-        complete: function() {
+        complete: function () {
             $('#loader').hide();
         },
-        success: function(response) {
+        success: function (response) {
+            globalResponse = JSON.parse(response);
             response = JSON.parse(response);
             drawData(response.data, response['prediction_offset'], response['enable_heavy_computing']);
             fillInfo(response.info);
@@ -58,7 +61,7 @@
             fillDataTable(response.data, response['enable_heavy_computing']);
             enableButtons();
         },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
             alert("There was an error while collecting data. Please try again later");
         }
     });
@@ -90,12 +93,12 @@
 
     function hideHistoricalStats() {
         document.getElementById("historical_stats_header").style.display = "none";
-        document.getElementById("historical_stats").style.display= "none";
+        document.getElementById("historical_stats").style.display = "none";
     }
 
     function hideHeavyComputingStats() {
         document.getElementById("fbprophet_stats_header").style.display = "none";
-        document.getElementById("fbprophet_stats").style.display= "none";
+        document.getElementById("fbprophet_stats").style.display = "none";
     }
 
     function mergeLabels(data, factor) {
@@ -112,15 +115,24 @@
     }
 
     function hasData(data, factor, enableHeavyComputing) {
-        if (enableHeavyComputing) {
-            return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
+        if (enableHeavyComputing && data.fbprophet) {
+            if(data.arima) {
+                return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
                     Object.keys(data.fbprophet).includes(factor) && hasFactorData(data.fbprophet, factor) ||
                     Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor) ||
                     Object.keys(data.arima).includes(factor) && hasFactorData(data.arima, factor);
+            } else {
+                return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
+                    Object.keys(data.fbprophet).includes(factor) && hasFactorData(data.fbprophet, factor) ||
+                    Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor);
+            }
+        } else if (data.arima) {
+            return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
+                Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor) ||
+                Object.keys(data.arima).includes(factor) && hasFactorData(data.arima, factor);
         } else {
             return Object.keys(data.historical).includes(factor) && hasFactorData(data.historical, factor) ||
-                    Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor) ||
-                    Object.keys(data.arima).includes(factor) && hasFactorData(data.arima, factor);
+                Object.keys(data.linreg).includes(factor) && hasFactorData(data.linreg, factor);
         }
     }
 
@@ -130,41 +142,46 @@
 
     function getDatasets(data, factor, predictionOffset, enableHeavyComputing) {
         datasets = [];
+
+        var fbprophetCheckbox = document.getElementById("fbprophet").checked;
+        var arimaCheckbox = document.getElementById("arima").checked;
+        var trendCheckbox = document.getElementById("trend").checked;
+
         if (Object.keys(data.historical).includes(factor)) {
             datasets.push({
-                        label: 'Historical data',
-                        data: Object.values(data.historical[factor]),
-                        fill: false,
-                        backgroundColor: 'rgb(255, 128, 0)',
-                        borderColor: 'rgb(255, 128, 0)'
-                    });
+                label: 'Historical data',
+                data: Object.values(data.historical[factor]),
+                fill: false,
+                backgroundColor: 'rgb(255, 128, 0)',
+                borderColor: 'rgb(255, 128, 0)'
+            });
         }
-        if (Object.keys(data.linreg).includes(factor)) {
+        if (Object.keys(data.linreg).includes(factor) && trendCheckbox) {
             datasets.push({
-                        label: 'Trend analysis prediction',
-                        data: applyPredictionOffset(Object.values(data.linreg[factor]), predictionOffset),
-                        fill: false,
-                        backgroundColor: 'rgb(153, 153, 0)',
-                        borderColor: 'rgb(153, 153, 0)'
-                    });
+                label: 'Trend analysis prediction',
+                data: applyPredictionOffset(Object.values(data.linreg[factor]), predictionOffset),
+                fill: false,
+                backgroundColor: 'rgb(153, 153, 0)',
+                borderColor: 'rgb(153, 153, 0)'
+            });
         }
-        if (enableHeavyComputing && Object.keys(data.fbprophet).includes(factor)) {
+        if (enableHeavyComputing && data.fbprophet && Object.keys(data.fbprophet).includes(factor) && fbprophetCheckbox) {
             datasets.push({
-                        label: 'FBProphet prediction',
-                        data: applyPredictionOffset(Object.values(data.fbprophet[factor]), predictionOffset),
-                        fill: false,
-                        backgroundColor: 'rgb(51, 51, 255)',
-                        borderColor: 'rgb(51, 51, 255)'
-                    });
+                label: 'FBProphet prediction',
+                data: applyPredictionOffset(Object.values(data.fbprophet[factor]), predictionOffset),
+                fill: false,
+                backgroundColor: 'rgb(51, 51, 255)',
+                borderColor: 'rgb(51, 51, 255)'
+            });
         }
-        if (Object.keys(data.arima).includes(factor)) {
+        if (data.arima && Object.keys(data.arima).includes(factor) && arimaCheckbox) {
             datasets.push({
-                        label: 'ARIMA prediction',
-                        data: applyPredictionOffset(Object.values(data.arima[factor]), predictionOffset),
-                        fill: false,
-                        backgroundColor: 'rgb(186, 85, 211)',
-                        borderColor: 'rgb(186, 85, 211)'
-                    });
+                label: 'ARIMA prediction',
+                data: applyPredictionOffset(Object.values(data.arima[factor]), predictionOffset),
+                fill: false,
+                backgroundColor: 'rgb(186, 85, 211)',
+                borderColor: 'rgb(186, 85, 211)'
+            });
         }
 
         return datasets;
@@ -494,9 +511,7 @@
         /* WIND DIRECTION */
         var wind_degree = new Chart(document.getElementById('wind_degree'), {
             type: 'line',
-            data: {
-
-            },
+            data: {},
             options: {
                 responsive: true,
                 title: {
@@ -588,8 +603,9 @@
             sources.push('historical');
         }
         sources.push('linreg');
-        sources.push('arima');
-        if (enableHeavyComputing) {
+        if(data.arima)
+            sources.push('arima');
+        if (enableHeavyComputing && data.fbprophet) {
             sources.push('fbprophet');
         }
         var sourcesFactorsData = {};
@@ -691,4 +707,9 @@
                 filename: filename + '.xls'
             });
         });
+    }
+
+    function onCheckboxChange()
+    {
+        drawData(globalResponse.data, globalResponse['prediction_offset'], globalResponse['enable_heavy_computing'])
     }

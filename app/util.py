@@ -19,8 +19,10 @@ def create_generation_parameters(form):
     is_humidity = form.cleaned_data.get('is_humidity')
     is_wind = form.cleaned_data.get('is_wind')
     is_clouds = form.cleaned_data.get('is_clouds')
+    calc_fbprophet = form.cleaned_data.get('calc_fbprophet')
+    calc_arima = form.cleaned_data.get('calc_arima')
 
-    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
+    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds, calc_fbprophet, calc_arima)
 
 # creates GenerationParameters model for guest
 def create_guest_generation_parameters(location):
@@ -66,6 +68,8 @@ def convert_from_generation_parameters(parameters):
     result['is_humidity'] = parameters.is_humidity
     result['is_wind'] = parameters.is_wind
     result['is_clouds'] = parameters.is_clouds
+    result['calc_fbprophet'] = parameters.calc_fbprophet
+    result['calc_arima'] = parameters.calc_arima
 
     return result
 
@@ -82,8 +86,10 @@ def convert_json_to_generation_parameters(parameters):
     is_humidity = parameters['is_humidity']
     is_wind = parameters['is_wind']
     is_clouds = parameters['is_clouds']
+    calc_fbprophet = parameters['calc_fbprophet']
+    calc_arima = parameters['calc_arima']
 
-    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds)
+    return models.GenerationParameters(address, radius, date_from, date_to, is_pm1, is_pm25, is_pm10, is_temp, is_pressure, is_humidity, is_wind, is_clouds, calc_fbprophet, calc_arima)
 
 # Measure distance between two locations - START
 

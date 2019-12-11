@@ -6,22 +6,25 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 from fbprophet import Prophet
-from pyramid.arima import auto_arima
+from pmdarima import auto_arima
 
 # calculates prediction data from date_from to date_to using past_data
 # after the process, cuts the (< date_from) part of predicted data so that
 # only datetimes between date_from and date_to are present in the result
-def predict(past_data, date_from, date_to):
+def predict(past_data, date_from, date_to, calc_fbprophet, calc_arima):
     past_data_quarter = get_past_data_quarter(past_data)
     past_data_month = get_past_data_month(past_data)
     past_data_week = get_past_data_week(past_data)
 
     if consts.ENABLE_HEAVY_COMPUTING:
-        fbprophet_full = calculate_prediction_data_fbprophet(past_data, date_to)
-        fbprophet_quarter = calculate_prediction_data_fbprophet(past_data_quarter, date_to)
-        fbprophet_month = calculate_prediction_data_fbprophet(past_data_month, date_to)
-        fbprophet_prediction = aggregate_prediction_3(fbprophet_full, fbprophet_quarter, fbprophet_month)
-        fbprophet_prediction = get_sorted_data(fbprophet_prediction)
+        if calc_fbprophet:
+            fbprophet_full = calculate_prediction_data_fbprophet(past_data, date_to)
+            fbprophet_quarter = calculate_prediction_data_fbprophet(past_data_quarter, date_to)
+            fbprophet_month = calculate_prediction_data_fbprophet(past_data_month, date_to)
+            fbprophet_prediction = aggregate_prediction_3(fbprophet_full, fbprophet_quarter, fbprophet_month)
+            fbprophet_prediction = get_sorted_data(fbprophet_prediction)
+        else:
+            fbprophet_prediction = None
 
     linreg_full = calculate_prediction_data_linreg(past_data, date_to)
     linreg_quarter = calculate_prediction_data_linreg(past_data_quarter, date_to)
@@ -30,8 +33,11 @@ def predict(past_data, date_from, date_to):
     linreg_prediction = aggregate_prediction_4(linreg_full, linreg_quarter, linreg_month, linreg_week)
     linreg_prediction = get_sorted_data(linreg_prediction)
 
-    arima_prediction = calculate_prediction_data_arima(past_data_month, date_to)
-    arima_prediction = get_sorted_data(arima_prediction)
+    if calc_arima:
+        arima_prediction = calculate_prediction_data_arima(past_data_month, date_to)
+        arima_prediction = get_sorted_data(arima_prediction)
+    else:
+        arima_prediction = None
 
     historical_data = get_historical_data(past_data, date_from)
     historical_data = get_sorted_data(historical_data)

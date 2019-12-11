@@ -65,6 +65,10 @@ td {
     margin: 0 auto;
 }
 
+#algo-checkboxes {
+    text-align: center;
+}
+
 #loader {
     margin: 20vh auto;
     text-align: center;
